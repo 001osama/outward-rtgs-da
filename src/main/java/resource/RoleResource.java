@@ -14,7 +14,7 @@ import org.jboss.logging.Logger;
 
 @Path("/role")
 @Produces(MediaType.APPLICATION_JSON)
-public class MainResource {
+public class RoleResource {
 
     @Inject
     Logger logger;
