@@ -1,6 +1,7 @@
 package repository;
 
 import io.agroal.api.AgroalDataSource;
+import io.quarkus.agroal.DataSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.sql.Connection;
@@ -17,6 +18,7 @@ import model.Role;
 public class RoleRepository {
 
     @Inject
+    
     AgroalDataSource dataSource;
 
     public Role get(int roleId) {

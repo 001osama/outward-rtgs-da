@@ -1,13 +1,14 @@
 package database;
 
 import io.agroal.api.AgroalDataSource;
-import jakarta.enterprise.context.RequestScoped;
+import io.quarkus.agroal.DataSource;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.jboss.logging.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-@RequestScoped
+@ApplicationScoped  
 public class Datasources {
 
     @Inject

@@ -9,8 +9,8 @@ import model.Role;
 import repository.RoleRepository;
 
 import java.util.List;
-
 import org.jboss.logging.Logger;
+
 
 @Path("/role")
 @Produces(MediaType.APPLICATION_JSON)
