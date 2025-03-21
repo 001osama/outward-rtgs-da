@@ -21,9 +21,9 @@ public class Datasources {
     public Connection getConnection() {
         try
         {
-                return conventionalDataSource.getConnection();
-
-        } catch (SQLException e) {
+            return conventionalDataSource.getConnection();
+        }
+        catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
