@@ -6,7 +6,6 @@ import org.jboss.logging.Logger;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
-import java.sql.*;
 import database.Datasources;
 
 @RequestScoped
@@ -19,26 +18,29 @@ public class ItoBatchService {
     Datasources datasources;
 
 
+    
     String response;
-
     public String getDetail() 
     {
         try
         {
         logger.info("message : =====> in ITO Batch Service getDetail()");
         
+
         String branch_code= "";
         Connection connection = datasources.getConnection();
-        Statement stmt = connection.createStatement();
-        ResultSet result = stmt.executeQuery("select * from date_tl");
+        Statement statement = connection.createStatement();
+        ResultSet result = statement.executeQuery("SELECT * FROM ROLE_TL");
+
         if(result.next())
         {
-            branch_code = result.getString("brn_cd");
+            branch_code = result.getString("ROLE_TYPE");
         }
-
-        response = "Hello RESTEasy-getDetail ===>" + branch_code;
+        logger.info(result);
+        response = branch_code;
         }
-        catch(SQLException e){
+        catch(Exception e)
+        {
             logger.info(e);
         }
 

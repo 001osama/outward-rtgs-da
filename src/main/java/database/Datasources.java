@@ -12,7 +12,6 @@ import java.sql.SQLException;
 public class Datasources {
 
     @Inject
-    @DataSource("conventional")
     AgroalDataSource conventionalDataSource;
 
     @Inject
