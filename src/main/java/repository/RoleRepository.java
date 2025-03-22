@@ -9,12 +9,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import org.jboss.logging.Logger;
 
 import database.Datasources;
 import model.Role;
 
 @ApplicationScoped
 public class RoleRepository {
+
+    @Inject
+    Logger logger;
 
     @Inject
     Datasources dataSource;
@@ -29,10 +33,11 @@ public class RoleRepository {
                     return new Role(resultSet.getInt("role_id"), resultSet.getString("role_type"));
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace(); // Handle appropriately in production
+        }  
+        catch (Exception e) {
+            logger.error("Unexpected error occurred while retrieving role with ID " + roleId, e);
         }
-        return null; // Or throw an exception
+        return null; 
     }
 
     public List<Role> getAll() {
@@ -45,7 +50,7 @@ public class RoleRepository {
                 roles.add(new Role(resultSet.getInt("role_id"), resultSet.getString("role_type")));
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle appropriately in production
+            logger.error("Unexpected error occurred while retrieving roles", e);
         }
         return roles;
     }
@@ -62,7 +67,7 @@ public class RoleRepository {
                 return role;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle appropriately in production
+            logger.error("Unexpected error occurred while creating role", e);
         }
         return null; // Or throw an exception
     }
@@ -79,7 +84,7 @@ public class RoleRepository {
                 return role;
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle appropriately in production
+            logger.error("Unexpected error occurred while update role", e);
         }
         return null; // Or throw an exception
     }
@@ -92,7 +97,7 @@ public class RoleRepository {
             int affectedRows = preparedStatement.executeUpdate();
             return affectedRows > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle appropriately in production
+            logger.error("Unexpected error occurred while deleting role", e);
         }
         return false;
     }
