@@ -1,7 +1,5 @@
 package repository;
 
-import io.agroal.api.AgroalDataSource;
-import io.quarkus.agroal.DataSource;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import java.sql.Connection;
@@ -12,14 +10,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import database.Datasources;
 import model.Role;
 
 @ApplicationScoped
 public class RoleRepository {
 
     @Inject
-    
-    AgroalDataSource dataSource;
+    Datasources dataSource;
 
     public Role get(int roleId) {
         try (Connection connection = dataSource.getConnection();
@@ -56,7 +54,7 @@ public class RoleRepository {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO ROLE_TL (role_id, role_type) VALUES (?, ?)")) {
 
-            preparedStatement.setInt(1, role.getRoleID());
+            preparedStatement.setInt(1, role.getRoleId());
             preparedStatement.setString(2, role.getRoleType());
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -74,7 +72,7 @@ public class RoleRepository {
              PreparedStatement preparedStatement = connection.prepareStatement("UPDATE ROLE_TL SET role_type = ? WHERE role_id = ?")) {
 
             preparedStatement.setString(1, role.getRoleType());
-            preparedStatement.setInt(2, role.getRoleID());
+            preparedStatement.setInt(2, role.getRoleId());
 
             int affectedRows = preparedStatement.executeUpdate();
             if (affectedRows > 0) {

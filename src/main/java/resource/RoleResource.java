@@ -23,10 +23,10 @@ public class RoleResource {
     RoleRepository roleRepo;
 
     @GET
-    @Path("/getdetail")
-    public List<Role> getDetail() 
+    @Path("/getRoles")
+    public List<Role> getRoles() 
     {
-        logger.info("message : =====> getDetail method started");
+        logger.info("message : =====> getRoles method started");
         return roleRepo.getAll();
     }
 }
