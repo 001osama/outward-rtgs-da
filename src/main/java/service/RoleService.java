@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.logging.Logger;
-
 import database.Datasources;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
