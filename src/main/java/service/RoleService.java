@@ -1,7 +1,5 @@
-package repository;
+package service;
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,14 +7,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.jboss.logging.Logger;
 
 import database.Datasources;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import model.Role;
 
 @ApplicationScoped
-public class RoleRepository {
-
+public class RoleService {
     @Inject
     Logger logger;
 
@@ -69,7 +69,7 @@ public class RoleRepository {
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while creating role", e);
         }
-        return null; // Or throw an exception
+        return null;
     }
 
     public Role update(Role role) {
@@ -86,7 +86,7 @@ public class RoleRepository {
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while update role", e);
         }
-        return null; // Or throw an exception
+        return null;
     }
 
     public boolean delete(int roleId) {
