@@ -117,7 +117,6 @@ public class RoleResource {
     }
 
 
-    // //Once the update method works change this method
     @DELETE
     @Path("/delete")
     public Response deleteRole(@QueryParam("id") int id) 
