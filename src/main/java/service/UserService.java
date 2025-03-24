@@ -49,7 +49,7 @@ public class UserService {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO USER_TL(user_name, role_id, branch_cd, password) VALUES (?, ?, ?, ?)")) {
 
-            preparedStatement.setString(1, user.getUserName());
+            preparedStatement.setString(1, user.getUsername());
             preparedStatement.setInt(2, user.getRoleId());
             preparedStatement.setBigDecimal(3, new BigDecimal(user.getBranchCode()));
             preparedStatement.setString(4, user.getPassword());
