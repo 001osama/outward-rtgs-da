@@ -16,7 +16,6 @@ public class Datasources {
     @Inject
     Logger logger;
 
-
     public Connection getConnection() throws SQLException {
         if (conventionalDataSource == null) {
             logger.error("Database source is not available.");

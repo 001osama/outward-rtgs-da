@@ -58,6 +58,11 @@ public class RoleResource {
         try
         {
             var role = roleService.get(id);
+            if(role == null)
+                return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ApiResponse(null,"Role not found",false))
+                    .build();
+
             return Response.ok(new ApiResponse(role, null, true))
                 .build();
         }
