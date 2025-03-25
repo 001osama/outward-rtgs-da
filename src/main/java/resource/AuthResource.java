@@ -59,7 +59,7 @@ public class AuthResource {
         logger.info("message : =====> login method hit with body "+ loginRequest.toString());
         try 
         {
-            var result = userService.get(loginRequest.getUsername());
+            var result = userService.get(loginRequest.getLoginId());
 
             if(result == null || 
                 (result.getBranchCode() != loginRequest.getBranchCode() &&
