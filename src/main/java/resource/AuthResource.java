@@ -3,6 +3,7 @@ package resource;
 import org.jboss.logging.Logger;
 
 import dto.LoginRequestDto;
+import dto.LoginResponseDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -34,7 +35,13 @@ public class AuthResource {
         logger.info("message : =====> create method hit with body "+ user.toString());
         try 
         {
-            var result = userService.create(user);
+            var result = userService.get(user.getLoginId());
+            if(result != null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Login Id already exists",false))
+                .build();
+
+            result = userService.create(user);
 
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -62,15 +69,15 @@ public class AuthResource {
             var result = userService.get(loginRequest.getLoginId());
 
             if(result == null || 
-                (result.getBranchCode() != loginRequest.getBranchCode() &&
-                    result.getPassword() != loginRequest.getPassword()
-                )
+                !result.getBranchCode().equals(loginRequest.getBranchCode()) ||
+                !result.getPassword().equals(loginRequest.getPassword()) 
             )
                 return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ApiResponse(null,"Invalid Login Attempt",false))
                     .build();
 
-            return Response.ok(new ApiResponse(result, null, true))
+            var response = new LoginResponseDto(result.getLoginId(), result.getBranchCode() );
+            return Response.ok(new ApiResponse(response, null, true))
                 .build();
         } 
         catch (Exception ex) {

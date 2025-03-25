@@ -22,11 +22,11 @@ public class UserService {
     Datasources dataSource;
 
 
-    public User get(String userName) {
+    public User get(String loginId) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER_TL WHERE user_name = ?")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER_TL WHERE login_id = ?")) {
 
-            preparedStatement.setString(1, userName);
+            preparedStatement.setString(1, loginId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) 
                 {
@@ -40,7 +40,7 @@ public class UserService {
             }
         }  
         catch (Exception e) {
-            logger.error("Unexpected error occurred while retrieving user with username " + userName, e);
+            logger.error("Unexpected error occurred while retrieving user with loginId " + loginId, e);
         }
         return null; 
     }
