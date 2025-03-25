@@ -31,7 +31,7 @@ public class UserService {
                 if (resultSet.next()) 
                 {
                     return new User(
-                        resultSet.getString("user_name"),
+                        resultSet.getString("login_id"),
                         resultSet.getInt("role_id"), 
                         resultSet.getString("branch_cd"),
                         resultSet.getString("password")
@@ -47,9 +47,9 @@ public class UserService {
 
     public User create(User user) {
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO USER_TL(user_name, role_id, branch_cd, password) VALUES (?, ?, ?, ?)")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO USER_TL(login_id, role_id, branch_cd, password) VALUES (?, ?, ?, ?)")) {
 
-            preparedStatement.setString(1, user.getUsername());
+            preparedStatement.setString(1, user.getLoginId());
             preparedStatement.setInt(2, user.getRoleId());
             preparedStatement.setBigDecimal(3, new BigDecimal(user.getBranchCode()));
             preparedStatement.setString(4, user.getPassword());
@@ -59,7 +59,7 @@ public class UserService {
                 return user;
             }
         } catch (SQLException ex) {
-            logger.error("Unexpected error occurred while creating role", ex);
+            logger.error("Unexpected error occurred while creating user", ex);
         }
         return null;
     }
