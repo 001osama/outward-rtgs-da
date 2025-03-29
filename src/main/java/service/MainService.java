@@ -11,11 +11,12 @@ import com.oracle.svm.core.annotate.Inject;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
+import dto.BranchDto;
+import dto.CurrencyDto;
+import dto.SBPTranTypeDto;
+import dto.UserDto;
+
 import org.jboss.logging.Logger;
-import model.Branch;
-import model.Currency;
-import model.SBPTranType;
-import model.User;
 
 public class MainService {
     
@@ -25,7 +26,7 @@ public class MainService {
     @Inject
     Logger logger;
 
-    public User getUser(String loginId) {
+    public UserDto getUser(String loginId) {
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER_TL WHERE login_id = ?")) {
 
@@ -33,7 +34,7 @@ public class MainService {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) 
                 {
-                    return new User(
+                    return new UserDto(
                         resultSet.getString("login_id"),
                         resultSet.getInt("role_id"), 
                         resultSet.getString("branch_cd"),
@@ -48,7 +49,7 @@ public class MainService {
         return null; 
     }
 
-    public User createUser(User user) {
+    public UserDto createUser(UserDto user) {
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO USER_TL(login_id, role_id, branch_cd, password) VALUES (?, ?, ?, ?)")) {
 
@@ -68,14 +69,14 @@ public class MainService {
     }
 
 
-    public List<Branch> getAllBranches() {
-        List<Branch> branches = new ArrayList<>();
+    public List<BranchDto> getAllBranches() {
+        List<BranchDto> branches = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM BRANCH_TL")) {
 
             while (resultSet.next()) {
-                branches.add(new Branch(resultSet.getInt("branch_cd"), resultSet.getString("branch_name")));
+                branches.add(new BranchDto(resultSet.getInt("branch_cd"), resultSet.getString("branch_name")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while retrieving branches", e);
@@ -84,14 +85,14 @@ public class MainService {
     }
 
 
-    public List<Currency> getAllCurrencies() {
-        List<Currency> currency = new ArrayList<>();
+    public List<CurrencyDto> getAllCurrencies() {
+        List<CurrencyDto> currency = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM CURRENCY_TL")) {
 
             while (resultSet.next()) {
-                currency.add(new Currency(resultSet.getString("currency_cd"), resultSet.getString("currency_type")));
+                currency.add(new CurrencyDto(resultSet.getString("currency_cd"), resultSet.getString("currency_type")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while accessing currency", e);
@@ -99,14 +100,14 @@ public class MainService {
         return currency;
     }
 
-    public List<SBPTranType> getAllSBPTranTypes() {
-        List<SBPTranType> sbptrantype = new ArrayList<>();
+    public List<SBPTranTypeDto> getAllSBPTranTypes() {
+        List<SBPTranTypeDto> sbptrantype = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery("SELECT * FROM SBP_TRANSACTION_TYPE_TL")) {
 
             while (resultSet.next()) {
-                sbptrantype.add(new SBPTranType(resultSet.getInt("sbp_transaction_type_cd"), resultSet.getString("sbp_transaction_type")));
+                sbptrantype.add(new SBPTranTypeDto(resultSet.getInt("sbp_transaction_type_cd"), resultSet.getString("sbp_transaction_type")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while accessing transaction type", e);

@@ -1,4 +1,4 @@
-package model;
+package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +10,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
-public class Currency {
+public class CurrencyDto {
     private String currencyCode;
     private String currencyType;
 }

@@ -1,4 +1,4 @@
-package model;
+package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,9 +10,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
-public class Customer {
-    private int customerNo;
-    private String customerName;
-    private String customerAddress;
-    private String customerMobile;
+public class UserDto {
+    private String loginId;
+    private int roleId;
+    private String branchCode;
+    private String password;
 }

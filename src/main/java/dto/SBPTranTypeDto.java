@@ -1,4 +1,4 @@
-package model;
+package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,8 +10,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
-public class SBPTranType {
+public class SBPTranTypeDto {
     private int sbptrantypeCode;
     private String sbptranType;
-
 }

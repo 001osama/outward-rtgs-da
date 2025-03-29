@@ -1,7 +1,10 @@
 package resource;
 
 import org.jboss.logging.Logger;
+
+import dto.ApiResponse;
 import dto.LoginRequestDto;
+import dto.UserDto;
 import dto.UserInfoDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -12,8 +15,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import model.ApiResponse;
-import model.User;
 import service.MainService;
 
 @Path("/data-access")
@@ -29,7 +30,7 @@ public class MainResource {
 
     @POST
     @Path("/createuser")
-    public Response createUser(User user) 
+    public Response createUser(UserDto user) 
     {
         logger.info("message : =====> create method hit with body "+ user.toString());
         try 

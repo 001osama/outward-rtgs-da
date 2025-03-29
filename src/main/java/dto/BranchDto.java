@@ -1,4 +1,4 @@
-package model;
+package dto;
 
 
 import lombok.AllArgsConstructor;
@@ -11,7 +11,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
-public class Branch {
+public class BranchDto {
     private int branchCd;
     private String branchName;
     

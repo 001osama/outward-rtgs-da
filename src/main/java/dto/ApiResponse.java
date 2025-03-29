@@ -1,18 +1,18 @@
-package model;
+package dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-
-public class User {
-    private String loginId;
-    private int roleId;
-    private String branchCode;
-    private String password;
+public class ApiResponse {
+    private Object data;
+    private String message;
+    private boolean success = true;
 }
