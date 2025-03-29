@@ -7,8 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-
-public class LoginResponseDto {
+public class UserInfoDto {
     private String loginId;
     private String branchCode;
+    private int role;
 }
