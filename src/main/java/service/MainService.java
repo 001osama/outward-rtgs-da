@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import com.oracle.svm.core.annotate.Inject;
+import jakarta.inject.Inject;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
@@ -15,9 +15,12 @@ import dto.BranchDto;
 import dto.CurrencyDto;
 import dto.SBPTranTypeDto;
 import dto.UserDto;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import org.jboss.logging.Logger;
 
+
+@ApplicationScoped
 public class MainService {
     
     @Inject 
@@ -107,7 +110,7 @@ public class MainService {
              ResultSet resultSet = statement.executeQuery("SELECT * FROM SBP_TRANSACTION_TYPE_TL")) {
 
             while (resultSet.next()) {
-                sbptrantype.add(new SBPTranTypeDto(resultSet.getInt("sbp_transaction_type_cd"), resultSet.getString("sbp_transaction_type")));
+                sbptrantype.add(new SBPTranTypeDto(resultSet.getInt("transaction_type_cd"), resultSet.getString("transaction_type")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while accessing transaction type", e);
@@ -128,8 +131,8 @@ public class MainService {
                 //                         "check_digit AS account_number" +
                 //                         "FROM account_tl;"))
 
-                .prepareStatement("SELECT" +  
-                                    "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit)" + 
+                .prepareStatement("SELECT " +  
+                                    "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit) " + 
                                     "AS account_number FROM account_tl where customer_no = ?;")
         ){
             preparedStatement.setString(1, customerNo);
@@ -137,7 +140,7 @@ public class MainService {
             List<String> result = new ArrayList<String>();
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    result.add(resultSet.getString("account_no")) ;
+                    result.add(resultSet.getString("account_number")) ;
                 }
             }
             return result;

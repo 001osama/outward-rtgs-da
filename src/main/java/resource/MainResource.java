@@ -96,6 +96,11 @@ public class MainResource {
         try
         {
             var result = mainService.getAllBranches();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
             return Response.ok(new ApiResponse(result, null, true))
                 .build();
         }
@@ -105,7 +110,6 @@ public class MainResource {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
                 .build();
-            
         }
     }
 
@@ -117,6 +121,11 @@ public class MainResource {
         try
         {
             var result = mainService.getAllCurrencies();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
             return Response.ok(new ApiResponse(result, null, true))
                 .build();
         }
@@ -138,6 +147,11 @@ public class MainResource {
         try
         {
             var result = mainService.getAllSBPTranTypes();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
             return Response.ok(new ApiResponse(result, null, true))
                 .build();
         }
@@ -193,7 +207,6 @@ public class MainResource {
                 return Response.status(Response.Status.NOT_FOUND)
                     .entity(new ApiResponse(null,"Account not found",false))
                     .build();
-
             
             return Response.ok(new ApiResponse(accountDetails, null, true))
                 .build();
