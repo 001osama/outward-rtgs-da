@@ -181,10 +181,10 @@ public class MainService {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                    return new AccountDetailDto(
-                    resultSet.getString("acc_type"),
-                    resultSet.getString("iban"),
-                    resultSet.getString("acc_name"),
-                    resultSet.getString("available_bal")
+                        resultSet.getString("acc_type"),
+                        resultSet.getString("iban"),
+                        resultSet.getString("acc_name"),
+                        resultSet.getString("available_bal")
                     );
                 }
             }

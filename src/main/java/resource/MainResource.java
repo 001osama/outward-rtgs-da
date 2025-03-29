@@ -1,7 +1,7 @@
 package resource;
 
 import org.jboss.logging.Logger;
-
+import dto.AccountNumberDto;
 import dto.ApiResponse;
 import dto.LoginRequestDto;
 import dto.UserDto;
@@ -132,7 +132,7 @@ public class MainResource {
 
     @GET
     @Path("/getallsbptrantypes")
-    public Response getTranType() 
+    public Response getSBPTranType() 
     {
         logger.info("message : =====> getAll method hit");
         try
@@ -167,6 +167,35 @@ public class MainResource {
 
             
             return Response.ok(new ApiResponse(accountNolist, null, true))
+                .build();
+        }
+        catch(Exception ex)
+        {
+            logger.error("Error fetching Accounts", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null,"Internal Server Error Occured",false))
+                .build();
+        }
+    }
+
+
+    @GET
+    @Path("/getaccountdetails")
+    public Response getAccountDetails(@QueryParam("accountNo") String accountNo) 
+    {
+        logger.info("message : =====> getAccountDetails method hit");
+        var detailsArray = accountNo.split("-");
+        var accoutNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
+        try
+        {
+            var accountDetails = mainService.getAccountDetails(accoutNumberDto);
+            if(accountDetails == null)
+                return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ApiResponse(null,"Account not found",false))
+                    .build();
+
+            
+            return Response.ok(new ApiResponse(accountDetails, null, true))
                 .build();
         }
         catch(Exception ex)
