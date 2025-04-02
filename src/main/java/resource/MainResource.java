@@ -141,7 +141,7 @@ public class MainResource {
 
     @GET
     @Path("/getallsbptrantypes")
-    public Response getSBPTranType() 
+    public Response getAllSBPTranTypes() 
     {
         logger.info("message : =====> getAll method hit");
         try
