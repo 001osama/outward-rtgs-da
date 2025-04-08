@@ -6,6 +6,7 @@ import dto.ApiResponse;
 import dto.LoginRequestDto;
 import dto.UserDto;
 import dto.UserInfoDto;
+import dto.FormSubmissionDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -113,40 +114,40 @@ public class MainResource {
         }
     }
 
+    // @GET
+    // @Path("/getallbranches")
+    // public Response getAllBranches() 
+    // {
+    //     logger.info("message : =====> getAll method hit");
+    //     try
+    //     {
+    //         var result = mainService.getAllBranches();
+    //         if(result == null)
+    //             return Response.status(Response.Status.BAD_REQUEST)
+    //             .entity(new ApiResponse(null,"Invalid Data",false))
+    //             .build();
+
+    //         return Response.ok(new ApiResponse(result, null, true))
+    //             .build();
+    //     }
+    //     catch(Exception ex)
+    //     {
+    //         logger.error("Error fetching branch details", ex);
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //             .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
+    //             .build();
+    //     }
+    // }
+
+
     @GET
-    @Path("/getallbranches")
-    public Response getAllBranches() 
+    @Path("/getallcurrencylist")
+    public Response getAllCurrencyList() 
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllBranches();
-            if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
-                .entity(new ApiResponse(null,"Invalid Data",false))
-                .build();
-
-            return Response.ok(new ApiResponse(result, null, true))
-                .build();
-        }
-        catch(Exception ex)
-        {
-            logger.error("Error fetching branch details", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
-                .build();
-        }
-    }
-
-
-    @GET
-    @Path("/getallcurrencies")
-    public Response getAllCurrencies() 
-    {
-        logger.info("message : =====> getAll method hit");
-        try
-        {
-            var result = mainService.getAllCurrencies();
+            var result = mainService.getAllCurrencyList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -166,13 +167,13 @@ public class MainResource {
     }
 
     @GET
-    @Path("/getallsbptrantypes")
-    public Response getSBPTranType()
+    @Path("/getallsbptrantypelist")
+    public Response getAllSBPTranTypeList()
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllSBPTranTypes();
+            var result = mainService.getAllSBPTranTypeList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -245,5 +246,65 @@ public class MainResource {
                 .build();
         }
     }
+
+    @GET
+    @Path("/getallpurposeofpaymentlist")                                                                                                      
+    public Response getAllPurposeofPaymentList()
+    {
+        logger.info("message : =====> getAll method hit");
+        try
+        {
+            var result = mainService.getAllPurposeofPaymentList();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        }
+        catch(Exception ex)
+        {
+            logger.error("Error in retrieving purpose of payment", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
+                .build();
+            
+        }
+    }
+
+
+    // @POST
+    // @Path("/submit-form")
+    // public Response submitForm(FormSubmissionDto dto)
+    // {
+    //     logger.info("message : =====> getAccountDetails method hit" + dto);
+
+    //     try{
+    //         if (dto.sbpTranType == null || dto.sbpTranType.isEmpty()) {
+    //             return Response.status(Response.Status.BAD_REQUEST)
+    //             .entity(new ApiResponse(null, "Please select SBP Transaction Type", false))
+    //             .build();
+
+    //         }
+
+    //         var result = mainService.submitForm(dto);
+
+    //         return Response.ok(new ApiResponse(result, "Form Submitted Successfully", true))
+    //         .build();
+        
+    //     }
+    //     catch (Exception ex){
+    //         logger.error("Error Submitting Form", ex);
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //         .entity(new ApiResponse(null, "Internal Server Error Occured" , false))
+    //         .build();
+    //     }
+
+    // }
+
+
+
+
 
 }

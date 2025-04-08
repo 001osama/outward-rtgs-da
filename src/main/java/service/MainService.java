@@ -5,15 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.OPTIONS;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
 import dto.BranchDto;
 import dto.CurrencyDto;
 import dto.ListDto;
+import dto.FormSubmissionDto;
 import dto.SBPTranTypeDto;
 import dto.UserDto;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,7 +32,6 @@ public class MainService {
 
     @Inject
     Logger logger;
-
     public UserDto getUser(String loginId) {
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM USER_TL WHERE login_id = ?")) {
@@ -73,20 +75,20 @@ public class MainService {
     }
 
 
-    public List<BranchDto> getAllBranches() {
-        List<BranchDto> branches = new ArrayList<>();
-        try (Connection connection = datasource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT branch_cd as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
+    // public List<BranchDto> getAllBranches() {
+    //     List<BranchDto> branches = new ArrayList<>();
+    //     try (Connection connection = datasource.getConnection();
+    //          Statement statement = connection.createStatement();
+    //          ResultSet resultSet = statement.executeQuery("SELECT branch_cd as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
 
-            while (resultSet.next()) {
-                branches.add(new BranchDto(resultSet.getInt("value"), resultSet.getString("label")));
-            }
-        } catch (SQLException e) {
-            logger.error("Unexpected error occurred while retrieving branches", e);
-        }
-        return branches;
-    }
+    //         while (resultSet.next()) {
+    //             branches.add(new BranchDto(resultSet.getInt("value"), resultSet.getString("label")));
+    //         }
+    //     } catch (SQLException e) {
+    //         logger.error("Unexpected error occurred while retrieving branches", e);
+    //     }
+    //     return branches;
+    // }
 
     public List<ListDto> getAllBranchList() {
         List<ListDto> optionList = new ArrayList<>();
@@ -105,34 +107,34 @@ public class MainService {
     }
 
 
-    public List<CurrencyDto> getAllCurrencies() {
-        List<CurrencyDto> currency = new ArrayList<>();
+    public List<ListDto> getAllCurrencyList() {
+        List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM CURRENCY_TL")) {
+             ResultSet resultSet = statement.executeQuery("SELECT currency_cd as value, currency_type || ' - ' || currency_cd as label FROM CURRENCY_TL")) {
 
             while (resultSet.next()) {
-                currency.add(new CurrencyDto(resultSet.getString("currency_cd"), resultSet.getString("currency_type")));
+                optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while accessing currency", e);
         }
-        return currency;
+        return optionList;
     }
 
-    public List<SBPTranTypeDto> getAllSBPTranTypes() {
-        List<SBPTranTypeDto> sbptrantype = new ArrayList<>();
+    public List<ListDto> getAllSBPTranTypeList() {
+        List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM SBP_TRANSACTION_TYPE_TL")) {
+             ResultSet resultSet = statement.executeQuery("SELECT sbp_transaction_type_cd as value, sbp_transaction_type || ' - ' || sbp_transaction_type_cd as label FROM SBP_TRANSACTION_TYPE_TL")) {
 
             while (resultSet.next()) {
-                sbptrantype.add(new SBPTranTypeDto(resultSet.getInt("sbp_transaction_type_cd"), resultSet.getString("sbp_transaction_type")));
+                optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while accessing transaction type", e);
         }
-        return sbptrantype;
+        return optionList;
     }
 
 
@@ -140,17 +142,12 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection
              //For ibm db2 testing remains
-                // .prepareStatement("SELECT" + 
-                //                         "LPAD(branch_cd, 4, '0') || '-' ||" + 
-                //                         "LPAD(account_type_cd, 4, '0') || '-' ||" + 
-                //                         "LPAD(customer_no, 6, '0') || '-' ||" + 
-                //                         "LPAD(run_no, 4, '0') || '-' ||" + 
-                //                         "check_digit AS account_number" +
-                //                         "FROM account_tl;"))
+                .prepareStatement("SELECT LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 4, '0') || '-' || check_digit AS account_number FROM account_tl where customer_no = ?");
 
-                .prepareStatement("SELECT " +  
-                                    "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit) " + 
-                                    "AS account_number FROM account_tl where customer_no = ?;")
+                // .prepareStatement("SELECT " +  
+                //                     "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit) " + 
+                //                     "AS account_number FROM account_tl where customer_no = ?;")
+
         ){
             preparedStatement.setString(1, customerNo);
 
@@ -163,7 +160,7 @@ public class MainService {
             return result;
         }  
         catch (Exception e) {
-            logger.error("Unexpected error occurred while retrieving branch with CD ", e);
+            logger.error("Unexpected error occurred while retrieving account with customer number ", e);
         }
         return null; 
     }
@@ -172,7 +169,7 @@ public class MainService {
 
     public AccountDetailDto getAccountDetails(AccountNumberDto accountNo) {
         StringBuilder query = new StringBuilder();
-        query.append("SELECT ")
+        query.append("SELECT")
             .append("CONCAT(acctype.account_type, '-', acctype.account_type_cd) AS acc_type, ")
             .append("CONCAT('PK65BAHL', acc.branch_cd, acc.account_type_cd, acc.customer_no, acc.run_no, acc.check_digit) AS iban, ")
             .append("CONCAT(acc.branch_cd, '-', acc.account_type_cd, '-', acc.customer_no, '-', acc.run_no, '-', acc.check_digit, '-', acc.account_title) AS acc_name, ")
@@ -216,4 +213,135 @@ public class MainService {
         return null; 
     }
 
+    public List<ListDto> getAllPurposeofPaymentList() {
+        List<ListDto> optionList = new ArrayList<>();
+        try (Connection connection = datasource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT purpose_of_payment_cd as value, purpose_of_payment_type || ' - ' || purpose_of_payment_cd as label FROM PURPOSE_OF_PAYMENT_TL")) {
+
+            while (resultSet.next()) {
+                optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while accessing purpose of payment", e);
+        }
+        return optionList;
+    }
+
+
+    // public RtgsTDto createRtgsTransaction(RtgsTDto rtgsDto) {
+    //     String insertSql = "INSERT INTO RTGS_TL (" +
+    //             "BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, " +
+    //             "VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, " +
+    //             "TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, " +
+    //             "POSTED_TIME, POSTED_BY, AUTH_DATE, AUTH_TIME, AUTH_BY, " +
+    //             "PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS" +
+    //             ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    //     try (Connection connection = dataSource.getConnection();
+    //          PreparedStatement preparedStatement = connection.prepareStatement(insertSql)) {
+
+    //         preparedStatement.setBigDecimal(1, rtgsDto.getBranchCd());
+    //         preparedStatement.setInt(2, rtgsDto.getAccountTypeCd());
+    //         preparedStatement.setBigDecimal(3, rtgsDto.getCustomerNo());
+    //         preparedStatement.setBigDecimal(4, rtgsDto.getRunNo());
+    //         preparedStatement.setBigDecimal(5, rtgsDto.getCheckDigit());
+    //         preparedStatement.setBigDecimal(6, rtgsDto.getVoucherNo());
+    //         if (rtgsDto.getVoucherYear() != null) {
+    //             preparedStatement.setBigDecimal(7, rtgsDto.getVoucherYear());
+    //         } else {
+    //             preparedStatement.setNull(7, java.sql.Types.DECIMAL);
+    //         }
+    //         preparedStatement.setBigDecimal(8, rtgsDto.getSbpTransactionTypeCd());
+    //         preparedStatement.setBigDecimal(9, rtgsDto.getCurrencyCd());
+    //         preparedStatement.setString(10, rtgsDto.getTransferType());
+    //         preparedStatement.setString(11, rtgsDto.getPaymentMode());
+    //         if (rtgsDto.getTotalAmount() != null) {
+    //             preparedStatement.setBigDecimal(12, rtgsDto.getTotalAmount());
+    //         } else {
+    //             preparedStatement.setNull(12, java.sql.Types.DECIMAL);
+    //         }
+    //         if (rtgsDto.getPostedDate() != null) {
+    //             preparedStatement.setDate(13, Date.valueOf(rtgsDto.getPostedDate()));
+    //         } else {
+    //             preparedStatement.setNull(13, java.sql.Types.DATE);
+    //         }
+    //         if (rtgsDto.getPostedTime() != null) {
+    //             preparedStatement.setTime(14, Time.valueOf(rtgsDto.getPostedTime()));
+    //         } else {
+    //             preparedStatement.setNull(14, java.sql.Types.TIME);
+    //         }
+    //         preparedStatement.setString(15, rtgsDto.getPostedBy());
+    //         if (rtgsDto.getAuthDate() != null) {
+    //             preparedStatement.setDate(16, Date.valueOf(rtgsDto.getAuthDate()));
+    //         } else {
+    //             preparedStatement.setNull(16, java.sql.Types.DATE);
+    //         }
+    //         if (rtgsDto.getAuthTime() != null) {
+    //             preparedStatement.setTime(17, Time.valueOf(rtgsDto.getAuthTime()));
+    //         } else {
+    //             preparedStatement.setNull(17, java.sql.Types.TIME);
+    //         }
+    //         preparedStatement.setString(18, rtgsDto.getAuthBy());
+    //         preparedStatement.setInt(19, rtgsDto.getPurposeOfPaymentCd());
+    //         preparedStatement.setString(20, rtgsDto.getRemarks());
+    //         preparedStatement.setString(21, rtgsDto.getStatus());
+
+    //         int affectedRows = preparedStatement.executeUpdate();
+    //         if (affectedRows > 0) {
+    //             return rtgsDto;
+    //         }
+    //     } catch (SQLException ex) {
+    //         logger.error("Unexpected error occurred while creating RTGS transaction", ex);
+    //     }
+    //     return null;
+    // }
 }
+
+
+
+
+
+
+
+
+
+    // public boolean submitForm(FormSubmissionDto dto) {
+    //     String formInsert = INSERT INTO RTGS_TL (branch_cd, currency_cd, sbp_transaction_type_cd, customer_no, account_type_cd, run_no, check_digit, available_balance,
+    //             payment_mode, transfer_amount, beneficiary_account_name,
+    //             beneficiary_bank_name, beneficiary_branch_code, beneficiary_iban,
+    //             purpose_of_payment, remarks
+    //         ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+    
+    //     // Assuming you have a `dataSource` or `EntityManager` injected
+    //     var conn = dataSource.getConnection();
+    //     var ps = conn.prepareStatement(lodgementInsert);
+    
+    //     ps.setString(1, dto.branch);
+    //     ps.setString(2, dto.currency);
+    //     ps.setString(3, dto.sbpTranType);
+    //     ps.setString(4, dto.transferType);
+    //     ps.setString(5, dto.customerNo);
+    //     ps.setString(6, dto.accountNo);
+    //     ps.setString(7, dto.acType);
+    //     ps.setString(8, dto.iban);
+    //     ps.setString(9, dto.accountName);
+    //     ps.setBigDecimal(10, dto.availableBalance);
+    //     ps.setString(11, dto.paymentMode);
+    //     ps.setBigDecimal(12, dto.transferAmount);
+    //     ps.setString(13, dto.beneficiaryAccountName);
+    //     ps.setString(14, dto.beneficiaryBankName);
+    //     ps.setString(15, dto.beneficiaryBranchCode);
+    //     ps.setString(16, dto.beneficiaryIBAN);
+    //     ps.setString(17, dto.purposeOfPayment);
+    //     ps.setString(18, dto.remarks);
+    
+    //     int inserted = ps.executeUpdate();
+    //     ps.close();
+    //     conn.close();
+    
+    //     return inserted > 0;
+    // }
+    
+
+
