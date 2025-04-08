@@ -13,6 +13,7 @@ import dto.AccountDetailDto;
 import dto.AccountNumberDto;
 import dto.BranchDto;
 import dto.CurrencyDto;
+import dto.ListDto;
 import dto.SBPTranTypeDto;
 import dto.UserDto;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -76,15 +77,31 @@ public class MainService {
         List<BranchDto> branches = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery("SELECT * FROM BRANCH_TL")) {
+             ResultSet resultSet = statement.executeQuery("SELECT branch_cd as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
 
             while (resultSet.next()) {
-                branches.add(new BranchDto(resultSet.getInt("branch_cd"), resultSet.getString("branch_name")));
+                branches.add(new BranchDto(resultSet.getInt("value"), resultSet.getString("label")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while retrieving branches", e);
         }
         return branches;
+    }
+
+    public List<ListDto> getAllBranchList() {
+        List<ListDto> optionList = new ArrayList<>();
+        try (Connection connection = datasource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT branch_cd as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
+
+            while (resultSet.next()) {
+                optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
+            }
+
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while retrieving branches", e);
+        }
+        return optionList;
     }
 
 
@@ -110,7 +127,7 @@ public class MainService {
              ResultSet resultSet = statement.executeQuery("SELECT * FROM SBP_TRANSACTION_TYPE_TL")) {
 
             while (resultSet.next()) {
-                sbptrantype.add(new SBPTranTypeDto(resultSet.getInt("transaction_type_cd"), resultSet.getString("transaction_type")));
+                sbptrantype.add(new SBPTranTypeDto(resultSet.getInt("sbp_transaction_type_cd"), resultSet.getString("sbp_transaction_type")));
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while accessing transaction type", e);

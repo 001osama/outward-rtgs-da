@@ -73,7 +73,7 @@ public class MainResource {
                 !result.getPassword().equals(loginRequest.getPassword()) 
             )
                 return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ApiResponse(null,"Invalid Login Attempt",false))
+                    .entity(new ApiResponse(null,"Invalid username or password",false))
                     .build();
 
             var response = new UserInfoDto(result.getLoginId(), result.getBranchCode(), result.getRoleId());
@@ -84,6 +84,31 @@ public class MainResource {
             logger.error("Error creating user", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(new ApiResponse(null,"Internal Server Error Occured",false))
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/getallbranchlist")
+    public Response getAllBranchesList() 
+    {
+        logger.info("message : =====> getAll method hit");
+        try
+        {
+            var result = mainService.getAllBranchList();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        }
+        catch(Exception ex)
+        {
+            logger.error("Error fetching branch details", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
                 .build();
         }
     }
@@ -113,6 +138,7 @@ public class MainResource {
         }
     }
 
+
     @GET
     @Path("/getallcurrencies")
     public Response getAllCurrencies() 
@@ -141,7 +167,7 @@ public class MainResource {
 
     @GET
     @Path("/getallsbptrantypes")
-    public Response getSBPTranType() 
+    public Response getSBPTranType()
     {
         logger.info("message : =====> getAll method hit");
         try
