@@ -73,7 +73,7 @@ public class MainResource {
                 !result.getPassword().equals(loginRequest.getPassword()) 
             )
                 return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ApiResponse(null,"Invalid Login Attempt",false))
+                    .entity(new ApiResponse(null,"Invalid username or password",false))
                     .build();
 
             var response = new UserInfoDto(result.getLoginId(), result.getBranchCode(), result.getRoleId());
@@ -89,13 +89,13 @@ public class MainResource {
     }
 
     @GET
-    @Path("/getallbranches")
-    public Response getAllBranches() 
+    @Path("/getbranchlist")
+    public Response getBranchesList() 
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllBranches();
+            var result = mainService.getBranchList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -113,14 +113,40 @@ public class MainResource {
         }
     }
 
+    // @GET
+    // @Path("/getallbranches")
+    // public Response getAllBranches() 
+    // {
+    //     logger.info("message : =====> getAll method hit");
+    //     try
+    //     {
+    //         var result = mainService.getAllBranches();
+    //         if(result == null)
+    //             return Response.status(Response.Status.BAD_REQUEST)
+    //             .entity(new ApiResponse(null,"Invalid Data",false))
+    //             .build();
+
+    //         return Response.ok(new ApiResponse(result, null, true))
+    //             .build();
+    //     }
+    //     catch(Exception ex)
+    //     {
+    //         logger.error("Error fetching branch details", ex);
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //             .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
+    //             .build();
+    //     }
+    // }
+
+
     @GET
-    @Path("/getallcurrencies")
-    public Response getAllCurrencies() 
+    @Path("/getcurrencylist")
+    public Response getCurrencyList() 
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllCurrencies();
+            var result = mainService.getCurrencyList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -140,13 +166,13 @@ public class MainResource {
     }
 
     @GET
-    @Path("/getallsbptrantypes")
-    public Response getAllSBPTranTypes() 
+    @Path("/getsbptrantypelist")
+    public Response getSBPTranTypeList()
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllSBPTranTypes();
+            var result = mainService.getSBPTranTypeList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -167,14 +193,14 @@ public class MainResource {
 
 
     @GET
-    @Path("/getallaccountnos")
-    public Response getAllAccounts(@QueryParam("customerNo") String customerNo) 
+    @Path("/getcustomeraccountnos")
+    public Response getCustomerAccountNos(@QueryParam("customerNo") String customerNo) 
     {
         logger.info("message : =====> getAccountNo method hit");
         try
         {
-            var accountNolist = mainService.getAllAccounts(customerNo);
-            if(accountNolist == null)
+            var accountNolist = mainService.getCustomerAccountNos(customerNo);
+            if(accountNolist.size() == 0)
                 return Response.status(Response.Status.NOT_FOUND)
                     .entity(new ApiResponse(null,"Account not found",false))
                     .build();
@@ -219,5 +245,66 @@ public class MainResource {
                 .build();
         }
     }
+
+
+    @GET
+    @Path("/getpurposeofpaymentlist")                                                                                                      
+    public Response getPurposeofPaymentList()
+    {
+        logger.info("message : =====> getAll method hit");
+        try
+        {
+            var result = mainService.getPurposeofPaymentList();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        }
+        catch(Exception ex)
+        {
+            logger.error("Error in retrieving purpose of payment", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
+                .build();
+            
+        }
+    }
+
+
+    // @POST
+    // @Path("/submit-form")
+    // public Response submitForm(FormSubmissionDto dto)
+    // {
+    //     logger.info("message : =====> getAccountDetails method hit" + dto);
+
+    //     try{
+    //         if (dto.sbpTranType == null || dto.sbpTranType.isEmpty()) {
+    //             return Response.status(Response.Status.BAD_REQUEST)
+    //             .entity(new ApiResponse(null, "Please select SBP Transaction Type", false))
+    //             .build();
+
+    //         }
+
+    //         var result = mainService.submitForm(dto);
+
+    //         return Response.ok(new ApiResponse(result, "Form Submitted Successfully", true))
+    //         .build();
+        
+    //     }
+    //     catch (Exception ex){
+    //         logger.error("Error Submitting Form", ex);
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //         .entity(new ApiResponse(null, "Internal Server Error Occured" , false))
+    //         .build();
+    //     }
+
+    // }
+
+
+
+
 
 }
