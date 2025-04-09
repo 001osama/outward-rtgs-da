@@ -90,7 +90,7 @@ public class MainService {
     //     return branches;
     // }
 
-    public List<ListDto> getAllBranchList() {
+    public List<ListDto> getBranchList() {
         List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
@@ -107,7 +107,7 @@ public class MainService {
     }
 
 
-    public List<ListDto> getAllCurrencyList() {
+    public List<ListDto> getCurrencyList() {
         List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
@@ -122,7 +122,7 @@ public class MainService {
         return optionList;
     }
 
-    public List<ListDto> getAllSBPTranTypeList() {
+    public List<ListDto> getSBPTranTypeList() {
         List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();
@@ -138,7 +138,7 @@ public class MainService {
     }
 
 
-    public List<String> getAllAccounts(String customerNo) {
+    public List<String> getCustomerAccountNos(String customerNo) {
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection
              //For ibm db2 testing remains
@@ -169,19 +169,20 @@ public class MainService {
 
     public AccountDetailDto getAccountDetails(AccountNumberDto accountNo) {
         StringBuilder query = new StringBuilder();
-        query.append("SELECT")
-            .append("CONCAT(acctype.account_type, '-', acctype.account_type_cd) AS acc_type, ")
-            .append("CONCAT('PK65BAHL', acc.branch_cd, acc.account_type_cd, acc.customer_no, acc.run_no, acc.check_digit) AS iban, ")
-            .append("CONCAT(acc.branch_cd, '-', acc.account_type_cd, '-', acc.customer_no, '-', acc.run_no, '-', acc.check_digit, '-', acc.account_title) AS acc_name, ")
-            .append("acc.available_bal ")
-            .append("FROM account_tl AS acc ")
-            .append("LEFT JOIN account_type_tl AS acctype ")
-            .append("ON acc.account_type_cd = acctype.account_type_cd ")
-            .append("WHERE acc.branch_cd = ? AND ")
-            .append("acc.account_type_cd = ? AND ")
-            .append("acc.customer_no = ? AND ")
-            .append("acc.run_no = ? AND ")
-            .append("acc.check_digit = ?;");
+        query.append(" SELECT");
+        query.append(" acctype.account_type || '-' || LPAD(acc.account_type_cd, 4, '0') AS acc_type,");
+        query.append(" 'PK65BAHL' || LPAD(acc.branch_cd, 4, '0') || LPAD(acc.account_type_cd, 4, '0') || LPAD(acc.customer_no, 6, '0') || LPAD(acc.run_no, 4, '0') || acc.check_digit AS iban,");
+        query.append(" LPAD(acc.branch_cd, 4, '0') || '-' || LPAD(acc.account_type_cd, 4, '0') || '-' || LPAD(acc.customer_no, 6, '0') || '-' || LPAD(acc.run_no, 4, '0') || '-' || acc.check_digit || '-' || acc.account_title AS acc_name,");
+        query.append(" acc.available_bal");
+        query.append(" FROM account_tl AS acc");
+        query.append(" LEFT JOIN account_type_tl AS acctype");
+        query.append(" ON acc.account_type_cd = acctype.account_type_cd");
+        query.append(" WHERE acc.branch_cd = ?");
+        query.append(" AND acc.account_type_cd = ?");
+        query.append(" AND acc.customer_no = ?");
+        query.append(" AND acc.run_no = ?");
+        query.append(" AND acc.check_digit = ?");
+
 
         String sqlQuery = query.toString();
 
@@ -213,7 +214,7 @@ public class MainService {
         return null; 
     }
 
-    public List<ListDto> getAllPurposeofPaymentList() {
+    public List<ListDto> getPurposeofPaymentList() {
         List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
              Statement statement = connection.createStatement();

@@ -6,7 +6,6 @@ import dto.ApiResponse;
 import dto.LoginRequestDto;
 import dto.UserDto;
 import dto.UserInfoDto;
-import dto.FormSubmissionDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -90,13 +89,13 @@ public class MainResource {
     }
 
     @GET
-    @Path("/getallbranchlist")
-    public Response getAllBranchesList() 
+    @Path("/getbranchlist")
+    public Response getBranchesList() 
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllBranchList();
+            var result = mainService.getBranchList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -141,13 +140,13 @@ public class MainResource {
 
 
     @GET
-    @Path("/getallcurrencylist")
-    public Response getAllCurrencyList() 
+    @Path("/getcurrencylist")
+    public Response getCurrencyList() 
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllCurrencyList();
+            var result = mainService.getCurrencyList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -167,13 +166,13 @@ public class MainResource {
     }
 
     @GET
-    @Path("/getallsbptrantypelist")
-    public Response getAllSBPTranTypeList()
+    @Path("/getsbptrantypelist")
+    public Response getSBPTranTypeList()
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllSBPTranTypeList();
+            var result = mainService.getSBPTranTypeList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
@@ -194,14 +193,14 @@ public class MainResource {
 
 
     @GET
-    @Path("/getallaccountnos")
-    public Response getAllAccounts(@QueryParam("customerNo") String customerNo) 
+    @Path("/getcustomeraccountnos")
+    public Response getCustomerAccountNos(@QueryParam("customerNo") String customerNo) 
     {
         logger.info("message : =====> getAccountNo method hit");
         try
         {
-            var accountNolist = mainService.getAllAccounts(customerNo);
-            if(accountNolist == null)
+            var accountNolist = mainService.getCustomerAccountNos(customerNo);
+            if(accountNolist.size() == 0)
                 return Response.status(Response.Status.NOT_FOUND)
                     .entity(new ApiResponse(null,"Account not found",false))
                     .build();
@@ -247,14 +246,15 @@ public class MainResource {
         }
     }
 
+
     @GET
-    @Path("/getallpurposeofpaymentlist")                                                                                                      
-    public Response getAllPurposeofPaymentList()
+    @Path("/getpurposeofpaymentlist")                                                                                                      
+    public Response getPurposeofPaymentList()
     {
         logger.info("message : =====> getAll method hit");
         try
         {
-            var result = mainService.getAllPurposeofPaymentList();
+            var result = mainService.getPurposeofPaymentList();
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Invalid Data",false))
