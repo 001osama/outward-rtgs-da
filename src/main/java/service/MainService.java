@@ -138,15 +138,12 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
                         // For ibm db2 testing remains
-                        // .prepareStatement("SELECT LPAD(branch_cd, 4, '0') || '-' ||
-                        // LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' ||
-                        // LPAD(run_no, 4, '0') || '-' || check_digit AS account_number FROM account_tl
-                        // where customer_no = ?");
+                        .prepareStatement("SELECT LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 4, '0') || '-' || check_digit AS account_number FROM account_tl where customer_no = ?");
 
-                        .prepareStatement("SELECT " +
-                                "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit) "
-                                +
-                                "AS account_number FROM account_tl where customer_no = ?;")
+                        // .prepareStatement("SELECT " +
+                        //         "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit) "
+                        //         +
+                        //         "AS account_number FROM account_tl where customer_no = ?;")
 
         ) {
             preparedStatement.setString(1, customerNo);
@@ -168,48 +165,42 @@ public class MainService {
         StringBuilder query = new StringBuilder();
 
         //FOR MSSQL
-        query.append(" SELECT ");
-        query.append(" acctype.account_type + '-' + RIGHT('0000' + CAST(acc.account_type_cd AS VARCHAR), 4) AS acc_type, ");
-        query.append(" 'PK65BAHL' + ");
-        query.append(" RIGHT('0000' + CAST(acc.branch_cd AS VARCHAR), 4) + ");
-        query.append(" RIGHT('0000' + CAST(acc.account_type_cd AS VARCHAR), 4) + ");
-        query.append(" RIGHT('000000' + CAST(acc.customer_no AS VARCHAR), 6) + ");
-        query.append(" RIGHT('0000' + CAST(acc.run_no AS VARCHAR), 4) + ");
-        query.append(" CAST(acc.check_digit AS VARCHAR) AS iban, ");
-        query.append(" RIGHT('0000' + CAST(acc.branch_cd AS VARCHAR), 4) + '-' + ");
-        query.append(" RIGHT('0000' + CAST(acc.account_type_cd AS VARCHAR), 4) + '-' + ");
-        query.append(" RIGHT('000000' + CAST(acc.customer_no AS VARCHAR), 6) + '-' + ");
-        query.append(" RIGHT('0000' + CAST(acc.run_no AS VARCHAR), 4) + '-' + ");
-        query.append(" CAST(acc.check_digit AS VARCHAR) + '-' + acc.account_title AS acc_name, ");
-        query.append(" acc.available_bal ");
-        query.append(" FROM account_tl AS acc ");
-        query.append(" LEFT JOIN account_type_tl AS acctype ");
-        query.append(" ON acc.account_type_cd = acctype.account_type_cd ");
-        query.append(" WHERE acc.branch_cd = ? ");
-        query.append(" AND acc.account_type_cd = ? ");
-        query.append(" AND acc.customer_no = ? ");
-        query.append(" AND acc.run_no = ? ");
-        query.append(" AND acc.check_digit = ? ");
+        // query.append(" SELECT ");
+        // query.append(" acctype.account_type + '-' + RIGHT('0000' + CAST(acc.account_type_cd AS VARCHAR), 4) AS acc_type, ");
+        // query.append(" 'PK65BAHL' + ");
+        // query.append(" RIGHT('0000' + CAST(acc.branch_cd AS VARCHAR), 4) + ");
+        // query.append(" RIGHT('0000' + CAST(acc.account_type_cd AS VARCHAR), 4) + ");
+        // query.append(" RIGHT('000000' + CAST(acc.customer_no AS VARCHAR), 6) + ");
+        // query.append(" RIGHT('0000' + CAST(acc.run_no AS VARCHAR), 4) + ");
+        // query.append(" CAST(acc.check_digit AS VARCHAR) AS iban, ");
+        // query.append(" RIGHT('0000' + CAST(acc.branch_cd AS VARCHAR), 4) + '-' + ");
+        // query.append(" RIGHT('0000' + CAST(acc.account_type_cd AS VARCHAR), 4) + '-' + ");
+        // query.append(" RIGHT('000000' + CAST(acc.customer_no AS VARCHAR), 6) + '-' + ");
+        // query.append(" RIGHT('0000' + CAST(acc.run_no AS VARCHAR), 4) + '-' + ");
+        // query.append(" CAST(acc.check_digit AS VARCHAR) + '-' + acc.account_title AS acc_name, ");
+        // query.append(" acc.available_bal ");
+        // query.append(" FROM account_tl AS acc ");
+        // query.append(" LEFT JOIN account_type_tl AS acctype ");
+        // query.append(" ON acc.account_type_cd = acctype.account_type_cd ");
+        // query.append(" WHERE acc.branch_cd = ? ");
+        // query.append(" AND acc.account_type_cd = ? ");
+        // query.append(" AND acc.customer_no = ? ");
+        // query.append(" AND acc.run_no = ? ");
+        // query.append(" AND acc.check_digit = ? ");
 
-        // query.append(" SELECT");
-        // query.append(" acctype.account_type || '-' || LPAD(acc.account_type_cd, 4,
-        // '0') AS acc_type,");
-        // query.append(" 'PK65BAHL' || LPAD(acc.branch_cd, 4, '0') ||
-        // LPAD(acc.account_type_cd, 4, '0') || LPAD(acc.customer_no, 6, '0') ||
-        // LPAD(acc.run_no, 4, '0') || acc.check_digit AS iban,");
-        // query.append(" LPAD(acc.branch_cd, 4, '0') || '-' ||
-        // LPAD(acc.account_type_cd, 4, '0') || '-' || LPAD(acc.customer_no, 6, '0') ||
-        // '-' || LPAD(acc.run_no, 4, '0') || '-' || acc.check_digit || '-' ||
-        // acc.account_title AS acc_name,");
-        // query.append(" acc.available_bal");
-        // query.append(" FROM account_tl AS acc");
-        // query.append(" LEFT JOIN account_type_tl AS acctype");
-        // query.append(" ON acc.account_type_cd = acctype.account_type_cd");
-        // query.append(" WHERE acc.branch_cd = ?");
-        // query.append(" AND acc.account_type_cd = ?");
-        // query.append(" AND acc.customer_no = ?");
-        // query.append(" AND acc.run_no = ?");
-        // query.append(" AND acc.check_digit = ?");
+        query.append(" SELECT");
+        query.append(" acctype.account_type || '-' || LPAD(acc.account_type_cd, 4,'0') AS acc_type,");
+        query.append(" 'PK65BAHL' || LPAD(acc.branch_cd, 4, '0') || LPAD(acc.account_type_cd, 4, '0') || LPAD(acc.customer_no, 6, '0') || LPAD(acc.run_no, 4, '0') || acc.check_digit AS iban,");
+        query.append(" LPAD(acc.branch_cd, 4, '0') || '-' || LPAD(acc.account_type_cd, 4, '0') || '-' || LPAD(acc.customer_no, 6, '0') || '-' || LPAD(acc.run_no, 4, '0') || '-' || acc.check_digit || '-' || acc.account_title AS acc_name,");
+        query.append(" acc.available_bal");
+        query.append(" FROM account_tl AS acc");
+        query.append(" LEFT JOIN account_type_tl AS acctype");
+        query.append(" ON acc.account_type_cd = acctype.account_type_cd");
+        query.append(" WHERE acc.branch_cd = ?");
+        query.append(" AND acc.account_type_cd = ?");
+        query.append(" AND acc.customer_no = ?");
+        query.append(" AND acc.run_no = ?");
+        query.append(" AND acc.check_digit = ?");
 
         String sqlQuery = query.toString();
 
