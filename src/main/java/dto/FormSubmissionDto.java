@@ -1,28 +1,41 @@
 package dto;
 
+
 import java.math.BigDecimal;
-import java.util.List;
+import java.sql.Date;
+import java.sql.Time;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 
 public class FormSubmissionDto {
-
-    public String branchCode;
-    public String currency;
-    public String sbpTranType;
-    public String transferType;
-    public String customerNo;
-    public String accountNo;
-    public String accType;
-    public String iban;
-    public String accountName;
-    public BigDecimal availableBalance;
-    public String paymentMode;
-    public BigDecimal transferAmount;
-    public String beneficiaryAccountName;
-    public String beneficiaryBankName;
-    public String beneficiaryBranchCode;
-    public String beneficiaryIBAN;
-    public String purposeOfPayment;
-    public String remarks;
-    public List<ChargesDto> charges;
+    private int branchCode;
+    private int accountTypeCode;
+    private BigDecimal customerNo;
+    private int runNo;
+    private BigDecimal checkDigit;
+    private BigDecimal voucherNo;
+    private BigDecimal voucherYear;
+    private BigDecimal sbpTransactionTypeCode;
+    private BigDecimal currencyCode;
+    private String transferType;
+    private String paymentMode;
+    private BigDecimal totalAmount;
+    private Date postedDate;
+    private Time postedTime;
+    private String postedBy;
+    private Date authDate;
+    private Time authTime;
+    private String authBy;
+    private int purposeOfPaymentCode;
+    private String remarks;
+    private String status;
 
 }

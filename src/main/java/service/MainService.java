@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
+import dto.FormSubmissionDto;
 import dto.ListDto;
 import dto.UserDto;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -122,8 +123,7 @@ public class MainService {
         List<ListDto> optionList = new ArrayList<>();
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(
-                        "SELECT sbp_transaction_type_cd as value, sbp_transaction_type || ' - ' || sbp_transaction_type_cd as label FROM SBP_TRANSACTION_TYPE_TL")) {
+                ResultSet resultSet = statement.executeQuery("SELECT sbp_transaction_type_cd as value, sbp_transaction_type || ' - ' || sbp_transaction_type_cd as label FROM SBP_TRANSACTION_TYPE_TL")) {
 
             while (resultSet.next()) {
                 optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
@@ -138,14 +138,7 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
                         // For ibm db2 testing remains
-                        .prepareStatement("SELECT LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 4, '0') || '-' || check_digit AS account_number FROM account_tl where customer_no = ?");
-
-                        // .prepareStatement("SELECT " +
-                        //         "CONCAT(FORMAT(branch_cd, '0000'), '-', FORMAT(account_type_cd, '0000'), '-', FORMAT(customer_no, '000000'), '-', FORMAT(run_no, '0000'), '-', check_digit) "
-                        //         +
-                        //         "AS account_number FROM account_tl where customer_no = ?;")
-
-        ) {
+                        .prepareStatement("SELECT LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 4, '0') || '-' || check_digit AS account_number FROM account_tl where customer_no = ?")) {
             preparedStatement.setString(1, customerNo);
 
             List<String> result = new ArrayList<String>();
@@ -245,112 +238,83 @@ public class MainService {
         return optionList;
     }
 
-    // public RtgsTDto createRtgsTransaction(RtgsTDto rtgsDto) {
-    // String insertSql = "INSERT INTO RTGS_TL (" +
-    // "BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, " +
-    // "VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, " +
-    // "TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, " +
-    // "POSTED_TIME, POSTED_BY, AUTH_DATE, AUTH_TIME, AUTH_BY, " +
-    // "PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS" +
-    // ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public FormSubmissionDto submitRtgsForm(FormSubmissionDto formSubmissionDto) {
+        String insertSql = "INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, AUTH_DATE, AUTH_TIME, AUTH_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    // try (Connection connection = dataSource.getConnection();
-    // PreparedStatement preparedStatement = connection.prepareStatement(insertSql))
-    // {
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(insertSql)) {
 
-    // preparedStatement.setBigDecimal(1, rtgsDto.getBranchCd());
-    // preparedStatement.setInt(2, rtgsDto.getAccountTypeCd());
-    // preparedStatement.setBigDecimal(3, rtgsDto.getCustomerNo());
-    // preparedStatement.setBigDecimal(4, rtgsDto.getRunNo());
-    // preparedStatement.setBigDecimal(5, rtgsDto.getCheckDigit());
-    // preparedStatement.setBigDecimal(6, rtgsDto.getVoucherNo());
-    // if (rtgsDto.getVoucherYear() != null) {
-    // preparedStatement.setBigDecimal(7, rtgsDto.getVoucherYear());
-    // } else {
-    // preparedStatement.setNull(7, java.sql.Types.DECIMAL);
-    // }
-    // preparedStatement.setBigDecimal(8, rtgsDto.getSbpTransactionTypeCd());
-    // preparedStatement.setBigDecimal(9, rtgsDto.getCurrencyCd());
-    // preparedStatement.setString(10, rtgsDto.getTransferType());
-    // preparedStatement.setString(11, rtgsDto.getPaymentMode());
-    // if (rtgsDto.getTotalAmount() != null) {
-    // preparedStatement.setBigDecimal(12, rtgsDto.getTotalAmount());
-    // } else {
-    // preparedStatement.setNull(12, java.sql.Types.DECIMAL);
-    // }
-    // if (rtgsDto.getPostedDate() != null) {
-    // preparedStatement.setDate(13, Date.valueOf(rtgsDto.getPostedDate()));
-    // } else {
-    // preparedStatement.setNull(13, java.sql.Types.DATE);
-    // }
-    // if (rtgsDto.getPostedTime() != null) {
-    // preparedStatement.setTime(14, Time.valueOf(rtgsDto.getPostedTime()));
-    // } else {
-    // preparedStatement.setNull(14, java.sql.Types.TIME);
-    // }
-    // preparedStatement.setString(15, rtgsDto.getPostedBy());
-    // if (rtgsDto.getAuthDate() != null) {
-    // preparedStatement.setDate(16, Date.valueOf(rtgsDto.getAuthDate()));
-    // } else {
-    // preparedStatement.setNull(16, java.sql.Types.DATE);
-    // }
-    // if (rtgsDto.getAuthTime() != null) {
-    // preparedStatement.setTime(17, Time.valueOf(rtgsDto.getAuthTime()));
-    // } else {
-    // preparedStatement.setNull(17, java.sql.Types.TIME);
-    // }
-    // preparedStatement.setString(18, rtgsDto.getAuthBy());
-    // preparedStatement.setInt(19, rtgsDto.getPurposeOfPaymentCd());
-    // preparedStatement.setString(20, rtgsDto.getRemarks());
-    // preparedStatement.setString(21, rtgsDto.getStatus());
+            preparedStatement.setInt(1, formSubmissionDto.getBranchCode());
+            preparedStatement.setInt(2, formSubmissionDto.getAccountTypeCode());
+            preparedStatement.setBigDecimal(3, formSubmissionDto.getCustomerNo());
+            preparedStatement.setInt(4, formSubmissionDto.getRunNo());
+            preparedStatement.setBigDecimal(5, formSubmissionDto.getCheckDigit());
+            preparedStatement.setBigDecimal(6, formSubmissionDto.getVoucherNo());
+            if (formSubmissionDto.getVoucherYear() != null) {
+                preparedStatement.setBigDecimal(7, formSubmissionDto.getVoucherYear());
+            } else {
+                preparedStatement.setNull(7, java.sql.Types.DECIMAL);
+            }
+            preparedStatement.setBigDecimal(8, formSubmissionDto.getSbpTransactionTypeCode());
+            preparedStatement.setBigDecimal(9, formSubmissionDto.getCurrencyCode());
+            preparedStatement.setString(10, formSubmissionDto.getTransferType());
+            preparedStatement.setString(11, formSubmissionDto.getPaymentMode());
+            if (formSubmissionDto.getTotalAmount() != null) {
+                preparedStatement.setBigDecimal(12, formSubmissionDto.getTotalAmount());
+            } else {
+                preparedStatement.setNull(12, java.sql.Types.DECIMAL);
+            }
+            if (formSubmissionDto.getPostedDate() != null) {
+                preparedStatement.setDate(13, formSubmissionDto.getPostedDate());
+            } else {
+                preparedStatement.setNull(13, java.sql.Types.DATE);
+            }
+            if (formSubmissionDto.getPostedTime() != null) {
+                preparedStatement.setTime(14, formSubmissionDto.getPostedTime());
+            } else {
+                preparedStatement.setNull(14, java.sql.Types.TIME);
+            }
+            preparedStatement.setString(15, formSubmissionDto.getPostedBy());
+            if (formSubmissionDto.getAuthDate() != null) {
+                preparedStatement.setDate(16, formSubmissionDto.getAuthDate());
+            } else {
+                preparedStatement.setNull(16, java.sql.Types.DATE);
+            }
+            if (formSubmissionDto.getAuthTime() != null) {
+                preparedStatement.setTime(17, formSubmissionDto.getAuthTime());
+            } else {
+                preparedStatement.setNull(17, java.sql.Types.TIME);
+            }
+            preparedStatement.setString(18, formSubmissionDto.getAuthBy());
+            preparedStatement.setInt(19, formSubmissionDto.getPurposeOfPaymentCode());
+            preparedStatement.setString(20, formSubmissionDto.getRemarks());
+            preparedStatement.setString(21, formSubmissionDto.getStatus());
 
-    // int affectedRows = preparedStatement.executeUpdate();
-    // if (affectedRows > 0) {
-    // return rtgsDto;
-    // }
-    // } catch (SQLException ex) {
-    // logger.error("Unexpected error occurred while creating RTGS transaction",
-    // ex);
-    // }
-    // return null;
-    // }
+            int affectedRows = preparedStatement.executeUpdate();
+            if (affectedRows > 0) {
+                return formSubmissionDto;
+            }
+        } catch (SQLException ex) {
+            logger.error("Unexpected error occurred while creating RTGS transaction", ex);
+        }
+        return null;
+    }
+
+    public List<ListDto> getBeneficiaryBankList() {
+        List<ListDto> optionList = new ArrayList<>();
+        try (Connection connection = datasource.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT bank_cd as value, bank_name || ' - ' || bank_cd as label FROM BANKS_TL")) {
+
+            while (resultSet.next()) {
+                optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while accessing bank name", e);
+        }
+        return optionList;
+    }
 }
 
-// public boolean submitForm(FormSubmissionDto dto) {
-// String formInsert = INSERT INTO RTGS_TL (branch_cd, currency_cd,
-// sbp_transaction_type_cd, customer_no, account_type_cd, run_no, check_digit,
-// available_balance,
-// payment_mode, transfer_amount, beneficiary_account_name,
-// beneficiary_bank_name, beneficiary_branch_code, beneficiary_iban,
-// purpose_of_payment, remarks
-// ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
 
-// // Assuming you have a `dataSource` or `EntityManager` injected
-// var conn = dataSource.getConnection();
-// var ps = conn.prepareStatement(lodgementInsert);
-
-// ps.setString(1, dto.branch);
-// ps.setString(2, dto.currency);
-// ps.setString(3, dto.sbpTranType);
-// ps.setString(4, dto.transferType);
-// ps.setString(5, dto.customerNo);
-// ps.setString(6, dto.accountNo);
-// ps.setString(7, dto.acType);
-// ps.setString(8, dto.iban);
-// ps.setString(9, dto.accountName);
-// ps.setBigDecimal(10, dto.availableBalance);
-// ps.setString(11, dto.paymentMode);
-// ps.setBigDecimal(12, dto.transferAmount);
-// ps.setString(13, dto.beneficiaryAccountName);
-// ps.setString(14, dto.beneficiaryBankName);
-// ps.setString(15, dto.beneficiaryBranchCode);
-// ps.setString(16, dto.beneficiaryIBAN);
-// ps.setString(17, dto.purposeOfPayment);
-// ps.setString(18, dto.remarks);
-
-// int inserted = ps.executeUpdate();
-// ps.close();
-// conn.close();
-
-// return inserted > 0;
-// }

@@ -4,6 +4,7 @@ import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
 import dto.ApiResponse;
 import dto.LoginRequestDto;
+import dto.FormSubmissionDto;
 import dto.UserDto;
 import dto.UserInfoDto;
 import jakarta.inject.Inject;
@@ -160,7 +161,7 @@ public class MainResource {
             logger.error("Error fetching currency", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(new ApiResponse(null,"Failed to retrieve currency",false))
-                .build();
+                .build(); 
             
         }
     }
@@ -270,6 +271,61 @@ public class MainResource {
                 .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
                 .build();
             
+        }
+    }
+
+
+    @GET
+    @Path("/getbeneficiarybanklist")                                                                                                      
+    public Response getBeneficiaryBankList()
+    {
+        logger.info("message : =====> getAll method hit");
+        try
+        {
+            var result = mainService.getBeneficiaryBankList();
+            if(result == null)
+                return Response.status(Response.Status.BAD_REQUEST)
+                .entity(new ApiResponse(null,"Invalid Data",false))
+                .build();
+
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        }
+        catch(Exception ex)
+        {
+            logger.error("Error in retrieving purpose of payment", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
+                .build();
+            
+        }
+    }
+
+
+    @POST
+    @Path("/submitform")
+    public Response submitRtgsForm(FormSubmissionDto formSubmissionDto) {
+        logger.info("message : =====> submitRtgsForm method hit with body " + formSubmissionDto.toString());
+        try {
+            // You might want to add validation logic here before calling the service
+
+            FormSubmissionDto createdTransaction = mainService.submitRtgsForm(formSubmissionDto);
+
+            if (createdTransaction == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Invalid RTGS Form Data", false))
+                        .build();
+            }
+
+            return Response.status(Response.Status.CREATED)
+                    .entity(new ApiResponse(createdTransaction, "RTGS form submitted successfully", true))
+                    .build();
+
+        } catch (Exception ex) {
+            logger.error("Error submitting RTGS form", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
+                    .build();
         }
     }
 
