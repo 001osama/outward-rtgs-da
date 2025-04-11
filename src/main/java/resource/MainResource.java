@@ -302,6 +302,34 @@ public class MainResource {
     }
 
 
+    @GET
+    @Path("/getbeneficiaryaccount")
+    
+    public Response getBeneficairyAccount(@QueryParam("beneficiaryAccountNo") String beneficiaryAccountNo) 
+    {
+        logger.info("message : =====> getAccountNo method hit");
+        try
+        {
+            var result = mainService.getBeneficiaryAccount(beneficiaryAccountNo);
+            if(result == null)
+                return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ApiResponse(null,"Beneficiary Account not found",false))
+                    .build();
+
+            
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        }
+        catch(Exception ex)
+        {
+            logger.error("Error fetching Accounts", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null,"Internal Server Error Occured",false))
+                .build();
+        }
+    }
+
+
     @POST
     @Path("/submitform")
     public Response submitRtgsForm(FormSubmissionDto formSubmissionDto) {
@@ -328,36 +356,6 @@ public class MainResource {
                     .build();
         }
     }
-
-
-    // @POST
-    // @Path("/submit-form")
-    // public Response submitForm(FormSubmissionDto dto)
-    // {
-    //     logger.info("message : =====> getAccountDetails method hit" + dto);
-
-    //     try{
-    //         if (dto.sbpTranType == null || dto.sbpTranType.isEmpty()) {
-    //             return Response.status(Response.Status.BAD_REQUEST)
-    //             .entity(new ApiResponse(null, "Please select SBP Transaction Type", false))
-    //             .build();
-
-    //         }
-
-    //         var result = mainService.submitForm(dto);
-
-    //         return Response.ok(new ApiResponse(result, "Form Submitted Successfully", true))
-    //         .build();
-        
-    //     }
-    //     catch (Exception ex){
-    //         logger.error("Error Submitting Form", ex);
-    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-    //         .entity(new ApiResponse(null, "Internal Server Error Occured" , false))
-    //         .build();
-    //     }
-
-    // }
 
 
 

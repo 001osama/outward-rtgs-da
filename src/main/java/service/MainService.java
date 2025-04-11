@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
+import dto.BeneficiaryAccountDto;
 import dto.FormSubmissionDto;
 import dto.ListDto;
 import dto.UserDto;
@@ -315,6 +316,30 @@ public class MainService {
         }
         return optionList;
     }
+
+
+    public BeneficiaryAccountDto getBeneficiaryAccount(String beneficiaryAccountNo) {
+        try (Connection connection = datasource.getConnection();
+                PreparedStatement preparedStatement = connection
+                        // For ibm db2 testing remains
+                        .prepareStatement("SELECT beneficiary_iban, beneficiary_branch_cd, account_title FROM beneficiary_account_tl where beneficiary_account_no = ?")) {
+            preparedStatement.setString(1, beneficiaryAccountNo);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new BeneficiaryAccountDto(
+                            resultSet.getString("beneficiary_iban"),
+                            resultSet.getInt("beneficiary_branch_cd"),
+                            resultSet.getString("account_title"));
+                }
+            }
+            return null;
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while retrieving branch with CD " + beneficiaryAccountNo, e);
+        }
+        return null;
+    }
+    
 }
 
 
