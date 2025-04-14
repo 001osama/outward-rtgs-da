@@ -301,13 +301,25 @@ public class MainService {
         return null;
     }
 
-    public List<ListDto> getBeneficiaryBankList() {
-        List<ListDto> optionList = new ArrayList<>();
-        try (Connection connection = datasource.getConnection();
-                Statement statement = connection.createStatement();
-                ResultSet resultSet = statement.executeQuery(
-                        "SELECT bank_cd as value, bank_name || ' - ' || bank_cd as label FROM BANKS_TL")) {
 
+    public List<ListDto> getBeneficiaryBankList(String searchTerm) {
+        List<ListDto> optionList = new ArrayList<>();
+        String sql = "SELECT bank_cd as value, bank_name || ' - ' || bank_cd as label FROM BANKS_TL";
+    
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            sql += " WHERE LOWER(bank_name) LIKE LOWER('%' || ? || '%') OR LOWER(bank_cd) LIKE LOWER('%' || ? || '%')";
+        }
+    
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+    
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                preparedStatement.setString(1, searchTerm);
+                preparedStatement.setString(2, searchTerm);
+            }
+    
+            ResultSet resultSet = preparedStatement.executeQuery();
+    
             while (resultSet.next()) {
                 optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
             }
@@ -318,27 +330,53 @@ public class MainService {
     }
 
 
-    public BeneficiaryAccountDto getBeneficiaryAccount(String beneficiaryAccountNo) {
+    public BeneficiaryAccountDto getBeneficiaryAccountDetails(String beneficiaryAccOrIban) {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
-                        // For ibm db2 testing remains
-                        .prepareStatement("SELECT beneficiary_iban, beneficiary_branch_cd, account_title FROM beneficiary_account_tl where beneficiary_account_no = ?")) {
-            preparedStatement.setString(1, beneficiaryAccountNo);
+                        .prepareStatement("SELECT beneficiary_branch_cd, account_title FROM BENEFICIARY_ACCOUNT_TL WHERE ? IN (beneficiary_iban, BENEFICIARY_ACCOUNT_NO)")) {
+            preparedStatement.setString(1, beneficiaryAccOrIban);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return new BeneficiaryAccountDto(
-                            resultSet.getString("beneficiary_iban"),
                             resultSet.getInt("beneficiary_branch_cd"),
                             resultSet.getString("account_title"));
                 }
             }
             return null;
         } catch (Exception e) {
-            logger.error("Unexpected error occurred while retrieving branch with CD " + beneficiaryAccountNo, e);
+            logger.error("Unexpected error occurred while retrieving beneficiary account with IBAN: " + beneficiaryAccOrIban, e);
         }
         return null;
     }
+
+
+
+    
+
+
+
+    // public BeneficiaryAccountDto getBeneficiaryAccount(String beneficiaryAccountNo) {
+    //     try (Connection connection = datasource.getConnection();
+    //             PreparedStatement preparedStatement = connection
+    //                     // For ibm db2 testing remains
+    //                     .prepareStatement("SELECT beneficiary_iban, beneficiary_branch_cd, account_title FROM beneficiary_account_tl where beneficiary_account_no = ?")) {
+    //         preparedStatement.setString(1, beneficiaryAccountNo);
+
+    //         try (ResultSet resultSet = preparedStatement.executeQuery()) {
+    //             if (resultSet.next()) {
+    //                 return new BeneficiaryAccountDto(
+    //                         resultSet.getString("beneficiary_iban"),
+    //                         resultSet.getInt("beneficiary_branch_cd"),
+    //                         resultSet.getString("account_title"));
+    //             }
+    //         }
+    //         return null;
+    //     } catch (Exception e) {
+    //         logger.error("Unexpected error occurred while retrieving branch with CD " + beneficiaryAccountNo, e);
+    //     }
+    //     return null;
+    // }
     
 }
 

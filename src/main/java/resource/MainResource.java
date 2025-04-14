@@ -3,6 +3,7 @@ package resource;
 import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
 import dto.ApiResponse;
+import dto.BeneficiaryAccountDto;
 import dto.LoginRequestDto;
 import dto.FormSubmissionDto;
 import dto.UserDto;
@@ -275,60 +276,81 @@ public class MainResource {
     }
 
 
-    @GET
-    @Path("/getbeneficiarybanklist")                                                                                                      
-    public Response getBeneficiaryBankList()
-    {
-        logger.info("message : =====> getAll method hit");
-        try
-        {
-            var result = mainService.getBeneficiaryBankList();
-            if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
-                .entity(new ApiResponse(null,"Invalid Data",false))
-                .build();
+    // @GET
+    // @Path("/getbeneficiarybanklist")                                                                                                      
+    // public Response getBeneficiaryBankList()
+    // {
+    //     logger.info("message : =====> getAll method hit");
+    //     try
+    //     {
+    //         var result = mainService.getBeneficiaryBankList();
+    //         if(result == null)
+    //             return Response.status(Response.Status.BAD_REQUEST)
+    //             .entity(new ApiResponse(null,"Invalid Data",false))
+    //             .build();
 
-            return Response.ok(new ApiResponse(result, null, true))
-                .build();
-        }
-        catch(Exception ex)
-        {
-            logger.error("Error in retrieving purpose of payment", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
-                .build();
+    //         return Response.ok(new ApiResponse(result, null, true))
+    //             .build();
+    //     }
+    //     catch(Exception ex)
+    //     {
+    //         logger.error("Error in retrieving purpose of payment", ex);
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //             .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
+    //             .build();
             
-        }
-    }
-
+    //     }
+    // }
 
     @GET
-    @Path("/getbeneficiaryaccount")
-    
-    public Response getBeneficairyAccount(@QueryParam("beneficiaryAccountNo") String beneficiaryAccountNo) 
+    @Path("/getbeneficiarybanklist")
+    public Response getBeneficiaryBankList(@QueryParam("search") String search) 
     {
-        logger.info("message : =====> getAccountNo method hit");
-        try
-        {
-            var result = mainService.getBeneficiaryAccount(beneficiaryAccountNo);
-            if(result == null)
-                return Response.status(Response.Status.NOT_FOUND)
-                    .entity(new ApiResponse(null,"Beneficiary Account not found",false))
+        logger.info("message : =====> getBeneficiaryBankList method hit with search term: {}" + search);
+        try {
+        var result = mainService.getBeneficiaryBankList(search);
+        if (result == null) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ApiResponse(null, "Invalid Data", false))
                     .build();
-
-            
-            return Response.ok(new ApiResponse(result, null, true))
-                .build();
         }
-        catch(Exception ex)
-        {
-            logger.error("Error fetching Accounts", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ApiResponse(null,"Internal Server Error Occured",false))
+        return Response.ok(new ApiResponse(result, null, true))
                 .build();
+        } catch (Exception ex) {
+            logger.error("Error in retrieving beneficiary bank list", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Failed to retrieve beneficiary bank list", false))
+                    .build();
         }
     }
 
+
+
+    @GET
+    @Path("/getbeneficiaryaccountdetails")
+    public Response getBeneficairyAccountDetails(@QueryParam("acciban") String accountNoOrIban) {
+        logger.info("message : =====> getBeneficiaryAccount method hit with accountNo: " + accountNoOrIban);
+        try {
+            BeneficiaryAccountDto result = null;
+
+            if (accountNoOrIban != null && !accountNoOrIban.trim().isEmpty()) 
+                result = mainService.getBeneficiaryAccountDetails(accountNoOrIban);
+
+            if (result == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ApiResponse(null, "Beneficiary Account not found", false))
+                        .build();
+            }
+
+            return Response.ok(new ApiResponse(result, null, true))
+                    .build();
+        } catch (Exception ex) {
+            logger.error("Error fetching Account details", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error Occurred", false))
+                    .build();
+        }
+    }
 
     @POST
     @Path("/submitform")
