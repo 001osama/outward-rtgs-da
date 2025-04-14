@@ -5,7 +5,7 @@ import dto.AccountNumberDto;
 import dto.ApiResponse;
 import dto.BeneficiaryAccountDto;
 import dto.LoginRequestDto;
-import dto.FormSubmissionDto;
+import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
 import jakarta.inject.Inject;
@@ -353,13 +353,13 @@ public class MainResource {
     }
 
     @POST
-    @Path("/submitform")
-    public Response submitRtgsForm(FormSubmissionDto formSubmissionDto) {
+    @Path("/submitRtgsform")
+    public Response submitRtgsForm(OutwardRTGSFormDto formSubmissionDto) {
         logger.info("message : =====> submitRtgsForm method hit with body " + formSubmissionDto.toString());
         try {
             // You might want to add validation logic here before calling the service
 
-            FormSubmissionDto createdTransaction = mainService.submitRtgsForm(formSubmissionDto);
+            OutwardRTGSFormDto createdTransaction = mainService.submitRtgsForm(formSubmissionDto);
 
             if (createdTransaction == null) {
                 return Response.status(Response.Status.BAD_REQUEST)

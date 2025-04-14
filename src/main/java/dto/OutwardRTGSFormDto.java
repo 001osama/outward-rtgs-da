@@ -15,7 +15,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
-public class FormSubmissionDto {
+public class OutwardRTGSFormDto {
     private int branchCode;
     private int accountTypeCode;
     private BigDecimal customerNo;

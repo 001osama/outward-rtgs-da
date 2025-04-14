@@ -13,7 +13,7 @@ import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
 import dto.BeneficiaryAccountDto;
-import dto.FormSubmissionDto;
+import dto.OutwardRTGSFormDto;
 import dto.ListDto;
 import dto.UserDto;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -238,8 +238,9 @@ public class MainService {
         }
         return optionList;
     }
+    
 
-    public FormSubmissionDto submitRtgsForm(FormSubmissionDto formSubmissionDto) {
+    public OutwardRTGSFormDto submitRtgsForm(OutwardRTGSFormDto formSubmissionDto) {
         String insertSql = "INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, AUTH_DATE, AUTH_TIME, AUTH_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = datasource.getConnection();
