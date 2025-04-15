@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -114,31 +115,6 @@ public class MainResource {
                 .build();
         }
     }
-
-    // @GET
-    // @Path("/getallbranches")
-    // public Response getAllBranches() 
-    // {
-    //     logger.info("message : =====> getAll method hit");
-    //     try
-    //     {
-    //         var result = mainService.getAllBranches();
-    //         if(result == null)
-    //             return Response.status(Response.Status.BAD_REQUEST)
-    //             .entity(new ApiResponse(null,"Invalid Data",false))
-    //             .build();
-
-    //         return Response.ok(new ApiResponse(result, null, true))
-    //             .build();
-    //     }
-    //     catch(Exception ex)
-    //     {
-    //         logger.error("Error fetching branch details", ex);
-    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-    //             .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
-    //             .build();
-    //     }
-    // }
 
 
     @GET
@@ -276,32 +252,6 @@ public class MainResource {
     }
 
 
-    // @GET
-    // @Path("/getbeneficiarybanklist")                                                                                                      
-    // public Response getBeneficiaryBankList()
-    // {
-    //     logger.info("message : =====> getAll method hit");
-    //     try
-    //     {
-    //         var result = mainService.getBeneficiaryBankList();
-    //         if(result == null)
-    //             return Response.status(Response.Status.BAD_REQUEST)
-    //             .entity(new ApiResponse(null,"Invalid Data",false))
-    //             .build();
-
-    //         return Response.ok(new ApiResponse(result, null, true))
-    //             .build();
-    //     }
-    //     catch(Exception ex)
-    //     {
-    //         logger.error("Error in retrieving purpose of payment", ex);
-    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-    //             .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
-    //             .build();
-            
-    //     }
-    // }
-
     @GET
     @Path("/getbeneficiarybanklist")
     public Response getBeneficiaryBankList(@QueryParam("search") String search) 
@@ -378,6 +328,71 @@ public class MainResource {
                     .build();
         }
     }
+
+    @PUT // Using PUT as it's an update operation
+    @Path("/cancel")
+    public Response cancelRtgsTransaction(@QueryParam("voucherNo") String voucherNo,
+                                           @QueryParam("voucherYear") String voucherYear) {
+        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherNo + voucherYear);
+        try {
+            if (voucherNo == null || voucherNo.trim().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Voucher number is required for cancellation.", false))
+                        .build();
+            }
+
+            boolean isCancelled = mainService.cancelRtgsTransaction(voucherNo, voucherYear);
+
+            if (isCancelled) {
+                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " has been successfully cancelled.", true))
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " not found or could not be cancelled.", false))
+                        .build();
+            }
+        } catch (Exception ex) {
+            logger.error("Error cancelling RTGS transaction for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error occurred while cancelling RTGS transaction.", false))
+                    .build();
+        }
+    }
+
+
+    @PUT // Using PUT as it's an update operation
+    @Path("/authorize")
+    public Response authorizeRtgsTransaction(@QueryParam("voucherNo") String voucherNo,
+                                             @QueryParam("voucherYear") String voucherYear) {
+        logger.info("message : =====> authorizeRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherNo + voucherYear);
+        try {
+            if (voucherNo == null || voucherNo.trim().isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Voucher number is required for authorization.", false))
+                        .build();
+            }
+
+            boolean isAuthorized = mainService.authorizeRtgsTransaction(voucherNo, voucherYear);
+
+            if (isAuthorized) {
+                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " has been successfully authorized.", true))
+                        .build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " not found or could not be authorized.", false))
+                        .build();
+            }
+        } catch (Exception ex) {
+            logger.error("Error authorizing RTGS transaction for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error occurred while authorizing RTGS transaction.", false))
+                    .build();
+        }
+    }
+
+
+
+
 
 
 
