@@ -204,6 +204,7 @@ public class MainResource {
         logger.info("message : =====> getAccountDetails method hit");
         var detailsArray = accountNo.split("-");
         var accoutNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
+        
         try
         {
             var accountDetails = mainService.getAccountDetails(accoutNumberDto);
@@ -303,13 +304,13 @@ public class MainResource {
     }
 
     @POST
-    @Path("/submitRtgsform")
-    public Response submitRtgsForm(OutwardRTGSFormDto formSubmissionDto) {
-        logger.info("message : =====> submitRtgsForm method hit with body " + formSubmissionDto.toString());
+    @Path("/createOutwardRtgs")
+    public Response createOutwardRtgs(OutwardRTGSFormDto rtgsForm) {
+        logger.info("message : =====> submitOutwardRtgs method hit with body " + rtgsForm.toString());
         try {
             // You might want to add validation logic here before calling the service
-
-            OutwardRTGSFormDto createdTransaction = mainService.submitRtgsForm(formSubmissionDto);
+            
+            OutwardRTGSFormDto createdTransaction = mainService.createOutwardRtgs(rtgsForm);
 
             if (createdTransaction == null) {
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -318,10 +319,11 @@ public class MainResource {
             }
 
             return Response.status(Response.Status.CREATED)
-                    .entity(new ApiResponse(createdTransaction, "RTGS form submitted successfully", true))
+                    .entity(new ApiResponse(rtgsForm, "RTGS form submitted successfully", true))
                     .build();
 
-        } catch (Exception ex) {
+        } 
+        catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
