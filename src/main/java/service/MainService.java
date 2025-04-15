@@ -353,32 +353,56 @@ public class MainService {
 
 
 
-    
+    public boolean cancelRtgsTransaction(String voucherNo, String voucherYear) {
+        String updateSql = "UPDATE RTGS_TL SET STATUS = 'CANCELLED' WHERE VOUCHER_NO = ?";
+        if (voucherYear != null && !voucherYear.trim().isEmpty()) {
+            updateSql += " AND VOUCHER_YEAR = ?";
+        }
+        int rowsUpdated = 0;
+
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
+
+            preparedStatement.setString(1, voucherNo);
+            if (voucherYear != null && !voucherYear.trim().isEmpty()) {
+                preparedStatement.setString(2, voucherYear);
+            }
+            rowsUpdated = preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            logger.error("Error updating RTGS transaction status to CANCELLED for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+        }
+        return rowsUpdated > 0;
+    }
+
+
+    public boolean authorizeRtgsTransaction(String voucherNo, String voucherYear) {
+        String updateSql = "UPDATE RTGS_TL SET STATUS = 'AUTHORIZED' WHERE VOUCHER_NO = ?";
+        if (voucherYear != null && !voucherYear.trim().isEmpty()) {
+            updateSql += " AND VOUCHER_YEAR = ?";
+        }
+        int rowsUpdated = 0;
+
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
+
+            preparedStatement.setString(1, voucherNo);
+            if (voucherYear != null && !voucherYear.trim().isEmpty()) {
+                preparedStatement.setString(2, voucherYear);
+            }
+            rowsUpdated = preparedStatement.executeUpdate();
+
+        } catch (SQLException ex) {
+            logger.error("Error updating RTGS transaction status to AUTHORIZED for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+        }
+        return rowsUpdated > 0;
+    }
 
 
 
-    // public BeneficiaryAccountDto getBeneficiaryAccount(String beneficiaryAccountNo) {
-    //     try (Connection connection = datasource.getConnection();
-    //             PreparedStatement preparedStatement = connection
-    //                     // For ibm db2 testing remains
-    //                     .prepareStatement("SELECT beneficiary_iban, beneficiary_branch_cd, account_title FROM beneficiary_account_tl where beneficiary_account_no = ?")) {
-    //         preparedStatement.setString(1, beneficiaryAccountNo);
 
-    //         try (ResultSet resultSet = preparedStatement.executeQuery()) {
-    //             if (resultSet.next()) {
-    //                 return new BeneficiaryAccountDto(
-    //                         resultSet.getString("beneficiary_iban"),
-    //                         resultSet.getInt("beneficiary_branch_cd"),
-    //                         resultSet.getString("account_title"));
-    //             }
-    //         }
-    //         return null;
-    //     } catch (Exception e) {
-    //         logger.error("Unexpected error occurred while retrieving branch with CD " + beneficiaryAccountNo, e);
-    //     }
-    //     return null;
-    // }
-    
+
+
 }
 
 
