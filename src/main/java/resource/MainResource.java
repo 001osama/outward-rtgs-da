@@ -72,11 +72,11 @@ public class MainResource {
             var result = mainService.getUser(loginRequest.getLoginId());
 
             if(result == null || 
-                // !result.getBranchCode().equals(loginRequest.getBranchCode()) ||
+                !result.getBranchCode().equals(loginRequest.getBranchCode()) ||
                 !result.getPassword().equals(loginRequest.getPassword()) 
             )
                 return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(new ApiResponse(null,"Invalid username or password",false))
+                    .entity(new ApiResponse(null,"Invalid credentials",false))
                     .build();
 
             var response = new UserInfoDto(result.getLoginId(), result.getBranchCode(), result.getRoleId());

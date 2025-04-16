@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.inject.Inject;
@@ -34,7 +35,7 @@ public class MainService {
     public UserDto getUser(String loginId) {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
-                        .prepareStatement("SELECT * FROM USER_TL WHERE login_id = ?")) {
+                        .prepareStatement("SELECT *, LPAD(BRANCH_CD, 4, '0') AS branch_cd_padded FROM USER_TL WHERE login_id = ?")) {
 
             preparedStatement.setString(1, loginId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -42,7 +43,7 @@ public class MainService {
                     return new UserDto(
                             resultSet.getString("login_id"),
                             resultSet.getInt("role_id"),
-                            resultSet.getString("branch_cd"),
+                            resultSet.getString("branch_cd_padded"),
                             resultSet.getString("password"));
                 }
             }
@@ -304,8 +305,13 @@ public class MainService {
         String currentYearString = String.valueOf(currentDate.getYear());
 
         var localDateString = String.valueOf(LocalDate.now());
-        var localTimeString = String.valueOf(LocalTime.now());
 
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String localTimeString = LocalTime.now().format(timeFormatter);
+
+        BigDecimal newVoucherNo = generateVoucherNo();
+        
+        
         
         String sqlQuery = "INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection connection = datasource.getConnection();
@@ -316,7 +322,7 @@ public class MainService {
             preparedStatement.setString(3, rtgsForm.getCustomerNo());
             preparedStatement.setString(4, accoutNumberDto.getRunNo());
             preparedStatement.setString(5, accoutNumberDto.getCheckDigit());
-            preparedStatement.setString(6, "12345");
+            preparedStatement.setBigDecimal(6, newVoucherNo);
             preparedStatement.setString(7, currentYearString);
             preparedStatement.setString(8, rtgsForm.getSbpTranTypeCode());
             preparedStatement.setString(9, rtgsForm.getCurrencyCode());
@@ -325,7 +331,7 @@ public class MainService {
             preparedStatement.setString(12, rtgsForm.getTotalAmount());
             preparedStatement.setString(13, localDateString);
             preparedStatement.setString(14, localTimeString);
-            preparedStatement.setString(15, "test1");
+            preparedStatement.setString(15, rtgsForm.getLoginId());
             preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
             preparedStatement.setString(17, rtgsForm.getRemarks());
             preparedStatement.setString(18, "PENDING");
@@ -336,7 +342,7 @@ public class MainService {
                 return rtgsForm;
             }
         } catch (SQLException ex) {
-            logger.error("Unexpected error occurred while creating user", ex);
+            logger.error("Unexpected error occurred while creating outward rtgs", ex);
         }
         return null;
     }
@@ -412,7 +418,24 @@ public class MainService {
 
 
 
+    private BigDecimal generateVoucherNo()
+    {
+        BigDecimal previousVoucher = BigDecimal.ZERO;
+        String sqlQuery = "SELECT VOUCHER_NO FROM RTGS_TL ORDER BY POSTED_TIME DESC, POSTED_DATE DESC, VOUCHER_NO DESC FETCH FIRST 1 ROW ONLY";
+        try (Connection connection = datasource.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sqlQuery)) {
 
+            if (resultSet.next()) {
+                previousVoucher = resultSet.getBigDecimal("VOUCHER_NO");
+            }
+
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while retrieving branches", e);
+            return null;
+        }
+        return previousVoucher.add(BigDecimal.ONE);
+    }
 
 
 }

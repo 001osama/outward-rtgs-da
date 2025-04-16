@@ -14,6 +14,7 @@ import lombok.ToString;
 @ToString
 
 public class OutwardRTGSFormDto {
+    private String loginId;
     private String accountNo;
     private String branchCode;
     private String currencyCode;
