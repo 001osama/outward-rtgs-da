@@ -274,11 +274,12 @@ public class MainService {
     }
 
 
-    public BeneficiaryAccountDto getBeneficiaryAccountDetails(String beneficiaryAccOrIban) {
+    public BeneficiaryAccountDto getBeneficiaryAccountDetails(String AccOrIban, String BankCode) {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
-                        .prepareStatement("SELECT beneficiary_branch_cd, account_title FROM BENEFICIARY_ACCOUNT_TL WHERE ? IN (beneficiary_iban, BENEFICIARY_ACCOUNT_NO)")) {
-            preparedStatement.setString(1, beneficiaryAccOrIban);
+                        .prepareStatement("SELECT beneficiary_branch_cd, account_title FROM BENEFICIARY_ACCOUNT_TL WHERE ? IN (beneficiary_iban, BENEFICIARY_ACCOUNT_NO) AND bank_cd = ?")) {
+            preparedStatement.setString(1, AccOrIban);
+            preparedStatement.setString(2, BankCode);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -289,7 +290,7 @@ public class MainService {
             }
             return null;
         } catch (Exception e) {
-            logger.error("Unexpected error occurred while retrieving beneficiary account with IBAN: " + beneficiaryAccOrIban, e);
+            logger.error("Unexpected error occurred while retrieving beneficiary account with IBAN", e);
         }
         return null;
     }
@@ -416,6 +417,35 @@ public class MainService {
         return rowsUpdated > 0;
     }
 
+    public boolean isChequeExist(AccountNumberDto accountDetails, String chequeNo){
+        try (Connection connection = datasource.getConnection();
+                PreparedStatement preparedStatement = connection
+                .prepareStatement("SELECT START_NO from CHEQUEBOOK_TL WHERE branch_cd = ? AND account_type_cd = ? AND customer_no = ? AND run_no = ? AND check_digit = ?")) {
+            preparedStatement.setString(1, accountDetails.getBranchCode());
+            preparedStatement.setString(2, accountDetails.getAccountType());
+            preparedStatement.setString(3, accountDetails.getCustomerNo());
+            preparedStatement.setString(4, accountDetails.getRunNo());
+            preparedStatement.setString(5, accountDetails.getCheckDigit());
+
+            BigDecimal chequeStartNo = null;
+            String test = null;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next())  
+                    chequeStartNo = resultSet.getBigDecimal("START_NO");
+            }
+
+            if(chequeStartNo != null)
+            {
+                chequeStartNo = chequeStartNo.add(BigDecimal.TEN); 
+            }
+
+
+
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while retrieving beneficiary account with IBAN", e);
+        }
+        return false;
+    }
 
 
     private BigDecimal generateVoucherNo()

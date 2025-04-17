@@ -9,6 +9,7 @@ import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -279,19 +280,23 @@ public class MainResource {
 
     @GET
     @Path("/getbeneficiaryaccountdetails")
-    public Response getBeneficairyAccountDetails(@QueryParam("acciban") String accountNoOrIban) {
-        logger.info("message : =====> getBeneficiaryAccount method hit with accountNo: " + accountNoOrIban);
+    public Response getBeneficairyAccountDetails(
+        @QueryParam("accOrIban") String accOrIban,
+        @QueryParam("bankCode") String bankCode) 
+        {
+        logger.info("message : =====> getBeneficiaryAccount method hit with accountNo: " + accOrIban);
         try {
             BeneficiaryAccountDto result = null;
 
-            if (accountNoOrIban != null && !accountNoOrIban.trim().isEmpty()) 
-                result = mainService.getBeneficiaryAccountDetails(accountNoOrIban);
+            if (accOrIban != null && !accOrIban.trim().isEmpty() 
+            && bankCode != null && !bankCode.trim().isEmpty()) 
+                result = mainService.getBeneficiaryAccountDetails(accOrIban, bankCode);
 
-            if (result == null) {
+            if (result == null) 
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity(new ApiResponse(null, "Beneficiary Account not found", false))
                         .build();
-            }
+
 
             return Response.ok(new ApiResponse(result, null, true))
                     .build();
@@ -390,6 +395,39 @@ public class MainResource {
                     .entity(new ApiResponse(null, "Internal Server Error occurred while authorizing RTGS transaction.", false))
                     .build();
         }
+    }
+
+
+    @GET 
+    @Path("/validatecheque")
+    public Response validateCheque(
+        @QueryParam("accountNo") String accountNo,
+        @QueryParam("chequeNo") String chequeNo) 
+        {
+            logger.info("message : =====> authorizeRtgsTransaction method hit for chequeNo: { "+ chequeNo +" } ");
+            try {
+                if (chequeNo == null || chequeNo.trim().isEmpty() || 
+                    accountNo == null || chequeNo.trim().isEmpty()) 
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(new ApiResponse(null, "Cheque Number is required.", false))
+                            .build();
+
+
+                var detailsArray = accountNo.split("-");
+                var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
+            
+                boolean isValid = mainService.isChequeExist(accountNumberDto, chequeNo);
+                
+            } catch (Exception ex) {
+                logger.error("Error authorizing RTGS transaction for chequeNo: { "+ chequeNo +" }", ex);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new ApiResponse(null, "Internal Server Error occurred while validating cheque.", false))
+                        .build();
+            }
+
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new ApiResponse(null, "Every thing working fine.", false))
+                        .build();
     }
 
 
