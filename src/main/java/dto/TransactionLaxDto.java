@@ -15,8 +15,9 @@ import lombok.ToString;
 public class TransactionLaxDto {
     private String transactionAmount; 
     private String beneficiaryBankName; 
-    private BigDecimal beneficiaryBankCode; 
+    private String beneficiaryBankCode; 
     private String beneficiaryAccountName; 
     private String beneficiaryIbanOrAccountNo; 
     private String beneficiaryAddress; 
+    private String beneficiaryBranchCode;
 }
