@@ -308,8 +308,36 @@ public class MainResource {
         }
     }
 
+
+
+    
+
+    @GET
+    @Path("/getexceptionlist")
+    public Response getExceptionList(@QueryParam("activityCode") String activityCode) 
+    {
+        logger.info("message : =====> getExceptionList method hit with activity Code" + activityCode);
+        try {
+            var result = mainService.getExceptionList(activityCode);
+            if (result == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ApiResponse(null, "Invalid Data", false))
+                    .build();
+            }
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        } catch (Exception ex) {
+            logger.error("Error in retrieving beneficiary bank list", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null, "Failed to retrieve beneficiary bank list", false))
+                .build();
+        }
+    }
+
+
     @POST
     @Path("/createOutwardRtgs")
+    //Create the complete voucher and laxes logic
     public Response createOutwardRtgs(OutwardRTGSFormDto rtgsForm) {
         logger.info("message : =====> submitOutwardRtgs method hit with body " + rtgsForm.toString());
         try {

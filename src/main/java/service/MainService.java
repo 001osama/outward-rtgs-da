@@ -16,6 +16,7 @@ import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
 import dto.BeneficiaryAccountDto;
+import dto.ExceptionDto;
 import dto.OutwardRTGSFormDto;
 import dto.ListDto;
 import dto.UserDto;
@@ -273,6 +274,25 @@ public class MainService {
         return optionList;
     }
 
+    public List<ExceptionDto> getExceptionList(String activityCode) {
+        List<ExceptionDto> optionList = new ArrayList<>();
+        String sql = "SELECT EXCEPTION_CD, EXCEPTION_DESC, ACTION_REQUIRED FROM exception_tl WHERE ACTIVITY_CD = ?";
+    
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setString(1, activityCode);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+    
+            while (resultSet.next()) {
+                optionList.add(new ExceptionDto(resultSet.getString("EXCEPTION_CD"), resultSet.getString("EXCEPTION_DESC"), resultSet.getString("ACTION_REQUIRED")));
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while getting exception list for activity", e);
+        }
+        return optionList;
+    }
+
 
     public BeneficiaryAccountDto getBeneficiaryAccountDetails(String AccOrIban, String BankCode) {
         try (Connection connection = datasource.getConnection();
@@ -298,7 +318,7 @@ public class MainService {
 
 
     public OutwardRTGSFormDto createOutwardRtgs(OutwardRTGSFormDto rtgsForm) {
-         
+
         var detailsArray = rtgsForm.getAccountNo().split("-");
         var accoutNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
 
@@ -312,41 +332,87 @@ public class MainService {
 
         BigDecimal newVoucherNo = generateVoucherNo();
         
-        
-        
-        String sqlQuery = "INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection connection = datasource.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+        try (Connection connection = datasource.getConnection()) 
+        {
+            connection.setAutoCommit(false);
+            String sqlQuery1 = "INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery1))
+            {
+                
+                preparedStatement.setString(1, rtgsForm.getBranchCode());
+                preparedStatement.setString(2, accoutNumberDto.getAccountType());
+                preparedStatement.setString(3, rtgsForm.getCustomerNo());
+                preparedStatement.setString(4, accoutNumberDto.getRunNo());
+                preparedStatement.setString(5, accoutNumberDto.getCheckDigit());
+                preparedStatement.setBigDecimal(6, newVoucherNo);
+                preparedStatement.setString(7, currentYearString);
+                preparedStatement.setString(8, rtgsForm.getSbpTranTypeCode());
+                preparedStatement.setString(9, rtgsForm.getCurrencyCode());
+                preparedStatement.setString(10, rtgsForm.getTransferTypeCode());
+                preparedStatement.setString(11, rtgsForm.getPaymentMode());
+                preparedStatement.setString(12, rtgsForm.getTotalAmount());
+                preparedStatement.setString(13, localDateString);
+                preparedStatement.setString(14, localTimeString);
+                preparedStatement.setString(15, rtgsForm.getLoginId());
+                preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
+                preparedStatement.setString(17, rtgsForm.getRemarks());
+                preparedStatement.setString(18, "PENDING");
 
-            preparedStatement.setString(1, rtgsForm.getBranchCode());
-            preparedStatement.setString(2, accoutNumberDto.getAccountType());
-            preparedStatement.setString(3, rtgsForm.getCustomerNo());
-            preparedStatement.setString(4, accoutNumberDto.getRunNo());
-            preparedStatement.setString(5, accoutNumberDto.getCheckDigit());
-            preparedStatement.setBigDecimal(6, newVoucherNo);
-            preparedStatement.setString(7, currentYearString);
-            preparedStatement.setString(8, rtgsForm.getSbpTranTypeCode());
-            preparedStatement.setString(9, rtgsForm.getCurrencyCode());
-            preparedStatement.setString(10, rtgsForm.getTransferTypeCode());
-            preparedStatement.setString(11, rtgsForm.getPaymentMode());
-            preparedStatement.setString(12, rtgsForm.getTotalAmount());
-            preparedStatement.setString(13, localDateString);
-            preparedStatement.setString(14, localTimeString);
-            preparedStatement.setString(15, rtgsForm.getLoginId());
-            preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
-            preparedStatement.setString(17, rtgsForm.getRemarks());
-            preparedStatement.setString(18, "PENDING");
 
-
-            int affectedRows = preparedStatement.executeUpdate();
-            if (affectedRows > 0) {
-                return rtgsForm;
+                int affectedRows = preparedStatement.executeUpdate();
+                // if (affectedRows > 0) {
+                //     return rtgsForm;
+                // }
             }
-        } catch (SQLException ex) {
-            logger.error("Unexpected error occurred while creating outward rtgs", ex);
+            catch (SQLException ex) {
+                logger.error("Transaction failed, rolling back", ex);
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    logger.error("Rollback failed", rollbackEx);
+                }
+            }
+
+            var transactionLax = rtgsForm.getTransactionLaxList().get(0);
+            var newAdviceNo = generateAdviseNo();
+
+            String sqlQuery2 = "INSERT INTO RTGS_BENEFICIARY_TL (ACC_NO_IBAN, ACC_TITLE, BANK_CD, BRANCH_CD, ADDRESS, ADVISE_NO, ADVISE_YEAR, VOUCHER_NO, VOUCHER_YEAR, AMOUNT) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery1))
+            {
+                preparedStatement.setString(1, transactionLax.getBeneficiaryIbanOrAccountNo());
+                preparedStatement.setString(2, transactionLax.getBeneficiaryAccountName());
+                preparedStatement.setString(3, transactionLax.getBeneficiaryBankCode());
+                preparedStatement.setString(4, transactionLax.getBeneficiaryBranchCode());
+                preparedStatement.setString(5, transactionLax.getBeneficiaryAddress());
+                preparedStatement.setBigDecimal(6, newAdviceNo);
+                preparedStatement.setString(7, currentYearString);
+                preparedStatement.setBigDecimal(8, newVoucherNo);
+                preparedStatement.setString(9, currentYearString);
+                preparedStatement.setString(9, transactionLax.getTransactionAmount());
+
+
+                int affectedRows = preparedStatement.executeUpdate();
+                // if (affectedRows > 0) {
+                //     return rtgsForm;
+                // }
+            }
+            catch (SQLException ex) {
+                logger.error("Transaction failed, rolling back", ex);
+                try {
+                    connection.rollback();
+                } catch (SQLException rollbackEx) {
+                    logger.error("Rollback failed", rollbackEx);
+                }
+            }
+
         }
+        catch (Exception ex)
+        {
+            logger.error("Unexpected error occurred while creating rtgs entry", ex);
+        } 
         return null;
     }
+
 
 
 
@@ -447,6 +513,28 @@ public class MainService {
         return false;
     }
 
+    private BigDecimal generateAdviseNo()
+    {
+        BigDecimal previousAdvice = BigDecimal.ZERO;
+        String sqlQuery = "SELECT MAX(ADVISE_NO) AS ADVICE_NO";
+        try (Connection connection = datasource.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sqlQuery)) {
+
+            if (resultSet.next()) {
+                previousAdvice = resultSet.getBigDecimal("ADVICE_NO");
+            }
+            else
+            {
+                previousAdvice = new BigDecimal(7070500);
+            }
+
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while retrieving branches", e);
+            return null;
+        }
+        return previousAdvice.add(BigDecimal.ONE);
+    }
 
     private BigDecimal generateVoucherNo()
     {
@@ -459,6 +547,10 @@ public class MainService {
             if (resultSet.next()) {
                 previousVoucher = resultSet.getBigDecimal("VOUCHER_NO");
             }
+            else
+            {
+                previousVoucher = new BigDecimal(386100);
+            }
 
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while retrieving branches", e);
@@ -470,4 +562,16 @@ public class MainService {
 
 }
 
+//SQL Queries written
+
+// CREATE TABLE EXCEPTION_TL(EXCEPTION_CD DECIMAL(4,0), ACTIVITY_CD DECIMAL(4,0), EXCEPTION_DESC VARCHAR(50), ACTION_REQUIRED VARCHAR(40) )
+
+
+// SELECT * FROM exception_tl
+
+// INSERT INTO EXCEPTION_TL (EXCEPTION_CD, ACTIVITY_CD, EXCEPTION_DESC, ACTION_REQUIRED) 
+// VALUES(10, 300, 'Invalid Account Number', 'Verify Account'),
+//     (20, 200, 'Transaction Limit Exceeded', 'Authorize Transaction'),
+//     (80, 100, 'Need Authorization', 'Require Authorization'),
+//     (40, 400, 'Incorrect Amount', 'Check Amount');
 
