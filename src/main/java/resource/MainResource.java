@@ -9,7 +9,6 @@ import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.BeanParam;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -337,11 +336,9 @@ public class MainResource {
 
     @POST
     @Path("/createOutwardRtgs")
-    //Create the complete voucher and laxes logic
     public Response createOutwardRtgs(OutwardRTGSFormDto rtgsForm) {
         logger.info("message : =====> submitOutwardRtgs method hit with body " + rtgsForm.toString());
         try {
-            // You might want to add validation logic here before calling the service
             
             OutwardRTGSFormDto createdTransaction = mainService.createOutwardRtgs(rtgsForm);
 
@@ -457,13 +454,5 @@ public class MainResource {
                         .entity(new ApiResponse(null, "Every thing working fine.", false))
                         .build();
     }
-
-
-
-
-
-
-
-
 
 }
