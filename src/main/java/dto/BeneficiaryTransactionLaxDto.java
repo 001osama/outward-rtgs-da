@@ -12,7 +12,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 
-public class TransactionLaxDto {
+public class BeneficiaryTransactionLaxDto {
     private String transactionAmount; 
     private String beneficiaryBankName; 
     private String beneficiaryBankCode; 

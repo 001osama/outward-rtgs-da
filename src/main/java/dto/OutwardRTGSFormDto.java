@@ -27,5 +27,5 @@ public class OutwardRTGSFormDto {
     private String senderToReceiverInformation;
     private String transferTypeCode;
     private String totalAmount;
-    private List<TransactionLaxDto> transactionLaxList;
+    private List<BeneficiaryTransactionLaxDto> transactionLaxList;
 }

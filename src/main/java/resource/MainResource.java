@@ -1,5 +1,7 @@
 package resource;
 
+import java.util.List;
+
 import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
 import dto.ApiResponse;
@@ -8,6 +10,7 @@ import dto.LoginRequestDto;
 import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
+import dto.VoucherLaxDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -340,16 +343,16 @@ public class MainResource {
         logger.info("message : =====> submitOutwardRtgs method hit with body " + rtgsForm.toString());
         try {
             
-            OutwardRTGSFormDto createdTransaction = mainService.createOutwardRtgs(rtgsForm);
+            var createdLaxList = mainService.createOutwardRtgs(rtgsForm);
 
-            if (createdTransaction == null) {
+            if (createdLaxList == null || createdLaxList.getVoucherLaxList().size() == 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ApiResponse(null, "Invalid RTGS Form Data", false))
                         .build();
             }
 
             return Response.status(Response.Status.CREATED)
-                    .entity(new ApiResponse(rtgsForm, "RTGS form submitted successfully", true))
+                    .entity(new ApiResponse(createdLaxList, "RTGS form submitted successfully", true))
                     .build();
 
         } 

@@ -12,18 +12,22 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
 import dto.BeneficiaryAccountDto;
 import dto.ExceptionDto;
 import dto.OutwardRTGSFormDto;
+import dto.OutwardRTGSReponseDto;
 import dto.ListDto;
 import dto.UserDto;
+import dto.VoucherLaxDto;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import org.jboss.logging.Logger;
+
+import com.ibm.db2.jcc.DB2Diagnosable;
+import com.ibm.db2.jcc.DB2Sqlca;
 
 @ApplicationScoped
 public class MainService {
@@ -317,8 +321,7 @@ public class MainService {
     }
 
 
-    @Transactional(rollbackOn = Exception.class)
-    public OutwardRTGSFormDto createOutwardRtgs(OutwardRTGSFormDto rtgsForm) throws Exception {
+    public OutwardRTGSReponseDto createOutwardRtgs(OutwardRTGSFormDto rtgsForm) throws Exception {
 
         var detailsArray = rtgsForm.getAccountNo().split("-");
         var accoutNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
@@ -333,143 +336,259 @@ public class MainService {
 
         BigDecimal newVoucherNo = generateVoucherNo();
         
-        try (Connection connection = datasource.getConnection()) 
-        {
-            String sqlQuery1 = "INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE, TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery1))
-            {
-                preparedStatement.setString(1, rtgsForm.getBranchCode());
-                preparedStatement.setString(2, accoutNumberDto.getAccountType());
-                preparedStatement.setString(3, rtgsForm.getCustomerNo());
-                preparedStatement.setString(4, accoutNumberDto.getRunNo());
-                preparedStatement.setString(5, accoutNumberDto.getCheckDigit());
-                preparedStatement.setBigDecimal(6, newVoucherNo);
-                preparedStatement.setString(7, currentYearString);
-                preparedStatement.setString(8, rtgsForm.getSbpTranTypeCode());
-                preparedStatement.setString(9, rtgsForm.getCurrencyCode());
-                preparedStatement.setString(10, rtgsForm.getTransferTypeCode());
-                preparedStatement.setString(11, rtgsForm.getPaymentMode());
-                preparedStatement.setString(12, rtgsForm.getTotalAmount());
-                preparedStatement.setString(13, localDateString);
-                preparedStatement.setString(14, localTimeString);
-                preparedStatement.setString(15, rtgsForm.getLoginId());
-                preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
-                preparedStatement.setString(17, rtgsForm.getRemarks());
-                preparedStatement.setString(18, "PENDING");
-
-
-                int affectedRows = preparedStatement.executeUpdate();
-                // if (affectedRows > 0) {
-                //     return rtgsForm;
-                // }
-            }
-            catch (SQLException ex) {
-                logger.error("Transaction failed, rolling back", ex);
-            }
-
-            var transactionLax = rtgsForm.getTransactionLaxList().get(0);
-            var newAdviceNo = generateAdviseNo();
-
-            String sqlQuery2 = "INSERT INTO RTGS_BENEFICIARY_TL (ACCOUNT_NO, ACCOUNT_TITLE, BANK_CD, BRANCH_CD, ADDRESS, ADVISE_NO, ADVISE_YEAR, VOUCHER_NO, VOUCHER_YEAR, AMOUNT) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try(PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery1))
-            {
-                preparedStatement.setString(1, transactionLax.getBeneficiaryIbanOrAccountNo());
-                preparedStatement.setString(2, transactionLax.getBeneficiaryAccountName());
-                preparedStatement.setString(3, transactionLax.getBeneficiaryBankCode());
-                preparedStatement.setString(4, transactionLax.getBeneficiaryBranchCode());
-                preparedStatement.setString(5, transactionLax.getBeneficiaryAddress());
-                preparedStatement.setBigDecimal(6, newAdviceNo);
-                preparedStatement.setString(7, currentYearString);
-                preparedStatement.setBigDecimal(8, newVoucherNo);
-                preparedStatement.setString(9, currentYearString);
-                preparedStatement.setString(10, transactionLax.getTransactionAmount());
-
-
-                int affectedRows = preparedStatement.executeUpdate();
-                // if (affectedRows > 0) {
-                //     return rtgsForm;
-                // }
-            }
-            catch (SQLException ex) {
-                logger.error("Transaction failed, rolling back", ex);
-            }
-
-            var newReferenceNo = generateRefNo();
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
-            sb.append("ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, TRAN_CODE,");
-            sb.append("AMOUNT, ACCOUNT_IDENTITY, STATUS)");
-            sb.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        StringBuilder sb = new StringBuilder();
+            sb.append("INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT,");
+            sb.append("VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE,");
+            sb.append("TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS)");
+            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
-            try(PreparedStatement preparedStatement = connection.prepareStatement(sb.toString()))
-            {
-                preparedStatement.setString(1, rtgsForm.getBranchCode()); 
-                preparedStatement.setBigDecimal(2, newVoucherNo); 
-                preparedStatement.setString(3, currentYearString); 
-                preparedStatement.setBigDecimal(4, newReferenceNo); 
-                preparedStatement.setString(5, accoutNumberDto.getAccountType()); 
-                preparedStatement.setString(6, accoutNumberDto.getCustomerNo()); 
-                preparedStatement.setString(7, accoutNumberDto.getRunNo());
-                preparedStatement.setString(8, accoutNumberDto.getCheckDigit()); 
-                preparedStatement.setString(9, "30630");   
-                preparedStatement.setBigDecimal(10, new BigDecimal(transactionLax.getTransactionAmount()).negate()); 
-                preparedStatement.setString(11, "C");  
-                preparedStatement.setString(12, "Active"); 
+        try (Connection connection = datasource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
 
-                int affectedRows = preparedStatement.executeUpdate();
-                // if (affectedRows > 0) {
-                //     return rtgsForm;
-                // }
-            }
-            catch (SQLException ex) {
-                logger.error("Transaction failed, rolling back", ex);
-            }
+                    preparedStatement.setBigDecimal(1, new BigDecimal(rtgsForm.getBranchCode()));
+                    preparedStatement.setBigDecimal(2, new BigDecimal(accoutNumberDto.getAccountType()));
+                    preparedStatement.setBigDecimal(3, new BigDecimal(rtgsForm.getCustomerNo()));
+                    preparedStatement.setBigDecimal(4, new BigDecimal(accoutNumberDto.getRunNo()));
+                    preparedStatement.setBigDecimal(5, new BigDecimal(accoutNumberDto.getCheckDigit()));
+                    preparedStatement.setBigDecimal(6, newVoucherNo);
+                    preparedStatement.setString(7, currentYearString);
+                    preparedStatement.setBigDecimal(8, new BigDecimal(rtgsForm.getSbpTranTypeCode()));
+                    preparedStatement.setBigDecimal(9, new BigDecimal(rtgsForm.getCurrencyCode()));
+                    preparedStatement.setString(10, rtgsForm.getTransferTypeCode());
+                    preparedStatement.setString(11, rtgsForm.getPaymentMode());
+                    preparedStatement.setBigDecimal(12, new BigDecimal(rtgsForm.getTotalAmount()));
+                    preparedStatement.setString(13, localDateString);
+                    preparedStatement.setString(14, localTimeString);
+                    preparedStatement.setString(15, rtgsForm.getLoginId());
+                    preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
+                    preparedStatement.setString(17, rtgsForm.getRemarks());
+                    preparedStatement.setString(18, "PENDING");
+    
+    
+                    int affectedRows = preparedStatement.executeUpdate();
+                    logger.info("Affected No of rows is: ");
+                    logger.info(affectedRows);
+        } catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+             if (ex instanceof DB2Diagnosable) {
+                 DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                 if (sqlca != null) {
+                     errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                     ", SQLSTATE = " + sqlca.getSqlState() +
+                                     ", Message = " + sqlca.getMessage();
+                     logger.error(errorMessage, ex); // Log the detailed error
+                 }
+             }
+             errorMessage += ex.getMessage();
+              logger.error(errorMessage, ex);
+        }
+
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append("INSERT INTO RTGS_BENEFICIARY_TL (ACCOUNT_NO, ACCOUNT_TITLE, BANK_CD, BRANCH_CD, ADDRESS, ADVISE_NO, ");
+        sb2.append("ADVISE_YEAR, VOUCHER_NO, VOUCHER_YEAR, AMOUNT) ");
+        sb2.append("VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        var transactionLax = rtgsForm.getTransactionLaxList().get(0);
+        var newAdviceNo = generateAdviseNo();
+        try (Connection connection = datasource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+
+            preparedStatement.setString(1, transactionLax.getBeneficiaryIbanOrAccountNo());
+            preparedStatement.setString(2, transactionLax.getBeneficiaryAccountName());
+            preparedStatement.setString(3, transactionLax.getBeneficiaryBankCode());
+            preparedStatement.setString(4, transactionLax.getBeneficiaryBranchCode());
+            preparedStatement.setString(5, transactionLax.getBeneficiaryAddress());
+            preparedStatement.setBigDecimal(6, newAdviceNo);
+            preparedStatement.setString(7, currentYearString);
+            preparedStatement.setBigDecimal(8, newVoucherNo);
+            preparedStatement.setString(9, currentYearString);
+            preparedStatement.setString(10, transactionLax.getTransactionAmount());
 
 
-            StringBuilder sb2 = new StringBuilder();
-            sb2.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
-            sb2.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2,");
-            sb2.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, STATUS)");
-            sb2.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            
-            try(PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString()))
-            {
-                preparedStatement.setString(1, "1001"); 
-                preparedStatement.setBigDecimal(2, newVoucherNo); 
-                preparedStatement.setString(3, currentYearString); 
-                preparedStatement.setBigDecimal(4, newReferenceNo.add(BigDecimal.ONE)); 
-                preparedStatement.setString(5, accoutNumberDto.getAccountType());
-                preparedStatement.setString(6, "80630");  
-                preparedStatement.setBigDecimal(7,new BigDecimal("400")); 
-                preparedStatement.setBigDecimal(8,new BigDecimal("25")); 
-                preparedStatement.setBigDecimal(9,new BigDecimal("20"));  
-                preparedStatement.setBigDecimal(10,new BigDecimal("4567"));  
-                preparedStatement.setBigDecimal(11,new BigDecimal("2"));   
-                preparedStatement.setBigDecimal(12, new BigDecimal(transactionLax.getTransactionAmount())); 
-                preparedStatement.setString(13, "G");  
-                preparedStatement.setString(14, "M"); 
-                preparedStatement.setString(15, "Active"); 
-
-                int affectedRows = preparedStatement.executeUpdate();
-                // if (affectedRows > 0) {
-                //     return rtgsForm;
-                // }
-            }
-            catch (SQLException ex) {
-                logger.error("Transaction failed, rolling back", ex);
-                try {
-                    connection.rollback();
-                } catch (SQLException rollbackEx) {
-                    logger.error("Rollback failed", rollbackEx);
+            int affectedRows = preparedStatement.executeUpdate();
+            logger.info("Affected No of rows is: ");
+            logger.info(affectedRows);
+        } catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
                 }
             }
-
+            errorMessage += ex.getMessage();
+            logger.error(errorMessage, ex);
         }
-        catch (Exception ex)
-        {
-            logger.error("Unexpected error occurred while creating rtgs entry", ex);
-        } 
+
+
+        var newReferenceNo = generateRefNo();
+
+        
+        StringBuilder sb3 = new StringBuilder();
+            sb3.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
+            sb3.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2,");
+            sb3.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, STATUS)");
+            sb3.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+            try (Connection connection = datasource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
+            preparedStatement.setString(1, "1001"); 
+            preparedStatement.setBigDecimal(2, newVoucherNo); 
+            preparedStatement.setString(3, currentYearString); 
+            preparedStatement.setString(4, newReferenceNo); 
+            preparedStatement.setString(5, accoutNumberDto.getAccountType());
+            preparedStatement.setString(6, "80630");  
+            preparedStatement.setBigDecimal(7,new BigDecimal("400")); 
+            preparedStatement.setBigDecimal(8,new BigDecimal("25")); 
+            preparedStatement.setBigDecimal(9,new BigDecimal("20"));  
+            preparedStatement.setBigDecimal(10,new BigDecimal("4567"));  
+            preparedStatement.setBigDecimal(11,new BigDecimal("2"));   
+            preparedStatement.setBigDecimal(12, new BigDecimal(transactionLax.getTransactionAmount())); 
+            preparedStatement.setString(13, "G");  
+            preparedStatement.setString(14, "M"); 
+            preparedStatement.setString(15, "Active"); 
+
+            int affectedRows = preparedStatement.executeUpdate();
+            logger.info("Affected No of rows is: ");
+            logger.info(affectedRows);
+        } catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
+                }
+            }
+            errorMessage += ex.getMessage();
+            logger.error(errorMessage, ex);
+        }
+
+        newReferenceNo = incrementReferenceNo(newReferenceNo);
+        StringBuilder sb4 = new StringBuilder();
+        sb4.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
+        sb4.append("ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, TRAN_CODE,");
+        sb4.append("AMOUNT, ACCOUNT_IDENTITY, STATUS)");
+        sb4.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        
+        try (Connection connection = datasource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sb4.toString())) {
+            preparedStatement.setString(1, rtgsForm.getBranchCode()); 
+            preparedStatement.setBigDecimal(2, newVoucherNo); 
+            preparedStatement.setString(3, currentYearString); 
+            preparedStatement.setString(4, newReferenceNo); 
+            preparedStatement.setString(5, accoutNumberDto.getAccountType()); 
+            preparedStatement.setString(6, accoutNumberDto.getCustomerNo()); 
+            preparedStatement.setString(7, accoutNumberDto.getRunNo());
+            preparedStatement.setString(8, accoutNumberDto.getCheckDigit()); 
+            preparedStatement.setString(9, "30630");   
+            preparedStatement.setBigDecimal(10, new BigDecimal(transactionLax.getTransactionAmount()).negate()); 
+            preparedStatement.setString(11, "C");  
+            preparedStatement.setString(12, "Active"); 
+
+
+            int affectedRows = preparedStatement.executeUpdate();
+            logger.info("Affected No of rows is: ");
+            logger.info(affectedRows);
+        } catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
+                }
+            }
+            errorMessage += ex.getMessage();
+            logger.error(errorMessage, ex);
+        }
+
+
+        StringBuilder sb5 = new StringBuilder();
+        sb5.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
+        sb5.append("CASE WHEN AMOUNT < 0 THEN ABS(AMOUNT) ELSE 0 END AS CREDIT, ");
+        sb5.append("CASE WHEN AMOUNT > 0 THEN AMOUNT ELSE 0 END AS DEBIT, ");
+        sb5.append("CASE WHEN ACCOUNT_IDENTITY = 'C' THEN ");
+        sb5.append("LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || ");
+        sb5.append("LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 4, '0') || '-' || check_digit ");
+        sb5.append("ELSE IDENTITY || '-' || LPAD(MAIN_HD, 3, '0') || '-' || LPAD(SUB_HD_1, 2, '0') || '-' || ");
+        sb5.append("LPAD(SUB_HD_2, 2, '0') || '-' || LPAD(GL_RUN_NO, 4, '0') || '-' || GL_CHECK_DIGIT END AS ACCOUNT_NO, ");
+        sb5.append("'PKR' AS CURRENCY_CODE ");
+        sb5.append("FROM TRANSACTION_TL WHERE VOUCHER_NO=?");
+
+        OutwardRTGSReponseDto result = new OutwardRTGSReponseDto();
+        List<VoucherLaxDto> resultList = new ArrayList<>();
+        try (Connection connection = datasource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sb5.toString())) {
+            preparedStatement.setBigDecimal(1, newVoucherNo); 
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                resultList.add( new VoucherLaxDto(
+                    resultSet.getString("VOUCHER_NO"),
+                    resultSet.getString("REFERENCE_NO"),
+                    resultSet.getString("CREDIT"),
+                    resultSet.getString("DEBIT"),
+                    resultSet.getString("ACCOUNT_NO"),
+                    resultSet.getString("CURRENCY_CODE"))
+                );
+            }
+            result.setVoucherLaxList(resultList);
+        }
+        catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
+                }
+            }
+            errorMessage += ex.getMessage();
+            logger.error(errorMessage, ex);
+        }
+
+
+        StringBuilder sb6 = new StringBuilder();
+        sb6.append("SELECT ADVISE_NO FROM RTGS_BENEFICIARY_TL WHERE VOUCHER_NO = ?");
+
+        try (Connection connection = datasource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sb6.toString())) {
+            preparedStatement.setBigDecimal(1, newVoucherNo); 
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<String> resultList2 = new ArrayList<>(); 
+            
+            while (resultSet.next()) {
+                resultList2.add(resultSet.getString("ADVISE_NO"));
+            }
+
+            result.setAdviceNoList(resultList2);
+            return result;
+        }
+        catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
+                }
+            }
+            errorMessage += ex.getMessage();
+            logger.error(errorMessage, ex);
+        }
+               
         return null;
     }
 
@@ -597,27 +716,24 @@ public class MainService {
         return previousAdvice.add(BigDecimal.ONE);
     }
 
-    private BigDecimal generateRefNo()
+    private String generateRefNo()
     {
-        BigDecimal previousReference = BigDecimal.ZERO;
-        String sqlQuery = "SELECT MAX(REFERENCE_NO) AS Reference_No";
+        String previousReference = "A1072";
+        String sqlQuery = "SELECT MAX(REFERENCE_NO) AS REFERENCE_NO FROM TRANSACTION_TL";
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sqlQuery)) {
 
             if (resultSet.next()) {
-                previousReference = resultSet.getBigDecimal("Reference_No");
+                previousReference = resultSet.getString("REFERENCE_NO");
             }
-            else
-            {
-                previousReference = new BigDecimal(1072);
-            }
+
 
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while retrieving Reference No", e);
             return null;
         }
-        return previousReference.add(BigDecimal.ONE);
+        return incrementReferenceNo(previousReference);
     }
 
 
@@ -644,7 +760,23 @@ public class MainService {
         return previousVoucher.add(BigDecimal.ONE);
     }
 
+    private String incrementReferenceNo(String referenceNo)
+    {
+        if (referenceNo == null || referenceNo.isEmpty()) {
+            return "A1073";  
+        }
 
+        try {
+            String numericPartStr = referenceNo.substring(1);  
+            int numericPart = Integer.parseInt(numericPartStr);
+            numericPart++;
+            return "A" + String.format("%04d", numericPart); 
+
+        } catch (NumberFormatException e) {
+            logger.error("Error incrementing reference number: Invalid format: "+ referenceNo.toString());
+            return "A1073"; 
+        }
+    }
 }
 
 //SQL Queries written
