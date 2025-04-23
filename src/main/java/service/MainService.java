@@ -12,14 +12,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
 import dto.BeneficiaryAccountDto;
+import dto.BeneficiaryTransactionLaxDto;
 import dto.ExceptionDto;
 import dto.OutwardRTGSFormDto;
 import dto.OutwardRTGSReponseDto;
+import dto.RTGSDto;
 import dto.ListDto;
+import dto.OutwardRTGSDto;
 import dto.UserDto;
 import dto.VoucherLaxDto;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -320,6 +324,134 @@ public class MainService {
         return null;
     }
 
+    public OutwardRTGSDto getOutwardRTGS(String VoucherNo, String VoucherYear) throws Exception
+    {
+        OutwardRTGSDto outwardRTGS = new OutwardRTGSDto();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT LPAD(BRANCH_CD, 4, '0') || '-' || LPAD(ACCOUNT_TYPE_CD , 4, '0') || '-' ||");
+        sb.append("LPAD(CUSTOMER_NO, 6, '0') || '-' || LPAD(RUN_NO, 4, '0') || '-' || ");
+        sb.append("CHECK_DIGIT AS ACCOUNT_NO, BRANCH_CD, CURRENCY_CD, SBP_TRANSACTION_TYPE_CD, TRANSFER_TYPE, ");
+        sb.append("CUSTOMER_NO, TOTAL_AMOUNT, PURPOSE_OF_PAYMENT_CD, REMARKS, PAYMENT_MODE FROM rtgs_tl ");
+        sb.append("WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
+
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
+            preparedStatement.setString(1, VoucherNo);
+            preparedStatement.setString(2, VoucherYear);
+            preparedStatement.setString(3, "U");
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                outwardRTGS = new OutwardRTGSDto(
+                    resultSet.getString("ACCOUNT_NO"), 
+                    resultSet.getString("BRANCH_CD"),
+                    resultSet.getString("CURRENCY_CD"),
+                    resultSet.getString("CUSTOMER_NO"),
+                    resultSet.getString("PAYMENT_MODE"),
+                    resultSet.getString("PURPOSE_OF_PAYMENT_CD"), 
+                    resultSet.getString("REMARKS"), 
+                    resultSet.getString("SBP_TRANSACTION_TYPE_CD"),
+                    resultSet.getString("TRANSFER_TYPE"),
+                    resultSet.getString("TOTAL_AMOUNT"),
+                    new ArrayList<>()
+                    );
+            
+            }
+        } catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+             if (ex instanceof DB2Diagnosable) {
+                 DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                 if (sqlca != null) {
+                     errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                     ", SQLSTATE = " + sqlca.getSqlState() +
+                                     ", Message = " + sqlca.getMessage();
+                     logger.error(errorMessage, ex); // Log the detailed error
+                 }
+             }
+             errorMessage += ex.getMessage();
+              logger.error(errorMessage, ex);
+        }
+
+
+        StringBuilder sb2 = new StringBuilder();
+        sb2.append("SELECT AMOUNT,btl.BANK_NAME, btl.BANK_CD, rbt.ACCOUNT_TITLE, rbt.ACCOUNT_NO, ");
+        sb2.append("rbt.ADDRESS, rbt.BRANCH_CD FROM RTGS_BENEFICIARY_TL AS rbt LEFT JOIN BANKS_TL AS btl ON rbt.BANK_CD  = btl.BANK_CD ");
+        sb2.append("WHERE rbt.VOUCHER_NO = ? AND rbt.VOUCHER_YEAR = ?");
+
+        List<BeneficiaryTransactionLaxDto> transactionLaxList = new ArrayList<>();
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+            preparedStatement.setString(1, VoucherNo);
+            preparedStatement.setString(2, VoucherYear);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                transactionLaxList.add(
+                    new BeneficiaryTransactionLaxDto(
+                        resultSet.getString("AMOUNT"), 
+                        resultSet.getString("BANK_NAME"),
+                        resultSet.getString("BANK_CD"),
+                        resultSet.getString("ACCOUNT_TITLE"),
+                        resultSet.getString("ACCOUNT_NO"),
+                        resultSet.getString("ADDRESS"),
+                        resultSet.getString("BRANCH_CD")
+                    )
+                );
+            }
+
+            outwardRTGS.setTransactionLaxList(transactionLaxList);
+
+        } catch (SQLException ex) {
+            String errorMessage = "Database error occurred: ";
+             if (ex instanceof DB2Diagnosable) {
+                 DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                 if (sqlca != null) {
+                     errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                     ", SQLSTATE = " + sqlca.getSqlState() +
+                                     ", Message = " + sqlca.getMessage();
+                     logger.error(errorMessage, ex); // Log the detailed error
+                 }
+             }
+             errorMessage += ex.getMessage();
+              logger.error(errorMessage, ex);
+        }
+
+        return outwardRTGS;
+    }
+
+
+    public List<RTGSDto> getUnauthorizedOutwardRTGSList()
+    {
+        List<RTGSDto> resultList = new ArrayList<>();
+        StringBuilder sb = new StringBuilder();
+        sb.append("SELECT CURRENCY_TYPE, TOTAL_AMOUNT, POSTED_BY, POSTED_DATE, VOUCHER_NO || '/' || VOUCHER_YEAR AS VOUCHER_NO,");
+        sb.append("'OUTBR' AS EXP_CODE FROM RTGS_TL AS RT LEFT JOIN CURRENCY_TL AS CT ON RT.CURRENCY_CD = CT.CURRENCY_CD ");
+        sb.append("WHERE STATUS = ?");
+    
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
+            preparedStatement.setString(1, "U");
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+    
+            while (resultSet.next()) {
+                resultList.add(
+                    new RTGSDto(
+                        resultSet.getString("CURRENCY_TYPE"), 
+                        resultSet.getString("TOTAL_AMOUNT"), 
+                        resultSet.getString("POSTED_BY"),
+                        resultSet.getString("POSTED_DATE"),
+                        resultSet.getString("VOUCHER_NO"),
+                        resultSet.getString("EXP_CODE")
+                    )
+                );
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while getting unauthorized rtgs list", e);
+        }
+        return resultList;
+    }
+
 
     public OutwardRTGSReponseDto createOutwardRtgs(OutwardRTGSFormDto rtgsForm) throws Exception {
 
@@ -362,7 +494,7 @@ public class MainService {
                     preparedStatement.setString(15, rtgsForm.getLoginId());
                     preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
                     preparedStatement.setString(17, rtgsForm.getRemarks());
-                    preparedStatement.setString(18, "PENDING");
+                    preparedStatement.setString(18, "U");
     
     
                     int affectedRows = preparedStatement.executeUpdate();
@@ -449,7 +581,7 @@ public class MainService {
             preparedStatement.setBigDecimal(12, new BigDecimal(transactionLax.getTransactionAmount())); 
             preparedStatement.setString(13, "G");  
             preparedStatement.setString(14, "M"); 
-            preparedStatement.setString(15, "Active"); 
+            preparedStatement.setString(15, "A"); 
 
             int affectedRows = preparedStatement.executeUpdate();
             logger.info("Affected No of rows is: ");
@@ -489,7 +621,7 @@ public class MainService {
             preparedStatement.setString(9, "30630");   
             preparedStatement.setBigDecimal(10, new BigDecimal(transactionLax.getTransactionAmount()).negate()); 
             preparedStatement.setString(11, "C");  
-            preparedStatement.setString(12, "Active"); 
+            preparedStatement.setString(12, "A"); 
 
 
             int affectedRows = preparedStatement.executeUpdate();
@@ -740,7 +872,7 @@ public class MainService {
     private BigDecimal generateVoucherNo()
     {
         BigDecimal previousVoucher = BigDecimal.ZERO;
-        String sqlQuery = "SELECT VOUCHER_NO FROM RTGS_TL ORDER BY POSTED_TIME DESC, POSTED_DATE DESC, VOUCHER_NO DESC FETCH FIRST 1 ROW ONLY";
+        String sqlQuery = "SELECT VOUCHER_NO FROM RTGS_TL ORDER BY VOUCHER_NO DESC, POSTED_TIME DESC, POSTED_DATE DESC FETCH FIRST 1 ROW ONLY";
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sqlQuery)) {

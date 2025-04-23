@@ -1,6 +1,5 @@
 package resource;
 
-import java.util.List;
 
 import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
@@ -10,7 +9,6 @@ import dto.LoginRequestDto;
 import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
-import dto.VoucherLaxDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -336,6 +334,33 @@ public class MainResource {
         }
     }
 
+    @GET
+    @Path("/getunauthorizedoutwardrtgslist")
+    public Response getUnauthorizedOutwardRTGSList() {
+        logger.info("message : =====> getUnauthorizedOutwardRTGSList method hit");
+        try {
+            
+            var rtgsList = mainService.getUnauthorizedOutwardRTGSList();
+
+            if (rtgsList == null || rtgsList.size() == 0) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "No Data exist", false))
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse(rtgsList, null, true))
+                    .build();
+
+        } 
+        catch (Exception ex) {
+            logger.error("Error submitting RTGS form", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
+                    .build();
+        }
+    }
+
 
     @POST
     @Path("/createOutwardRtgs")
@@ -363,6 +388,44 @@ public class MainResource {
                     .build();
         }
     }
+
+    @GET
+    @Path("/getOutwardRTGS")
+    public Response getOutwardRTGS(
+        @QueryParam("voucherNo") String voucherNo, 
+        @QueryParam("voucherYear") String voucherYear
+    ) 
+    {
+        logger.info("message : =====> getOutwardRTGS method hit with voucherInfo " + voucherNo + voucherYear);
+        try {
+
+            if (voucherNo == null || voucherNo.isEmpty() || voucherNo.isBlank()
+            || voucherYear == null || voucherYear.isEmpty() || voucherYear.isBlank()) 
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Invalid Request Data", false))
+                        .build();
+            
+            var outwardRTGS = mainService.getOutwardRTGS(voucherNo, voucherYear);
+
+            if (outwardRTGS == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Invalid RTGS Form Data", false))
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse(outwardRTGS,null, true))
+                    .build();
+
+        } 
+        catch (Exception ex) {
+            logger.error("Error submitting RTGS form", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
+                    .build();
+        }
+    }
+
 
     @PUT // Using PUT as it's an update operation
     @Path("/cancel")
