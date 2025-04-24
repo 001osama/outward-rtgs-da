@@ -4,11 +4,13 @@ package resource;
 import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
 import dto.ApiResponse;
+import dto.AuthorizeUserDto;
 import dto.BeneficiaryAccountDto;
 import dto.LoginRequestDto;
 import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
+import dto.VoucherInfoDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -362,6 +364,64 @@ public class MainResource {
     }
 
 
+    @GET
+    @Path("/iscancelvoucherexist")
+    public Response isCancelVoucherExist(
+        @QueryParam("voucherNo") String voucherNo,
+        @QueryParam("voucherYear") String voucherYear
+    ) {
+        logger.info("message : =====> isCancelVoucherExist method hit");
+        try {
+            
+            boolean isVoucherExist = mainService.isCancelVoucherExist(voucherNo, voucherYear);
+
+            if (!isVoucherExist) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Voucher not found for cancellation", false))
+                        .build();
+            }
+
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse(isVoucherExist, null, true))
+                    .build();
+
+        } 
+        catch (Exception ex) {
+            logger.error("Error submitting RTGS form", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
+                    .build();
+        }
+    }
+    
+    @POST
+    @Path("/authorizeUser")
+    public Response authorizeUser(AuthorizeUserDto authUserDto) {
+        logger.info("message : =====> authorizeUser method hit with body " + authUserDto.toString());
+        try {
+            
+            var isAuthorized = mainService.authorizeUser(authUserDto);
+
+            if (!isAuthorized) 
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Invalid Credentials", false))
+                        .build();
+            
+
+            return Response.status(Response.Status.CREATED)
+                    .entity(new ApiResponse(null, "User authorized successfully", true))
+                    .build();
+
+        } 
+        catch (Exception ex) {
+            logger.error("Error submitting RTGS form", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
+                    .build();
+        }
+    }
+
+
     @POST
     @Path("/createOutwardRtgs")
     public Response createOutwardRtgs(OutwardRTGSFormDto rtgsForm) {
@@ -427,30 +487,31 @@ public class MainResource {
     }
 
 
-    @PUT // Using PUT as it's an update operation
-    @Path("/cancel")
-    public Response cancelRtgsTransaction(@QueryParam("voucherNo") String voucherNo,
-                                           @QueryParam("voucherYear") String voucherYear) {
-        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherNo + voucherYear);
+    @POST 
+    @Path("/cancelOutwardRtgs")
+    public Response cancelRtgsTransaction(VoucherInfoDto voucherInfoDto) {
+        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherInfoDto.getVoucherNo() + voucherInfoDto.getVoucherYear() );
         try {
-            if (voucherNo == null || voucherNo.trim().isEmpty()) {
+            if (voucherInfoDto.getVoucherNo() == null || voucherInfoDto.getVoucherNo().trim().isEmpty() || voucherInfoDto.getVoucherYear() == null || voucherInfoDto.getVoucherYear().trim().isEmpty() ) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ApiResponse(null, "Voucher number is required for cancellation.", false))
                         .build();
             }
 
-            boolean isCancelled = mainService.cancelRtgsTransaction(voucherNo, voucherYear);
+            boolean isCancelled = mainService.cancelRtgsTransaction(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear());
 
             if (isCancelled) {
-                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " has been successfully cancelled.", true))
+                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number  ", true))
                         .build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " not found or could not be cancelled.", false))
-                        .build();
-            }
+            } 
+
+
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(new ApiResponse(null, "Voucher not found", false))
+                    .build();
+        
         } catch (Exception ex) {
-            logger.error("Error cancelling RTGS transaction for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+            logger.error("Error cancelling RTGS transaction for voucherNo: {} and year: {}", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ApiResponse(null, "Internal Server Error occurred while cancelling RTGS transaction.", false))
                     .build();

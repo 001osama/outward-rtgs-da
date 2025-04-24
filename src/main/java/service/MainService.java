@@ -16,6 +16,7 @@ import jakarta.ws.rs.core.Response;
 import database.Datasources;
 import dto.AccountDetailDto;
 import dto.AccountNumberDto;
+import dto.AuthorizeUserDto;
 import dto.BeneficiaryAccountDto;
 import dto.BeneficiaryTransactionLaxDto;
 import dto.ExceptionDto;
@@ -303,6 +304,27 @@ public class MainService {
     }
 
 
+    public boolean authorizeUser(AuthorizeUserDto authUserDto) {
+        List<ExceptionDto> optionList = new ArrayList<>();
+        String sqlQuery = "SELECT * FROM USER_TL WHERE LOGIN_ID=? AND PASSWORD=?";
+    
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+            preparedStatement.setString(1, authUserDto.getLoginId());
+            preparedStatement.setString(2, authUserDto.getPassword());
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+    
+            while (resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while getting exception list for activity", e);
+        }
+        return false;
+    }
+
+
     public BeneficiaryAccountDto getBeneficiaryAccountDetails(String AccOrIban, String BankCode) {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
@@ -419,6 +441,26 @@ public class MainService {
         return outwardRTGS;
     }
 
+    public boolean isCancelVoucherExist(String voucherNo, String voucherYear)
+    {
+        String query = "SELECT * FROM RTGS_TL WHERE VOUCHER_NO=? AND VOUCHER_YEAR=?  AND STATUS = ?"; 
+    
+        try (Connection connection = datasource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, voucherNo);
+            preparedStatement.setString(2, voucherYear);
+            preparedStatement.setString(3, "U");
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+    
+            while (resultSet.next()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while getting unauthorized rtgs list", e);
+        }
+        return false;
+    }
 
     public List<RTGSDto> getUnauthorizedOutwardRTGSList()
     {
@@ -750,19 +792,16 @@ public class MainService {
     // }
     
     public boolean cancelRtgsTransaction(String voucherNo, String voucherYear) {
-        String updateSql = "UPDATE RTGS_TL SET STATUS = 'CANCELLED' WHERE VOUCHER_NO = ?";
-        if (voucherYear != null && !voucherYear.trim().isEmpty()) {
-            updateSql += " AND VOUCHER_YEAR = ?";
-        }
+        String updateSql = "UPDATE RTGS_TL SET STATUS = ? WHERE VOUCHER_NO = ?  AND VOUCHER_YEAR = ?";
+       
         int rowsUpdated = 0;
 
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
 
-            preparedStatement.setString(1, voucherNo);
-            if (voucherYear != null && !voucherYear.trim().isEmpty()) {
-                preparedStatement.setString(2, voucherYear);
-            }
+            preparedStatement.setString(1, "C");
+            preparedStatement.setString(2, voucherNo);
+            preparedStatement.setString(3, voucherYear);
             rowsUpdated = preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
