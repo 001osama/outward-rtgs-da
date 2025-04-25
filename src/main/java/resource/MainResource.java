@@ -490,7 +490,7 @@ public class MainResource {
     @POST 
     @Path("/cancelOutwardRtgs")
     public Response cancelRtgsTransaction(VoucherInfoDto voucherInfoDto) {
-        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherInfoDto.getVoucherNo() + voucherInfoDto.getVoucherYear() );
+        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherInfoDto.toString() );
         try {
             if (voucherInfoDto.getVoucherNo() == null || voucherInfoDto.getVoucherNo().trim().isEmpty() || voucherInfoDto.getVoucherYear() == null || voucherInfoDto.getVoucherYear().trim().isEmpty() ) {
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -519,30 +519,32 @@ public class MainResource {
     }
 
 
-    @PUT // Using PUT as it's an update operation
-    @Path("/authorize")
-    public Response authorizeRtgsTransaction(@QueryParam("voucherNo") String voucherNo,
-                                             @QueryParam("voucherYear") String voucherYear) {
-        logger.info("message : =====> authorizeRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherNo + voucherYear);
+    @POST 
+    @Path("/authorizeOutwardRtgs")
+    public Response authorizeOutwardRtgs(VoucherInfoDto voucherInfo) {
+        logger.info("message : =====> authorizeRtgsTransaction method hit with voucher Info" + voucherInfo.toString() );
         try {
-            if (voucherNo == null || voucherNo.trim().isEmpty()) {
+            if (voucherInfo.getVoucherNo() == null || voucherInfo.getVoucherNo().isEmpty()
+            || voucherInfo.getVoucherYear() == null || voucherInfo.getVoucherYear().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ApiResponse(null, "Voucher number is required for authorization.", false))
                         .build();
             }
 
-            boolean isAuthorized = mainService.authorizeRtgsTransaction(voucherNo, voucherYear);
+            boolean isAuthorized = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear());
 
-            if (isAuthorized) {
-                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " has been successfully authorized.", true))
+            if (isAuthorized) 
+                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher " + voucherInfo.toString() + " has been successfully authorized.", true))
                         .build();
-            } else {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity(new ApiResponse(null, "RTGS transaction with voucher number " + voucherNo + (voucherYear != null && !voucherYear.trim().isEmpty() ? " and year " + voucherYear : "") + " not found or could not be authorized.", false))
+            
+
+            return Response.status(Response.Status.NOT_FOUND)
+                        .entity(new ApiResponse(null, "RTGS transaction with voucher number " + voucherInfo.toString() + " not found or could not be authorized.", false))
                         .build();
-            }
-        } catch (Exception ex) {
-            logger.error("Error authorizing RTGS transaction for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+            
+        } 
+        catch (Exception ex) {
+            logger.error("Error authorizing RTGS transaction for voucher "+ voucherInfo.toString(), ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity(new ApiResponse(null, "Internal Server Error occurred while authorizing RTGS transaction.", false))
                     .build();

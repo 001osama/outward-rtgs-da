@@ -791,7 +791,7 @@ public class MainService {
     //     return null;
     // }
     
-    public boolean cancelRtgsTransaction(String voucherNo, String voucherYear) {
+    public boolean cancelRtgsTransaction(String voucherNo, String voucherYear) throws Exception{
         String updateSql = "UPDATE RTGS_TL SET STATUS = ? WHERE VOUCHER_NO = ?  AND VOUCHER_YEAR = ?";
        
         int rowsUpdated = 0;
@@ -805,30 +805,49 @@ public class MainService {
             rowsUpdated = preparedStatement.executeUpdate();
 
         } catch (SQLException ex) {
-            logger.error("Error updating RTGS transaction status to CANCELLED for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
+                }
+            }
+            errorMessage += ex.getMessage();
+             logger.error(errorMessage, ex);
         }
         return rowsUpdated > 0;
     }
 
 
-    public boolean authorizeRtgsTransaction(String voucherNo, String voucherYear) {
-        String updateSql = "UPDATE RTGS_TL SET STATUS = 'AUTHORIZED' WHERE VOUCHER_NO = ?";
-        if (voucherYear != null && !voucherYear.trim().isEmpty()) {
-            updateSql += " AND VOUCHER_YEAR = ?";
-        }
+    public boolean authorizeOutwardRtgs(String voucherNo, String voucherYear) throws Exception{
+        String updateSql = "UPDATE RTGS_TL SET STATUS = ? WHERE VOUCHER_NO = ?  AND VOUCHER_YEAR = ?";
         int rowsUpdated = 0;
 
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
 
-            preparedStatement.setString(1, voucherNo);
-            if (voucherYear != null && !voucherYear.trim().isEmpty()) {
-                preparedStatement.setString(2, voucherYear);
-            }
+            preparedStatement.setString(1, "A");
+            preparedStatement.setString(2, voucherNo);
+            preparedStatement.setString(3, voucherYear);
+            
             rowsUpdated = preparedStatement.executeUpdate();
 
-        } catch (SQLException ex) {
-            logger.error("Error updating RTGS transaction status to AUTHORIZED for voucherNo: {} and year: {}" + voucherNo + voucherYear, ex);
+        } catch (SQLException ex) { 
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); // Log the detailed error
+                }
+            }
+            errorMessage += ex.getMessage();
+            logger.error(errorMessage, ex);
         }
         return rowsUpdated > 0;
     }
