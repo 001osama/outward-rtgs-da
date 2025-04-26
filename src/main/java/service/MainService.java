@@ -355,8 +355,8 @@ public class MainService {
         sb.append("SELECT LPAD(BRANCH_CD, 4, '0') || '-' || LPAD(ACCOUNT_TYPE_CD , 4, '0') || '-' ||");
         sb.append("LPAD(CUSTOMER_NO, 6, '0') || '-' || LPAD(RUN_NO, 4, '0') || '-' || ");
         sb.append("CHECK_DIGIT AS ACCOUNT_NO, BRANCH_CD, CURRENCY_CD, SBP_TRANSACTION_TYPE_CD, TRANSFER_TYPE, ");
-        sb.append("CUSTOMER_NO, TOTAL_AMOUNT, PURPOSE_OF_PAYMENT_CD, REMARKS, PAYMENT_MODE FROM rtgs_tl ");
-        sb.append("WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
+        sb.append("CUSTOMER_NO, TOTAL_AMOUNT, PURPOSE_OF_PAYMENT_CD, CHEQUE_NO, CHEQUE_DATE, SENDER_TO_RECEIVER_INFO, ");
+        sb.append("REMARKS, PAYMENT_MODE FROM rtgs_tl WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
 
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
@@ -375,6 +375,9 @@ public class MainService {
                     resultSet.getString("PURPOSE_OF_PAYMENT_CD"), 
                     resultSet.getString("REMARKS"), 
                     resultSet.getString("SBP_TRANSACTION_TYPE_CD"),
+                    resultSet.getString("SENDER_TO_RECEIVER_INFO"),
+                    resultSet.getString("CHEQUE_NO"),
+                    resultSet.getString("CHEQUE_DATE"),
                     resultSet.getString("TRANSFER_TYPE"),
                     resultSet.getString("TOTAL_AMOUNT"),
                     new ArrayList<>()
@@ -519,8 +522,9 @@ public class MainService {
             StringBuilder sb = new StringBuilder();
             sb.append("INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT,");
             sb.append("VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE,");
-            sb.append("TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, REMARKS, STATUS)");
-            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb.append("TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, ");
+            sb.append("SENDER_TO_RECEIVER_INFO, CHEQUE_DATE, CHEQUE_NO, IS_BENEF_TITLE_FETCH, REMARKS, STATUS)");
+            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try(PreparedStatement preparedStatement = connection.prepareStatement(sb.toString()))
             {
@@ -540,8 +544,12 @@ public class MainService {
                 preparedStatement.setString(14, localTimeString);
                 preparedStatement.setString(15, rtgsForm.getLoginId());
                 preparedStatement.setString(16, rtgsForm.getPurposeOfPaymentCode());
-                preparedStatement.setString(17, rtgsForm.getRemarks());
-                preparedStatement.setString(18, "U");
+                preparedStatement.setString(17, rtgsForm.getSenderToReceiverInformation());
+                preparedStatement.setString(18, rtgsForm.getChequeDate());
+                preparedStatement.setString(19, rtgsForm.getChequeNo());
+                preparedStatement.setInt(20, 1);
+                preparedStatement.setString(21, rtgsForm.getRemarks());
+                preparedStatement.setString(22, "U");
 
 
                 int affectedRows = preparedStatement.executeUpdate();
@@ -598,8 +606,8 @@ public class MainService {
             StringBuilder sb3 = new StringBuilder();
                 sb3.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
                 sb3.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2,");
-                sb3.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, STATUS)");
-                sb3.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                sb3.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
+                sb3.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
                 try (PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
                 preparedStatement.setString(1, "1001"); 
@@ -616,7 +624,9 @@ public class MainService {
                 preparedStatement.setBigDecimal(12, new BigDecimal(rtgsForm.getTotalAmount())); 
                 preparedStatement.setString(13, "G");  
                 preparedStatement.setString(14, "M"); 
-                preparedStatement.setString(15, "A"); 
+                preparedStatement.setString(15, localDateString); 
+                preparedStatement.setString(16, localTimeString); 
+                preparedStatement.setString(17, "A"); 
 
                 int affectedRows = preparedStatement.executeUpdate();
                 logger.info("Affected No of rows is: ");
@@ -632,8 +642,8 @@ public class MainService {
             StringBuilder sb4 = new StringBuilder();
             sb4.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
             sb4.append("ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, TRAN_CODE,");
-            sb4.append("AMOUNT, ACCOUNT_IDENTITY, STATUS)");
-            sb4.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb4.append("AMOUNT, ACCOUNT_IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
+            sb4.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb4.toString())) {
                 preparedStatement.setString(1, rtgsForm.getBranchCode()); 
@@ -647,7 +657,9 @@ public class MainService {
                 preparedStatement.setString(9, "30630");   
                 preparedStatement.setBigDecimal(10, new BigDecimal(rtgsForm.getTotalAmount()).negate()); 
                 preparedStatement.setString(11, "C");  
-                preparedStatement.setString(12, "A"); 
+                preparedStatement.setString(12, localDateString); 
+                preparedStatement.setString(13, localTimeString); 
+                preparedStatement.setString(14, "A"); 
 
 
                 int affectedRows = preparedStatement.executeUpdate();

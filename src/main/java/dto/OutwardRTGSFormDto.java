@@ -27,6 +27,8 @@ public class OutwardRTGSFormDto {
     private String remarks;
     private String sbpTranTypeCode;
     private String senderToReceiverInformation;
+    private String chequeDate;
+    private String chequeNo;
     private String transferTypeCode;
     private String totalAmount;
     private List<BeneficiaryTransactionLaxDto> transactionLaxList;
