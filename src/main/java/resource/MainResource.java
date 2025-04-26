@@ -346,7 +346,7 @@ public class MainResource {
 
             if (rtgsList == null || rtgsList.size() == 0) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new ApiResponse(null, "No Data exist", false))
+                        .entity(new ApiResponse(null, "No Voucher exist for authorization", false))
                         .build();
             }
 
@@ -444,7 +444,7 @@ public class MainResource {
         catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
+                    .entity(new ApiResponse(null, "Internal Server Error", false))
                     .build();
         }
     }
@@ -489,7 +489,7 @@ public class MainResource {
 
     @POST 
     @Path("/cancelOutwardRtgs")
-    public Response cancelRtgsTransaction(VoucherInfoDto voucherInfoDto) {
+    public Response cancelOutwardRtgs(VoucherInfoDto voucherInfoDto) {
         logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherInfoDto.toString() );
         try {
             if (voucherInfoDto.getVoucherNo() == null || voucherInfoDto.getVoucherNo().trim().isEmpty() || voucherInfoDto.getVoucherYear() == null || voucherInfoDto.getVoucherYear().trim().isEmpty() ) {
@@ -498,7 +498,7 @@ public class MainResource {
                         .build();
             }
 
-            boolean isCancelled = mainService.cancelRtgsTransaction(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear());
+            boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear());
 
             if (isCancelled) {
                 return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number  ", true))
