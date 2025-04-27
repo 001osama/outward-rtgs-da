@@ -1,14 +1,10 @@
 package resource;
 
-
+import java.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
-
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
 import dto.ApiResponse;
@@ -24,7 +20,6 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
@@ -595,9 +590,9 @@ public class MainResource {
 
 
     @GET
-    @Path("/downloadReport")
-    @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    public Response downloadReport(
+    @Path("/downloadExcelReport")
+    @Produces("application/json")  
+    public Response downloadExcelReport(
         @QueryParam("voucherNo") String voucherNo, 
         @QueryParam("voucherYear") String voucherYear) {
         try {
@@ -623,8 +618,9 @@ public class MainResource {
             workbook.write(out);
             workbook.close();
 
-            return Response.ok(new ApiResponse(out.toByteArray(), null, true ))
-                    .header("Content-Disposition", "attachment; filename=\"report.xlsx\"")
+            String base64Excel = Base64.getEncoder().encodeToString(out.toByteArray());
+
+            return Response.ok(new ApiResponse(base64Excel, null, true))
                     .build();
 
         } catch (Exception e) {
@@ -633,7 +629,7 @@ public class MainResource {
                         .entity(new ApiResponse(null, "Failed to create report", false))
                         .build();
         }
-    }
+}
 
 
 }
