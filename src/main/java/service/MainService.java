@@ -738,6 +738,60 @@ public class MainService {
     }
 
 
+    public List<VoucherLaxDto> getTransactionLaxList(String voucherNo, String voucherYear) throws Exception{
+        StringBuilder sb5 = new StringBuilder();
+        sb5.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
+        sb5.append("CASE WHEN AMOUNT < 0 THEN ABS(AMOUNT) ELSE 0 END AS CREDIT, ");
+        sb5.append("CASE WHEN AMOUNT > 0 THEN AMOUNT ELSE 0 END AS DEBIT, ");
+        sb5.append("CASE WHEN ACCOUNT_IDENTITY = 'C' THEN ");
+        sb5.append("LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || ");
+        sb5.append("LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 4, '0') || '-' || check_digit ");
+        sb5.append("ELSE IDENTITY || '-' || LPAD(MAIN_HD, 3, '0') || '-' || LPAD(SUB_HD_1, 2, '0') || '-' || ");
+        sb5.append("LPAD(SUB_HD_2, 2, '0') || '-' || LPAD(GL_RUN_NO, 4, '0') || '-' || GL_CHECK_DIGIT END AS ACCOUNT_NO, ");
+        sb5.append("'PKR' AS CURRENCY_CODE ");
+        sb5.append("FROM TRANSACTION_TL WHERE VOUCHER_NO=? AND VOUCHER_YEAR=?");
+
+        OutwardRTGSReponseDto result = new OutwardRTGSReponseDto();
+        List<VoucherLaxDto> resultList = new ArrayList<>();
+        try (
+            Connection connection = datasource.getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sb5.toString())
+        ) 
+        {
+                preparedStatement.setString(1, voucherNo); 
+                preparedStatement.setString(2, voucherYear); 
+                ResultSet resultSet = preparedStatement.executeQuery();
+
+                while (resultSet.next()) {
+                    resultList.add( new VoucherLaxDto(
+                        resultSet.getString("VOUCHER_NO"),
+                        resultSet.getString("REFERENCE_NO"),
+                        resultSet.getString("CREDIT"),
+                        resultSet.getString("DEBIT"),
+                        resultSet.getString("ACCOUNT_NO"),
+                        resultSet.getString("CURRENCY_CODE"))
+                    );
+                }
+                result.setVoucherLaxList(resultList);
+                
+        }
+        catch(SQLException ex){
+            String errorMessage = "Database error occurred: ";
+            if (ex instanceof DB2Diagnosable) {
+                DB2Sqlca sqlca = ((DB2Diagnosable) ex).getSqlca();
+                if (sqlca != null) {
+                    errorMessage += "SQLCODE = " + sqlca.getSqlCode() +
+                                    ", SQLSTATE = " + sqlca.getSqlState() +
+                                    ", Message = " + sqlca.getMessage();
+                    logger.error(errorMessage, ex); 
+                }
+            }
+            errorMessage += ex.getMessage();
+             logger.error(errorMessage, ex);
+        }
+        return resultList;
+    }
+
 
 
     // public BeneficiaryAccountDto getBeneficiaryAccount(String beneficiaryAccountNo) {

@@ -1,6 +1,14 @@
 package resource;
 
 
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.jboss.logging.Logger;
 import dto.AccountNumberDto;
 import dto.ApiResponse;
@@ -11,6 +19,7 @@ import dto.OutwardRTGSFormDto;
 import dto.UserDto;
 import dto.UserInfoDto;
 import dto.VoucherInfoDto;
+import dto.VoucherLaxDto;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -583,5 +592,48 @@ public class MainResource {
                         .entity(new ApiResponse(null, "Every thing working fine.", false))
                         .build();
     }
+
+
+    @GET
+    @Path("/downloadReport")
+    @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    public Response downloadReport(
+        @QueryParam("voucherNo") String voucherNo, 
+        @QueryParam("voucherYear") String voucherYear) {
+        try {
+            List<VoucherLaxDto> dataList = mainService.getTransactionLaxList(voucherNo, voucherYear);
+            
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Report");
+
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Amount");
+            headerRow.createCell(1).setCellValue("VoucherNo");
+            headerRow.createCell(2).setCellValue("ReferenceNo");
+
+            int rowNum = 1;
+            for (VoucherLaxDto entity : dataList) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(entity.getAccountNo());
+                row.createCell(1).setCellValue(entity.getVoucherNo());
+                row.createCell(2).setCellValue(entity.getReferenceNo());
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            workbook.write(out);
+            workbook.close();
+
+            return Response.ok(new ApiResponse(out.toByteArray(), null, true ))
+                    .header("Content-Disposition", "attachment; filename=\"report.xlsx\"")
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                        .entity(new ApiResponse(null, "Failed to create report", false))
+                        .build();
+        }
+    }
+
 
 }
