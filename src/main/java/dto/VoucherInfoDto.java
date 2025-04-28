@@ -14,4 +14,5 @@ import lombok.ToString;
 public class VoucherInfoDto {
     String voucherNo; 
     String voucherYear;
+    String loginId;
 }

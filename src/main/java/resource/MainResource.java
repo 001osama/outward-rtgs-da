@@ -496,7 +496,10 @@ public class MainResource {
     public Response cancelOutwardRtgs(VoucherInfoDto voucherInfoDto) {
         logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherInfoDto.toString() );
         try {
-            if (voucherInfoDto.getVoucherNo() == null || voucherInfoDto.getVoucherNo().trim().isEmpty() || voucherInfoDto.getVoucherYear() == null || voucherInfoDto.getVoucherYear().trim().isEmpty() ) {
+            if (voucherInfoDto.getVoucherNo() == null || 
+                voucherInfoDto.getVoucherNo().trim().isEmpty() || 
+                voucherInfoDto.getVoucherYear() == null || 
+                voucherInfoDto.getVoucherYear().trim().isEmpty() ) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ApiResponse(null, "Voucher number is required for cancellation.", false))
                         .build();
@@ -514,10 +517,11 @@ public class MainResource {
                     .entity(new ApiResponse(null, "Voucher not found", false))
                     .build();
         
-        } catch (Exception ex) {
+        } 
+        catch (Exception ex) {
             logger.error("Error cancelling RTGS transaction for voucherNo: {} and year: {}", ex);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity(new ApiResponse(null, "Internal Server Error occurred while cancelling RTGS transaction.", false))
+                    .entity(new ApiResponse(null, "Error occurred while cancelling voucher.", false))
                     .build();
         }
     }
@@ -529,12 +533,18 @@ public class MainResource {
         logger.info("message : =====> authorizeRtgsTransaction method hit with voucher Info" + voucherInfo.toString() );
         try {
             if (voucherInfo.getVoucherNo() == null || voucherInfo.getVoucherNo().isEmpty()
-            || voucherInfo.getVoucherYear() == null || voucherInfo.getVoucherYear().isEmpty()) {
+            || voucherInfo.getVoucherYear() == null || voucherInfo.getVoucherYear().isEmpty()
+            || voucherInfo.getLoginId() == null || voucherInfo.getLoginId().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ApiResponse(null, "Voucher number is required for authorization.", false))
                         .build();
             }
 
+            boolean isPostingUser = mainService.isPostingUser(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
+            if(isPostingUser)
+                return Response.ok(new ApiResponse(null, "Same user cannot authorize", false))
+                .build();
+            
             boolean isAuthorized = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear());
 
             if (isAuthorized) 
@@ -574,18 +584,37 @@ public class MainResource {
                 var detailsArray = accountNo.split("-");
                 var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
             
-                boolean isValid = mainService.isChequeExist(accountNumberDto, chequeNo);
+                String chequeStatus = mainService.getChequeStatus(accountNumberDto, chequeNo);
+
+                if(chequeStatus == null)
+                    return Response.status(Response.Status.NOT_FOUND)
+                            .entity(new ApiResponse(null, "Cheque does not exist", false))
+                            .build();
+
+                else if(chequeStatus.equals("C"))
+                {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(new ApiResponse(null, "Cheque has cancelled", false))
+                            .build();
+                }
+                else if(chequeStatus.equals("P"))
+                {
+                    return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(new ApiResponse(null, "Cheque is already Paid", false))
+                            .build();
+                }
                 
-            } catch (Exception ex) {
+                return Response.status(Response.Status.OK)
+                            .entity(new ApiResponse(chequeStatus, "null", true))
+                            .build();
+                
+            } 
+            catch (Exception ex) {
                 logger.error("Error authorizing RTGS transaction for chequeNo: { "+ chequeNo +" }", ex);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new ApiResponse(null, "Internal Server Error occurred while validating cheque.", false))
                         .build();
             }
-
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity(new ApiResponse(null, "Every thing working fine.", false))
-                        .build();
     }
 
 
@@ -602,16 +631,24 @@ public class MainResource {
             Sheet sheet = workbook.createSheet("Report");
 
             Row headerRow = sheet.createRow(0);
-            headerRow.createCell(0).setCellValue("Amount");
-            headerRow.createCell(1).setCellValue("VoucherNo");
-            headerRow.createCell(2).setCellValue("ReferenceNo");
+            headerRow.createCell(0).setCellValue("Voucher No.");
+            headerRow.createCell(1).setCellValue("Ref No");
+            headerRow.createCell(2).setCellValue("Account No.");
+            headerRow.createCell(3).setCellValue("A/C Title");
+            headerRow.createCell(4).setCellValue("CCY");
+            headerRow.createCell(5).setCellValue("DR");
+            headerRow.createCell(6).setCellValue("CR");
 
             int rowNum = 1;
             for (VoucherLaxDto entity : dataList) {
                 Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(entity.getAccountNo());
-                row.createCell(1).setCellValue(entity.getVoucherNo());
-                row.createCell(2).setCellValue(entity.getReferenceNo());
+                row.createCell(0).setCellValue(entity.getVoucherNo());
+                row.createCell(1).setCellValue(entity.getReferenceNo());
+                row.createCell(2).setCellValue(entity.getAccountNo());
+                row.createCell(3).setCellValue(entity.getAccountNo());
+                row.createCell(4).setCellValue(entity.getCurrencyCode());
+                row.createCell(5).setCellValue(entity.getDebitAmount());
+                row.createCell(6).setCellValue(entity.getCreditAmount());
             }
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -630,6 +667,5 @@ public class MainResource {
                         .build();
         }
 }
-
 
 }
