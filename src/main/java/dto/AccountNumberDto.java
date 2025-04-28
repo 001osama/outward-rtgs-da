@@ -6,9 +6,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class AccountNumberDto {
-    private String branchCode;
-    private String accountType;
-    private String customerNo;
-    private String runNo;
-    private String checkDigit;
+    String branchCode;
+    String accountType;
+    String customerNo;
+    String runNo;
+    String checkDigit;
 }

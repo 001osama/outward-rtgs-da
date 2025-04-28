@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class UserInfoDto {
-    private String loginId;
-    private String branchCode;
-    private int role;
+    String loginId;
+    String branchCode;
+    int role;
 }

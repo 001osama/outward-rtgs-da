@@ -12,7 +12,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class ApiResponse {
-    private Object data;
-    private String message;
-    private boolean success = true;
+    Object data;
+    String message;
+    boolean success = true;
 }

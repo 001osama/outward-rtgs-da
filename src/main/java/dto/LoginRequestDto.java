@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 
 public class LoginRequestDto {
-    private String loginId;
-    private String branchCode;
-    private String password;
+    String loginId;
+    String branchCode;
+    String password;
 }

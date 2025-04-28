@@ -10,8 +10,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class OutwardRTGSReponseDto {
-    private List<VoucherLaxDto> voucherLaxList;
-    private List<String> adviceNoList;
+    List<VoucherLaxDto> voucherLaxList;
+    List<String> adviceNoList;
 }
 
 

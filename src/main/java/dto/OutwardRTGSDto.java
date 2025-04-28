@@ -13,18 +13,18 @@ import lombok.Setter;
 @Setter
 @Getter
 public class OutwardRTGSDto {
-    private String accountNo;
-    private String branchCode;
-    private String currencyCode;
-    private String customerNo;
-    private String paymentMode;
-    private String purposeOfPaymentCode;
-    private String remarks;
-    private String sbpTranTypeCode;
-    private String senderToReceiverInformation;
-    private String chequeNo;
-    private String chequeDate;
-    private String transferTypeCode;
-    private String totalAmount;
-    private List<BeneficiaryTransactionLaxDto> transactionLaxList;
+    String accountNo;
+    String branchCode;
+    String currencyCode;
+    String customerNo;
+    String paymentMode;
+    String purposeOfPaymentCode;
+    String remarks;
+    String sbpTranTypeCode;
+    String senderToReceiverInformation;
+    String chequeNo;
+    String chequeDate;
+    String transferTypeCode;
+    String totalAmount;
+    List<BeneficiaryTransactionLaxDto> transactionLaxList;
 }

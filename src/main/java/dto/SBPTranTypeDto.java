@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 
 public class SBPTranTypeDto {
-    private int sbptrantypeCode;
-    private String sbptranType;
+    int sbptrantypeCode;
+    String sbptranType;
 }

@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 
 public class CurrencyDto {
-    private String currencyCode;
-    private String currencyType;
+    String currencyCode;
+    String currencyType;
 }

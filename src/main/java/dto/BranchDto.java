@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 
 public class BranchDto {
-    private int branchCd;
-    private String branchName;
+    int branchCd;
+    String branchName;
     
 }

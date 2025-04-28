@@ -13,6 +13,6 @@ import lombok.ToString;
 @ToString
 
 public class BeneficiaryAccountDto {
-    private int beneficiaryBranchCd;
-    private String accountTitle;
+    int beneficiaryBranchCd;
+    String accountTitle;
 }

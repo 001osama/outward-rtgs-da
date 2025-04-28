@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 
 public class ListDto {
-    private String label;
-    private String value;
+    String label;
+    String value;
 }
