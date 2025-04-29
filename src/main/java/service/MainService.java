@@ -1022,16 +1022,26 @@ public class MainService {
 
     }
 
-    public boolean authorizeOutwardRtgs(String voucherNo, String voucherYear) throws Exception{
-        String updateSql = "UPDATE RTGS_TL SET STATUS = ? WHERE VOUCHER_NO = ?  AND VOUCHER_YEAR = ?";
+    public boolean authorizeOutwardRtgs(String voucherNo, String voucherYear, String loginId) throws Exception{
+        String updateSql = "UPDATE RTGS_TL SET AUTH_DATE = ?, AUTH_TIME = ?, AUTH_BY = ?, STATUS = ? WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
         int rowsUpdated = 0;
+
+
+        var localDateString = String.valueOf(LocalDate.now());
+
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String localTimeString = LocalTime.now().format(timeFormatter);
+
 
         try (Connection connection = datasource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
 
-            preparedStatement.setString(1, "A");
-            preparedStatement.setString(2, voucherNo);
-            preparedStatement.setString(3, voucherYear);
+            preparedStatement.setString(1, localDateString);
+            preparedStatement.setString(2, localTimeString);
+            preparedStatement.setString(3, loginId);
+            preparedStatement.setString(4, "A");
+            preparedStatement.setString(5, voucherNo);
+            preparedStatement.setString(6, voucherYear);
             
             rowsUpdated = preparedStatement.executeUpdate();
 

@@ -545,7 +545,7 @@ public class MainResource {
                 return Response.ok(new ApiResponse(null, "Same user cannot authorize", false))
                 .build();
             
-            boolean isAuthorized = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear());
+            boolean isAuthorized = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
 
             if (isAuthorized) 
                 return Response.ok(new ApiResponse(null, "RTGS transaction with voucher " + voucherInfo.toString() + " has been successfully authorized.", true))
@@ -588,19 +588,19 @@ public class MainResource {
 
                 if(chequeStatus == null)
                     return Response.status(Response.Status.NOT_FOUND)
-                            .entity(new ApiResponse(null, "Cheque does not exist", false))
+                            .entity(new ApiResponse(null, "Cheque No " + chequeNo + " does not exist", false))
                             .build();
 
                 else if(chequeStatus.equals("C"))
                 {
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .entity(new ApiResponse(null, "Cheque has cancelled", false))
+                            .entity(new ApiResponse(null, "Cheque "+ chequeNo +" has cancelled", false))
                             .build();
                 }
                 else if(chequeStatus.equals("P"))
                 {
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .entity(new ApiResponse(null, "Cheque is already Paid", false))
+                            .entity(new ApiResponse(null, "Cheque " + chequeNo + " is already Paid", false))
                             .build();
                 }
                 
