@@ -522,8 +522,8 @@ public class MainService {
             sb.append("INSERT INTO RTGS_TL (BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT,");
             sb.append("VOUCHER_NO, VOUCHER_YEAR, SBP_TRANSACTION_TYPE_CD, CURRENCY_CD, TRANSFER_TYPE, PAYMENT_MODE,");
             sb.append("TOTAL_AMOUNT, POSTED_DATE, POSTED_TIME, POSTED_BY, PURPOSE_OF_PAYMENT_CD, ");
-            sb.append("SENDER_TO_RECEIVER_INFO, CHEQUE_DATE, CHEQUE_NO, IS_BENEF_TITLE_FETCH, REMARKS)");
-            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb.append("SENDER_TO_RECEIVER_INFO, CHEQUE_DATE, CHEQUE_NO, IS_BENEF_TITLE_FETCH, REMARKS, STATUS)");
+            sb.append(" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try(PreparedStatement preparedStatement = connection.prepareStatement(sb.toString()))
             {
@@ -548,6 +548,7 @@ public class MainService {
                 preparedStatement.setString(19, rtgsForm.getChequeNo());
                 preparedStatement.setBoolean(20, rtgsForm.getIsBeneficiaryTitleFetch());
                 preparedStatement.setString(21, rtgsForm.getRemarks());
+                preparedStatement.setString(22, "U");
 
 
                 int affectedRows = preparedStatement.executeUpdate();
