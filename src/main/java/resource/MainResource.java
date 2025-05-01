@@ -45,13 +45,13 @@ public class MainResource {
         logger.info("message : =====> create method hit with body "+ user.toString());
         try 
         {
-            var result = mainService.getUser(user.getLoginId());
-            if(result != null)
+            var isUserExist = mainService.isUserExist(user.getLoginId());
+            if(isUserExist)
                 return Response.status(Response.Status.BAD_REQUEST)
                 .entity(new ApiResponse(null,"Login Id already exists",false))
                 .build();
 
-            result = mainService.createUser(user);
+            var result = mainService.createUser(user);
 
             if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -76,18 +76,14 @@ public class MainResource {
         logger.info("message : =====> login method hit with body "+ loginRequest.toString());
         try 
         {
-            var result = mainService.getUser(loginRequest.getLoginId());
+            var result = mainService.getUser(loginRequest);
 
-            if(result == null || 
-                !result.getBranchCode().equals(loginRequest.getBranchCode()) ||
-                !result.getPassword().equals(loginRequest.getPassword()) 
-            )
+            if(result == null)
                 return Response.status(Response.Status.BAD_REQUEST)
                     .entity(new ApiResponse(null,"Invalid credentials",false))
                     .build();
 
-            var response = new UserInfoDto(result.getLoginId(), result.getBranchCode(), result.getRoleId());
-            return Response.ok(new ApiResponse(response, null, true))
+            return Response.ok(new ApiResponse(result, null, true))
                 .build();
         } 
         catch (Exception ex) {
@@ -505,6 +501,11 @@ public class MainResource {
                         .build();
             }
 
+            boolean isPostingUser = mainService.isPostingUser(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
+            if(isPostingUser)
+                return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
+                .build();
+
             boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear());
 
             if (isCancelled) {
@@ -540,10 +541,10 @@ public class MainResource {
                         .build();
             }
 
-            boolean isPostingUser = mainService.isPostingUser(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
-            if(isPostingUser)
-                return Response.ok(new ApiResponse(null, "Same user cannot authorize", false))
-                .build();
+            // boolean isPostingUser = mainService.isPostingUser(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
+            // if(isPostingUser)
+            //     return Response.ok(new ApiResponse(null, "Same user cannot authorize", false))
+            //     .build();
             
             boolean isAuthorized = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
 
@@ -570,12 +571,13 @@ public class MainResource {
     @Path("/validatecheque")
     public Response validateCheque(
         @QueryParam("accountNo") String accountNo,
-        @QueryParam("chequeNo") String chequeNo) 
+        @QueryParam("chequeNo") String chequeNo, 
+        @QueryParam("chequeDate") String chequeDate) 
         {
             logger.info("message : =====> authorizeRtgsTransaction method hit for chequeNo: { "+ chequeNo +" } ");
             try {
                 if (chequeNo == null || chequeNo.trim().isEmpty() || 
-                    accountNo == null || chequeNo.trim().isEmpty()) 
+                    accountNo == null || accountNo.trim().isEmpty()) 
                     return Response.status(Response.Status.BAD_REQUEST)
                             .entity(new ApiResponse(null, "Cheque Number is required.", false))
                             .build();
@@ -585,7 +587,7 @@ public class MainResource {
                 var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
             
                 String chequeStatus = mainService.getChequeStatus(accountNumberDto, chequeNo);
-
+                
                 if(chequeStatus == null)
                     return Response.status(Response.Status.NOT_FOUND)
                             .entity(new ApiResponse(null, "Cheque No " + chequeNo + " does not exist", false))
@@ -663,8 +665,8 @@ public class MainResource {
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                        .entity(new ApiResponse(null, "Failed to create report", false))
-                        .build();
+                .entity(new ApiResponse(null, "Failed to create report", false))
+                .build();
         }
 }
 

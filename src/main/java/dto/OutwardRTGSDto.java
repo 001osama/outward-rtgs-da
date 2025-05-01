@@ -26,5 +26,6 @@ public class OutwardRTGSDto {
     String chequeDate;
     String transferTypeCode;
     String totalAmount;
+    String postedBy;
     List<BeneficiaryTransactionLaxDto> transactionLaxList;
 }

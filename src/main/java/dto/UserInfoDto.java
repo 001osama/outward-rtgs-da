@@ -11,4 +11,6 @@ public class UserInfoDto {
     String loginId;
     String branchCode;
     int role;
+    String lastLoggedInDate;
+    String currentLoggedInDate;
 }
