@@ -25,6 +25,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import service.BirtService;
 import service.MainService;
 
 @Path("/data-access")
@@ -37,6 +38,9 @@ public class MainResource {
 
     @Inject
     MainService mainService;
+
+    @Inject
+    BirtService birtService;
 
     @POST
     @Path("/createuser")
@@ -668,6 +672,27 @@ public class MainResource {
                 .entity(new ApiResponse(null, "Failed to create report", false))
                 .build();
         }
-}
+    }
+
+
+    @GET
+    @Path("/downloadBirtReport")
+    @Produces("application/json")  
+    public Response downloadBirtReport() {
+        try {
+            byte[] reportByteArray = birtService.generateReport();
+
+            String base64Report = Base64.getEncoder().encodeToString(reportByteArray);
+
+            return Response.ok(new ApiResponse(base64Report, null, true))
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null, "Failed to create report", false))
+                .build();
+        }
+    }
 
 }

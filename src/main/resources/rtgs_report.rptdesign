@@ -1,0 +1,737 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.19.0.v202502081713</property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">queryText</property>
+            <property name="id">5</property>
+        </structure>
+        <structure>
+            <property name="name">queryTimeOut</property>
+            <property name="id">5</property>
+        </structure>
+        <structure>
+            <property name="name">rowFetchSize</property>
+            <property name="id">5</property>
+        </structure>
+    </list-property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="Data Source" id="4">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.ibm.db2.jcc.DB2Driver</property>
+            <property name="odaURL">jdbc:db2://10.51.41.27:50000/TESTDB</property>
+            <property name="odaUser">bahl</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">YkBobEAxMjM0</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="Data Set" id="5">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">Brn Cd</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">BRANCH_CD</text-property>
+                    <text-property name="heading">BRANCH_CD</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Advice No/Year</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Advice No/Year</text-property>
+                    <text-property name="heading">Advice No/Year</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Tran Type</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">TRANSFER_TYPE</text-property>
+                    <text-property name="heading">TRANSFER_TYPE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Account Number/Account Name</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Account Number/Account Name</text-property>
+                    <text-property name="heading">Account Number/Account Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Benef AccNo/Name</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Benef AccNo/Name</text-property>
+                    <text-property name="heading">Benef AccNo/Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Beneficiary Address</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">ADDRESS</text-property>
+                    <text-property name="heading">ADDRESS</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Beneficiary Bank Name</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">Beneficiary Bank Name</text-property>
+                    <text-property name="heading">Beneficiary Bank Name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">VouchNo/Year</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">VouchNo/Year</text-property>
+                    <text-property name="heading">VouchNo/Year</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">Tran Amt</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">Tran Amt</text-property>
+                    <text-property name="heading">Tran Amt</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TypeC</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">TypeC</text-property>
+                    <text-property name="heading">TypeC</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">Brn Cd</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Advice No/Year</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">Tran Type</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Account Number/Account Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">Benef AccNo/Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">Beneficiary Address</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">Beneficiary Bank Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">VouchNo/Year</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">Tran Amt</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">TypeC</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">Brn Cd</property>
+                    <property name="nativeName">BRANCH_CD</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">Advice No/Year</property>
+                    <property name="nativeName">Advice No/Year</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">Tran Type</property>
+                    <property name="nativeName">TRANSFER_TYPE</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">Account Number/Account Name</property>
+                    <property name="nativeName">Account Number/Account Name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">Benef AccNo/Name</property>
+                    <property name="nativeName">Benef AccNo/Name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Beneficiary Address</property>
+                    <property name="nativeName">ADDRESS</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">Beneficiary Bank Name</property>
+                    <property name="nativeName">BANK_NAME</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">VouchNo/Year</property>
+                    <property name="nativeName">VouchNo/Year</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">Tran Amt</property>
+                    <property name="nativeName">AMOUNT</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">TypeC</property>
+                    <property name="nativeName">SBP_TRANSACTION_TYPE_CD</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT
+    r.branch_cd AS "Brn Cd",
+    rb.advise_no || '/' || rb.advise_year AS "Advice No/Year",
+    r.transfer_type AS  "Tran Type",
+    a.branch_cd || '-' || a.account_type_cd || '-' || a.customer_no || '-' || a.run_no || '-' || a.check_digit || '/' || a.account_title AS "Account Number/Account Name",
+    rb.account_no || '/' || rb.account_title AS "Benef AccNo/Name",
+    rb.address AS "Beneficiary Address",
+    b.bank_name AS "Beneficiary Bank Name",
+    r.voucher_no || '/' || r.voucher_year AS "VouchNo/Year",
+    rb.amount AS "Tran Amt",
+    r.sbp_transaction_type_cd AS "TypeC"
+FROM RTGS_TL r
+JOIN RTGS_BENEFICIARY_TL rb ON r.voucher_no = rb.voucher_no
+JOIN ACCOUNT_TL a ON r.branch_cd = a.branch_cd
+JOIN BANKS_TL b ON rb.bank_cd = b.bank_cd]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CUSTOMER_NO</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>6</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CUSTOMER_NO</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CUSTOMER_NO</design:label>
+            <design:formattingHints>
+              <design:displaySize>8</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>CUSTOMER_NAME</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>CUSTOMER_NAME</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>CUSTOMER_NAME</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ADDRESS</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>100</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ADDRESS</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ADDRESS</design:label>
+            <design:formattingHints>
+              <design:displaySize>100</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>MOBILE</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>15</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>MOBILE</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>MOBILE</design:label>
+            <design:formattingHints>
+              <design:displaySize>15</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <styles>
+        <style name="NewStyle" id="29">
+            <property name="width">20cm</property>
+        </style>
+        <style name="NewStyle1" id="30">
+            <property name="width">10in</property>
+        </style>
+        <style name="NewStyle2" id="32">
+            <property name="width">6cm</property>
+        </style>
+        <style name="NewStyle3" id="87">
+            <property name="width">5cm</property>
+        </style>
+        <style name="NewStyle4" id="100">
+            <property name="height">2cm</property>
+        </style>
+        <style name="NewStyle5" id="101">
+            <property name="height">2mm</property>
+        </style>
+        <style name="NewStyle6" id="105">
+            <property name="height">2mm</property>
+        </style>
+        <style name="NewStyle7" id="106">
+            <property name="fontSize">larger</property>
+        </style>
+        <style name="NewStyle8" id="107">
+            <property name="fontSize">larger</property>
+        </style>
+        <style name="NewStyle9" id="353">
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+        </style>
+        <style name="NewStyle10" id="354">
+            <property name="marginBottom">2pt</property>
+        </style>
+        <style name="NewStyle11" id="355">
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+        </style>
+        <style name="NewStyle12" id="356">
+            <property name="borderBottomColor">#808080</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+        </style>
+        <style name="NewStyle13" id="357">
+            <property name="marginTop">auto</property>
+        </style>
+        <style name="NewStyle14" id="358">
+            <property name="marginTop">5pt</property>
+        </style>
+    </styles>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="headerHeight">1in</property>
+            <page-header>
+                <grid id="88">
+                    <property name="height">10.3125in</property>
+                    <property name="width">8.010416666666666in</property>
+                    <column id="89">
+                        <property name="width">2.1041666666666665in</property>
+                    </column>
+                    <column id="90">
+                        <property name="width">3.8958333333333335in</property>
+                    </column>
+                    <column id="91">
+                        <property name="width">2.0104166666666665in</property>
+                    </column>
+                    <row id="92">
+                        <property name="height">10.3125in</property>
+                        <cell id="93">
+                            <label id="99">
+                                <property name="fontSize">8pt</property>
+                                <text-property name="text">BANK AL HABIB LIMITED</text-property>
+                            </label>
+                            <image id="370">
+                                <property name="height">0.6145833333333334in</property>
+                                <property name="width">0.5104166666666666in</property>
+                                <property name="source">file</property>
+                                <expression name="uri" type="constant">bahl-logo.png</expression>
+                            </image>
+                        </cell>
+                        <cell id="94">
+                            <label id="96">
+                                <property name="style">NewStyle8</property>
+                                <property name="fontSize">11pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">RTGS TRANSACTION DETAIL</text-property>
+                            </label>
+                            <label id="111">
+                                <property name="fontSize">9pt</property>
+                                <property name="textAlign">center</property>
+                                <text-property name="text">From: Date      To: Date</text-property>
+                            </label>
+                        </cell>
+                        <cell id="95">
+                            <label id="103">
+                                <property name="fontSize">8pt</property>
+                                <property name="paddingLeft">20pt</property>
+                                <property name="textAlign">left</property>
+                                <text-property name="text">Report ID: RTGS OUTWARD</text-property>
+                            </label>
+                            <label id="104">
+                                <property name="fontSize">8pt</property>
+                                <property name="paddingLeft">20pt</property>
+                                <property name="textAlign">left</property>
+                                <text-property name="text">Produced On: Date &amp; Time</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="157">
+                    <column id="158"/>
+                    <column id="159"/>
+                    <row id="160">
+                        <cell id="161">
+                            <label id="166">
+                                <text-property name="text">Produced By: User</text-property>
+                            </label>
+                        </cell>
+                        <cell id="162"/>
+                    </row>
+                    <row id="163">
+                        <cell id="164">
+                            <label id="167">
+                                <text-property name="text">Produced By: Branch</text-property>
+                            </label>
+                        </cell>
+                        <cell id="165">
+                            <auto-text id="168">
+                                <property name="textAlign">right</property>
+                                <property name="type">page-number</property>
+                            </auto-text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <table id="289">
+            <property name="fontSize">9pt</property>
+            <property name="textAlign">center</property>
+            <property name="width">7.947916666666667in</property>
+            <property name="dataSet">Data Set</property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">Brn Cd</property>
+                    <text-property name="displayName">Brn Cd</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Brn Cd"]</expression>
+                    <property name="dataType">integer</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Advice No/Year</property>
+                    <text-property name="displayName">Advice No/Year</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Advice No/Year"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Tran Type</property>
+                    <text-property name="displayName">Tran Type</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Tran Type"]</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">Account Number/Account Name</property>
+                    <text-property name="displayName">Account Number/Account Name</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Account Number/Account Name"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Benef AccNo/Name</property>
+                    <text-property name="displayName">Benef AccNo/Name</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Benef AccNo/Name"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Beneficiary Address</property>
+                    <text-property name="displayName">ADDRESS</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Beneficiary Address"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Beneficiary Bank Name</property>
+                    <text-property name="displayName">Beneficiary Bank Name</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Beneficiary Bank Name"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">VouchNo/Year</property>
+                    <text-property name="displayName">VouchNo/Year</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["VouchNo/Year"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Tran Amt</property>
+                    <text-property name="displayName">Tran Amt</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["Tran Amt"]</expression>
+                    <property name="dataType">decimal</property>
+                </structure>
+                <structure>
+                    <property name="name">TypeC</property>
+                    <text-property name="displayName">TypeC</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TypeC"]</expression>
+                    <property name="dataType">integer</property>
+                </structure>
+            </list-property>
+            <column id="343">
+                <property name="width">0.5208333333333334in</property>
+            </column>
+            <column id="344">
+                <property name="width">0.8020833333333334in</property>
+            </column>
+            <column id="345">
+                <property name="width">0.6666666666666666in</property>
+            </column>
+            <column id="346">
+                <property name="width">1.1979166666666667in</property>
+            </column>
+            <column id="347">
+                <property name="width">1.0833333333333333in</property>
+            </column>
+            <column id="348">
+                <property name="width">0.7083333333333334in</property>
+            </column>
+            <column id="349">
+                <property name="width">0.84375in</property>
+            </column>
+            <column id="350">
+                <property name="width">0.7083333333333334in</property>
+            </column>
+            <column id="351">
+                <property name="width">0.78125in</property>
+            </column>
+            <column id="352">
+                <property name="width">0.6354166666666666in</property>
+            </column>
+            <header>
+                <row id="290">
+                    <property name="style">NewStyle12</property>
+                    <property name="fontWeight">bold</property>
+                    <property name="height">0.4895833333333333in</property>
+                    <cell id="291">
+                        <label id="292">
+                            <text-property name="text">Brn Cd</text-property>
+                        </label>
+                    </cell>
+                    <cell id="293">
+                        <label id="294">
+                            <text-property name="text">Advice No/Year</text-property>
+                        </label>
+                    </cell>
+                    <cell id="295">
+                        <label id="296">
+                            <text-property name="text">Tran_Type</text-property>
+                        </label>
+                    </cell>
+                    <cell id="297">
+                        <label id="298">
+                            <text-property name="text">Account Number/Account Name</text-property>
+                        </label>
+                    </cell>
+                    <cell id="299">
+                        <label id="300">
+                            <text-property name="text">Benef AccNo/Name</text-property>
+                        </label>
+                    </cell>
+                    <cell id="301">
+                        <label id="302">
+                            <text-property name="text">Beneficiary Address </text-property>
+                        </label>
+                    </cell>
+                    <cell id="303">
+                        <label id="304">
+                            <text-property name="text">Beneficiary Bank Name</text-property>
+                        </label>
+                    </cell>
+                    <cell id="305">
+                        <label id="306">
+                            <text-property name="text">VouchNo/Year</text-property>
+                        </label>
+                    </cell>
+                    <cell id="307">
+                        <label id="308">
+                            <text-property name="text">Tran Amt</text-property>
+                        </label>
+                    </cell>
+                    <cell id="309">
+                        <label id="310">
+                            <text-property name="text">TypeC</text-property>
+                        </label>
+                    </cell>
+                </row>
+            </header>
+            <detail>
+                <row id="359">
+                    <property name="style">NewStyle14</property>
+                    <property name="height">0.07291666666666667in</property>
+                    <cell id="360"/>
+                    <cell id="361"/>
+                    <cell id="362"/>
+                    <cell id="363"/>
+                    <cell id="364"/>
+                    <cell id="365"/>
+                    <cell id="366"/>
+                    <cell id="367"/>
+                    <cell id="368"/>
+                    <cell id="369"/>
+                </row>
+                <row id="311">
+                    <property name="style">NewStyle14</property>
+                    <property name="height">0.46875in</property>
+                    <cell id="312">
+                        <data id="313">
+                            <property name="resultSetColumn">Brn Cd</property>
+                        </data>
+                    </cell>
+                    <cell id="314">
+                        <data id="315">
+                            <property name="resultSetColumn">Advice No/Year</property>
+                        </data>
+                    </cell>
+                    <cell id="316">
+                        <data id="317">
+                            <property name="resultSetColumn">Tran Type</property>
+                        </data>
+                    </cell>
+                    <cell id="318">
+                        <data id="319">
+                            <property name="fontSize">9pt</property>
+                            <property name="resultSetColumn">Account Number/Account Name</property>
+                        </data>
+                    </cell>
+                    <cell id="320">
+                        <data id="321">
+                            <property name="resultSetColumn">Benef AccNo/Name</property>
+                        </data>
+                    </cell>
+                    <cell id="322">
+                        <data id="323">
+                            <property name="resultSetColumn">Beneficiary Address</property>
+                        </data>
+                    </cell>
+                    <cell id="324">
+                        <data id="325">
+                            <property name="resultSetColumn">Beneficiary Bank Name</property>
+                        </data>
+                    </cell>
+                    <cell id="326">
+                        <data id="327">
+                            <property name="resultSetColumn">VouchNo/Year</property>
+                        </data>
+                    </cell>
+                    <cell id="328">
+                        <data id="329">
+                            <property name="resultSetColumn">Tran Amt</property>
+                        </data>
+                    </cell>
+                    <cell id="330">
+                        <data id="331">
+                            <property name="resultSetColumn">TypeC</property>
+                        </data>
+                    </cell>
+                </row>
+            </detail>
+            <footer>
+                <row id="332">
+                    <cell id="333"/>
+                    <cell id="334"/>
+                    <cell id="335"/>
+                    <cell id="336"/>
+                    <cell id="337"/>
+                    <cell id="338"/>
+                    <cell id="339"/>
+                    <cell id="340"/>
+                    <cell id="341"/>
+                    <cell id="342"/>
+                </row>
+            </footer>
+        </table>
+    </body>
+</report>
