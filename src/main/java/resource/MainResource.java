@@ -12,6 +12,7 @@ import dto.AuthorizeUserDto;
 import dto.BeneficiaryAccountDto;
 import dto.LoginRequestDto;
 import dto.OutwardRTGSFormDto;
+import dto.ReportFilterDto;
 import dto.UserDto;
 import dto.UserInfoDto;
 import dto.VoucherInfoDto;
@@ -625,9 +626,9 @@ public class MainResource {
 
 
     @GET
-    @Path("/downloadExcelReport")
+    @Path("/getVoucherExcel")
     @Produces("application/json")  
-    public Response downloadExcelReport(
+    public Response getVoucherExcel(
         @QueryParam("voucherNo") String voucherNo, 
         @QueryParam("voucherYear") String voucherYear) {
         try {
@@ -664,6 +665,26 @@ public class MainResource {
             String base64Excel = Base64.getEncoder().encodeToString(out.toByteArray());
 
             return Response.ok(new ApiResponse(base64Excel, null, true))
+                    .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null, "Failed to create report", false))
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/getRtgsReport")
+    @Produces("application/json")  
+    public Response getRtgsReport(ReportFilterDto reportFilters) {
+        try {
+            byte[] reportByteArray = birtService.generateReport();
+
+            String base64Report = Base64.getEncoder().encodeToString(reportByteArray);
+
+            return Response.ok(new ApiResponse(base64Report, null, true))
                     .build();
 
         } catch (Exception e) {
