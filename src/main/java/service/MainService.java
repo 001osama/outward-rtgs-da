@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.Response;
 import database.DatabaseErrorHandler;
 import database.Datasources;
 import dto.AccountDetailDto;
