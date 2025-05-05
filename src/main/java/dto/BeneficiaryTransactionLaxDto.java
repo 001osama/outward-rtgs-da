@@ -2,19 +2,22 @@ package dto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 
 public class BeneficiaryTransactionLaxDto {
-    private String transactionAmount; 
-    private String beneficiaryBankName; 
-    private String beneficiaryBankCode; 
-    private String beneficiaryAccountName; 
-    private String beneficiaryIbanOrAccountNo; 
-    private String beneficiaryAddress; 
-    private String beneficiaryBranchCode;
+    String transactionAmount; 
+    String beneficiaryBankName; 
+    String beneficiaryBankCode; 
+    String beneficiaryAccountName; 
+    String beneficiaryIbanOrAccountNo; 
+    String beneficiaryAddress; 
+    String beneficiaryBranchCode;
+    public boolean isBeneficiaryTitleFetch;
 }

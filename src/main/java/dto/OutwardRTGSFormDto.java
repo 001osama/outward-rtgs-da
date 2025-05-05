@@ -21,7 +21,7 @@ public class OutwardRTGSFormDto {
     String branchCode;
     String currencyCode;
     String customerNo;
-    boolean isCustAcc;
+    public boolean isCustAcc;
     String paymentMode;
     String purposeOfPaymentCode;
     String remarks;
@@ -31,6 +31,5 @@ public class OutwardRTGSFormDto {
     String chequeNo;
     String transferTypeCode;
     String totalAmount;
-    Boolean isBeneficiaryTitleFetch;
     List<BeneficiaryTransactionLaxDto> transactionLaxList;
 }

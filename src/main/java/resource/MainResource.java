@@ -12,9 +12,9 @@ import dto.AuthorizeUserDto;
 import dto.BeneficiaryAccountDto;
 import dto.LoginRequestDto;
 import dto.OutwardRTGSFormDto;
+import dto.RTGSReportDto;
 import dto.ReportFilterDto;
 import dto.UserDto;
-import dto.UserInfoDto;
 import dto.VoucherInfoDto;
 import dto.VoucherLaxDto;
 import jakarta.inject.Inject;
@@ -675,14 +675,65 @@ public class MainResource {
         }
     }
 
-    @GET
-    @Path("/getRtgsReport")
+    @POST
+    @Path("/downloadRtgsReport")
     @Produces("application/json")  
+
     public Response getRtgsReport(ReportFilterDto reportFilters) {
         try {
-            byte[] reportByteArray = birtService.generateReport();
+            String base64Report;
+            if(reportFilters.getReportFormat().equals("excel"))
+            {
+                List<RTGSReportDto>  dataList = mainService.getRtgsExcelReportData(reportFilters);
+            
+                Workbook workbook = new XSSFWorkbook();
+                Sheet sheet = workbook.createSheet("RTGSInquiry");
 
-            String base64Report = Base64.getEncoder().encodeToString(reportByteArray);
+                Row headerRow = sheet.createRow(0);
+                headerRow.createCell(0).setCellValue("Branch Cd");
+                headerRow.createCell(1).setCellValue("Tran Dt");
+                headerRow.createCell(2).setCellValue("Advice No/Year");
+                headerRow.createCell(3).setCellValue("Tran. Type");
+                headerRow.createCell(4).setCellValue("AccountNumber-AccountName");
+                headerRow.createCell(5).setCellValue("Benef A/C No /IBAN /Name");
+                headerRow.createCell(6).setCellValue("Beneficiary Address");
+                headerRow.createCell(7).setCellValue("Benef. Title Fetch Through 1-Link");
+                headerRow.createCell(8).setCellValue("Benef. Bank Name");
+                headerRow.createCell(9).setCellValue("VouchNo/Year");
+                headerRow.createCell(10).setCellValue("Tran. Amt");
+                headerRow.createCell(11).setCellValue("TypeC");
+
+                int rowNum = 1;
+                for (RTGSReportDto entity : dataList) {
+                    Row row = sheet.createRow(rowNum++);
+                    row.createCell(0).setCellValue(entity.getBranchCode());
+                    row.createCell(1).setCellValue(entity.getTransactionDate());
+                    row.createCell(2).setCellValue(entity.getAdviceNo());
+                    row.createCell(3).setCellValue(entity.getTransferType());
+                    row.createCell(4).setCellValue(entity.getAccountInfo());
+                    row.createCell(5).setCellValue(entity.getBeneficiaryAccountInfo());
+                    row.createCell(6).setCellValue(entity.getBeneficiaryAddress());
+                    row.createCell(7).setCellValue(entity.isBeneficiaryTitleFetch());
+                    row.createCell(8).setCellValue(entity.getBankName());
+                    row.createCell(9).setCellValue(entity.getVoucherNo());
+                    row.createCell(10).setCellValue(entity.getTotalAmount());
+                    row.createCell(11).setCellValue(entity.getSbpTransactionType());
+                }
+
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                workbook.write(out);
+                workbook.close();
+
+                base64Report = Base64.getEncoder().encodeToString(out.toByteArray());
+
+            }
+            else
+            {
+
+                byte[] reportByteArray = birtService.generateReport();
+                
+                base64Report = Base64.getEncoder().encodeToString(reportByteArray);
+            }
 
             return Response.ok(new ApiResponse(base64Report, null, true))
                     .build();
