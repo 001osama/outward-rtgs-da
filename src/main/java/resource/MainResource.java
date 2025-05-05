@@ -506,10 +506,10 @@ public class MainResource {
                         .build();
             }
 
-            boolean isPostingUser = mainService.isPostingUser(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
-            if(isPostingUser)
-                return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
-                .build();
+            // boolean isPostingUser = mainService.isPostingUser(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
+            // if(isPostingUser)
+            //     return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
+            //     .build();
 
             boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear());
 
