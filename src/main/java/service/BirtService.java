@@ -11,7 +11,11 @@ import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.*;
 
+import dto.ReportFilterDto;
+
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @ApplicationScoped
@@ -35,16 +39,40 @@ public class BirtService {
 //        }
     }
 
-    public byte[] generateReport() throws BirtException {
+    public byte[] generateReport(ReportFilterDto reportFilter) throws BirtException {
+
+        Map<String, Object> params = new HashMap<>();
+        if (reportFilter != null) { // Add a null check
+            params.put("branchCode", reportFilter.getBranchCode());
+            params.put("rtgsType", reportFilter.getRtgsType());
+            params.put("transactionType", reportFilter.getTransactionType());
+            params.put("fromDate", reportFilter.getFromDate());
+            params.put("toDate", reportFilter.getToDate());
+            params.put("customerNo", reportFilter.getCustomerNo());
+            params.put("accountNo", reportFilter.getAccountNo());
+            params.put("status", reportFilter.getStatus());
+            params.put("reportFormat", reportFilter.getReportFormat());
+        }
+
+        if()
+        params.put("isToDate", reportFilter.getIsToDate());
+        params.put("isFromDate", reportFilter.getIsFromDate());
+
         EngineConfig engineConfig = new EngineConfig();
         engineConfig.setEngineHome("");
         Platform.startup(engineConfig);
         IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
         IReportEngine engine = factory.createReportEngine(engineConfig);
 
-        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/rtgs_report.rptdesign");
+        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/rtgs_report copy.rptdesign");
 
         IRunAndRenderTask task = engine.createRunAndRenderTask(report);
+
+        if (params!= null){
+            task.setParameterValues(params);
+        } 
+
+
         PDFRenderOption options = new PDFRenderOption();
         options.setOutputFormat("pdf");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

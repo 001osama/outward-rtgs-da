@@ -730,8 +730,7 @@ public class MainResource {
             else
             {
 
-                byte[] reportByteArray = birtService.generateReport();
-                
+                byte[] reportByteArray = birtService.generateReport(reportFilters);
                 base64Report = Base64.getEncoder().encodeToString(reportByteArray);
             }
 
