@@ -746,24 +746,24 @@ public class MainResource {
     }
 
 
-    @GET
-    @Path("/downloadBirtReport")
-    @Produces("application/json")  
-    public Response downloadBirtReport() {
-        try {
-            byte[] reportByteArray = birtService.generateReport();
+    // @GET
+    // @Path("/downloadBirtReport")
+    // @Produces("application/json")  
+    // public Response downloadBirtReport() {
+    //     try {
+    //         byte[] reportByteArray = birtService.generateReport();
 
-            String base64Report = Base64.getEncoder().encodeToString(reportByteArray);
+    //         String base64Report = Base64.getEncoder().encodeToString(reportByteArray);
 
-            return Response.ok(new ApiResponse(base64Report, null, true))
-                    .build();
+    //         return Response.ok(new ApiResponse(base64Report, null, true))
+    //                 .build();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                .entity(new ApiResponse(null, "Failed to create report", false))
-                .build();
-        }
-    }
+    //     } catch (Exception e) {
+    //         e.printStackTrace();
+    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //             .entity(new ApiResponse(null, "Failed to create report", false))
+    //             .build();
+    //     }
+    // }
 
 }

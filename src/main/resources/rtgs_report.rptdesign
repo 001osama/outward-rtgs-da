@@ -17,8 +17,20 @@
     </list-property>
     <property name="units">in</property>
     <method name="initialize"><![CDATA[0]]></method>
-    <method name="onPrepare"><![CDATA[if(params[""].value != "ALL") 
-{this.queryText + "WHERE comp_"}]]></method>
+    <method name="onPrepare"><![CDATA[if(params["branch"].value != "ALL") 
+{
+	this.queryText + "WHERE RT.BRANCH_CD = " + params["branch"]
+}
+
+if(params["transferType"].value != null || params["transferType"].value != "ALL")
+{
+	this.queryText + "WHERE RT.TRANSFER_TYPE = " + params["transferType"]
+}
+
+if(params["Status"].value != null || params["Status"].value != "ALL")
+{
+	this.queryText + "WHERE RT.STATUS = " + params["Status"]
+}]]></method>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
@@ -293,6 +305,7 @@
                     <text-property name="heading">BENEF_ACCOUNT_INFO</text-property>
                 </structure>
             </list-property>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -479,6 +492,7 @@ AND AT.CHECK_DIGIT = RT.CHECK_DIGIT
 LEFT JOIN TRANSACTION_TL AS TT 
 ON RT.VOUCHER_NO = TT.VOUCHER_NO
 LEFT JOIN BANKS_TL AS BT ON RBT.BANK_CD = BT.BANK_CD
+WHERE 1=1 
 
 ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>

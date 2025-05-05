@@ -43,20 +43,23 @@ public class BirtService {
 
         Map<String, Object> params = new HashMap<>();
         if (reportFilter != null) { // Add a null check
-            params.put("branchCode", reportFilter.getBranchCode());
-            params.put("rtgsType", reportFilter.getRtgsType());
-            params.put("transactionType", reportFilter.getTransactionType());
-            params.put("fromDate", reportFilter.getFromDate());
-            params.put("toDate", reportFilter.getToDate());
-            params.put("customerNo", reportFilter.getCustomerNo());
-            params.put("accountNo", reportFilter.getAccountNo());
+            params.put("branch", reportFilter.getBranchCode());
+            // params.put("rtgsType", reportFilter.getRtgsType());
+            params.put("transferType", reportFilter.getTransactionType());
+            // params.put("customerNo", reportFilter.getCustomerNo());
+            // params.put("accountNo", reportFilter.getAccountNo());
             params.put("status", reportFilter.getStatus());
-            params.put("reportFormat", reportFilter.getReportFormat());
         }
 
-        if()
-        params.put("isToDate", reportFilter.getIsToDate());
-        params.put("isFromDate", reportFilter.getIsFromDate());
+
+        if (Boolean.TRUE.equals(reportFilter.getIsFromDate())) {
+            params.put("fromdate", reportFilter.getFromDate());
+        }
+
+        if (Boolean.TRUE.equals(reportFilter.getIsToDate())) {
+            params.put("todate", reportFilter.getToDate());
+        }
+
 
         EngineConfig engineConfig = new EngineConfig();
         engineConfig.setEngineHome("");
@@ -64,7 +67,7 @@ public class BirtService {
         IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
         IReportEngine engine = factory.createReportEngine(engineConfig);
 
-        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/rtgs_report copy.rptdesign");
+        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/rtgs_report.rptdesign");
 
         IRunAndRenderTask task = engine.createRunAndRenderTask(report);
 
