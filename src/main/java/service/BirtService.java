@@ -11,6 +11,7 @@ import org.eclipse.birt.core.exception.BirtException;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.*;
 
+import dto.AccountNumberDto;
 import dto.ReportFilterDto;
 
 import java.io.ByteArrayOutputStream;
@@ -41,14 +42,27 @@ public class BirtService {
 
     public byte[] generateReport(ReportFilterDto reportFilter) throws BirtException {
 
+        var detailsArray = reportFilter.getAccountNo().split("-");
+        var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
+
+
+
         Map<String, Object> params = new HashMap<>();
-        if (reportFilter != null) { // Add a null check
+        if (reportFilter != null) { 
+            params.put("username", "Faiqa Haider");
             params.put("branch", reportFilter.getBranchCode());
-            // params.put("rtgsType", reportFilter.getRtgsType());
             params.put("transferType", reportFilter.getTransactionType());
+            params.put("Status", reportFilter.getStatus());
+
+            params.put("AccountBranchCd",accountNumberDto.getBranchCode());
+            params.put("AccountTypeCd",accountNumberDto.getAccountType());
+            params.put("customerNo",accountNumberDto.getCustomerNo());
+            params.put("runNo",accountNumberDto.getRunNo());
+            params.put("checkDigit",accountNumberDto.getCheckDigit());
+
+            // params.put("rtgsType", reportFilter.getRtgsType());
             // params.put("customerNo", reportFilter.getCustomerNo());
             // params.put("accountNo", reportFilter.getAccountNo());
-            params.put("status", reportFilter.getStatus());
         }
 
 

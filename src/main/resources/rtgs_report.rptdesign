@@ -17,20 +17,6 @@
     </list-property>
     <property name="units">in</property>
     <method name="initialize"><![CDATA[0]]></method>
-    <method name="onPrepare"><![CDATA[if(params["branch"].value != "ALL") 
-{
-	this.queryText + "WHERE RT.BRANCH_CD = " + params["branch"]
-}
-
-if(params["transferType"].value != null || params["transferType"].value != "ALL")
-{
-	this.queryText + "WHERE RT.TRANSFER_TYPE = " + params["transferType"]
-}
-
-if(params["Status"].value != null || params["Status"].value != "ALL")
-{
-	this.queryText + "WHERE RT.STATUS = " + params["Status"]
-}]]></method>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
@@ -341,7 +327,7 @@ if(params["Status"].value != null || params["Status"].value != "ALL")
                     <structure>
                         <property name="position">7</property>
                         <property name="name">IS_BENEF_TITLE_FETCH</property>
-                        <property name="dataType">integer</property>
+                        <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">8</property>
@@ -370,6 +356,79 @@ if(params["Status"].value != null || params["Status"].value != "ALL")
                     </structure>
                 </list-property>
             </structure>
+            <method name="beforeOpen"><![CDATA[if(params["branchCd"].value != null)
+{
+	this.queryText = this.queryText + " AND RT.BRANCH_CD = '" + params["branchCd"] + "' "; 
+}
+
+if(params["transferType"].value != null &amp;&amp; params["transferType"].value != "All")
+{
+	this.queryText = this.queryText + " AND RT.TRANSFER_TYPE = '" + params["transferType"] + "' "; 
+}
+
+if(params["todate"].value != null &amp;&amp; params["todate"].value != "")
+{
+	this.queryText = this.queryText + " AND TT.TRANSACTION_DATE <= '" + params["todate"] + "' "; 
+}
+
+if(params["fromdate"].value != null &amp;&amp; params["fromdate"].value != "")
+{
+	this.queryText = this.queryText + " AND TT.TRANSACTION_DATE >= '" + params["fromdate"] + "' "; 
+}
+
+if(params["Status"].value != null &amp;&amp; params["Status"].value != "All")
+{
+	this.queryText = this.queryText + " AND RT.STATUS = '" + params["Status"] + "' "; 
+}
+
+
+if(params["AccountBranchCd"].value != null)
+{
+	this.queryText = this.queryText + " AND AT.BRANCH_CD = " + params["AccountBranchCd"]; 
+}
+
+if(params["AccountTypeCd"].value != null)
+{
+	this.queryText = this.queryText + " AND AT.ACCOUNT_TYPE_CD = " + params["AccountTypeCd"]; 
+}
+
+if(params["customerNo"].value != null)
+{
+	this.queryText = this.queryText + " AND AT.CUSTOMER_NO = " + params["customerNo"]; 
+}
+
+if(params["runNo"].value != null)
+{
+	this.queryText = this.queryText + " AND AT.RUN_NO = " + params["runNo"]; 
+}
+
+if(params["checkDigit"].value != null)
+{
+	this.queryText = this.queryText + " AND AT.CHECK_DIGIT = " + params["checkDigit"]; 
+}
+
+
+
+importPackage(java.io)
+var filePath = "/home/bahl/testQuery.txt";
+var fileWriter = new FileWriter(filePath);
+
+try
+{
+	var bufferedWriter = new BufferedWriter(fileWriter);
+	bufferedWriter.write("EPRC Query is :"+ this.queryText);
+	
+	bufferedWriter.close()
+	java.lang.System.out.println("text file generated successfully",ex) 
+}
+catch(ex)
+{
+	java.lang.System.err.println("Error generating text file",ex.message) 
+}
+finally
+{
+	fileWriter.close()
+}]]></method>
             <property name="dataSource">Data Source</property>
             <list-property name="resultSet">
                 <structure>
@@ -418,8 +477,8 @@ if(params["Status"].value != null || params["Status"].value != "ALL")
                     <property name="position">7</property>
                     <property name="name">IS_BENEF_TITLE_FETCH</property>
                     <property name="nativeName">IS_BENEF_TITLE_FETCH</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">5</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">8</property>
@@ -467,7 +526,11 @@ TT.TRANSACTION_DATE, RT.TRANSFER_TYPE,
 		LPAD(AT.RUN_NO, 2, '0') || '-' || 
 		AT.CHECK_DIGIT || '-' || AT.ACCOUNT_TITLE AS ACCOUNT_INFO,
 		RBT.ADDRESS AS BENEFICIARY_ADDRESS,
-		RBT.IS_BENEF_TITLE_FETCH,
+		CASE RBT.IS_BENEF_TITLE_FETCH
+		        WHEN 1 THEN 'Yes'
+		        WHEN 0 THEN 'No'
+		        ELSE CAST(RBT.IS_BENEF_TITLE_FETCH AS VARCHAR(5))
+		    END AS IS_BENEF_TITLE_FETCH,
 		BT.BANK_NAME,
 		RT.VOUCHER_NO || '/' || RT.VOUCHER_YEAR AS VOUCHER_NO,
 		RT.TOTAL_AMOUNT ,
@@ -493,7 +556,6 @@ LEFT JOIN TRANSACTION_TL AS TT
 ON RT.VOUCHER_NO = TT.VOUCHER_NO
 LEFT JOIN BANKS_TL AS BT ON RBT.BANK_CD = BT.BANK_CD
 WHERE 1=1 
-
 ]]></xml-property>
             <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
@@ -666,12 +728,6 @@ WHERE 1=1
                                 <property name="fontSize">8pt</property>
                                 <text-property name="text">BANK AL HABIB LIMITED</text-property>
                             </label>
-                            <image id="370">
-                                <property name="height">0.6041666666666666in</property>
-                                <property name="width">0.5729166666666666in</property>
-                                <property name="source">file</property>
-                                <expression name="uri" type="constant">/home/bahl/Project/outward-rtgs-da/src/main/resources/images/bahl-logo.png</expression>
-                            </image>
                         </cell>
                         <cell id="94">
                             <label id="96">
@@ -685,7 +741,7 @@ WHERE 1=1
                             <text-data id="380">
                                 <property name="fontSize">10pt</property>
                                 <property name="textAlign">center</property>
-                                <expression name="valueExpr">"From: " + reportContext.getParameterValue("fromdate") + "To: " + reportContext.getParameterValue("todate")</expression>
+                                <expression name="valueExpr">"From: " + reportContext.getParameterValue("fromdate") + "   To: " + reportContext.getParameterValue("todate")</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
@@ -782,7 +838,8 @@ WHERE 1=1
                     <property name="name">IS_BENEF_TITLE_FETCH</property>
                     <text-property name="displayName">IS_BENEF_TITLE_FETCH</text-property>
                     <expression name="expression" type="javascript">dataSetRow["IS_BENEF_TITLE_FETCH"]</expression>
-                    <property name="dataType">integer</property>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">BANK_NAME</property>
