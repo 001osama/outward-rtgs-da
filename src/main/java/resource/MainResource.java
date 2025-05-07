@@ -511,7 +511,7 @@ public class MainResource {
             //     return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
             //     .build();
 
-            boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear());
+            boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
 
             if (isCancelled) {
                 return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number  ", true))

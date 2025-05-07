@@ -856,7 +856,7 @@ public class MainService {
 
     public List<RTGSReportDto> getRtgsExcelReportData(ReportFilterDto reportFilters) throws Exception {
         StringBuilder sql = new StringBuilder("SELECT DISTINCT RBT.ADVISE_NO || '/' || RBT.ADVISE_YEAR AS ADVICE_NO,");
-        sql.append("LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD, TT.TRANSACTION_DATE, RT.TRANSFER_TYPE, ");
+        sql.append("LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD, TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, RT.TRANSFER_TYPE, ");
         sql.append("LPAD(AT.BRANCH_CD, 4, '0') || '-' || LPAD(AT.ACCOUNT_TYPE_CD, 4, '0') || '-' || LPAD(AT.CUSTOMER_NO, 6, '0') || '-' || LPAD(AT.RUN_NO, 2, '0') || '-' || AT.CHECK_DIGIT || '-' || AT.ACCOUNT_TITLE AS ACCOUNT_INFO, ");
         sql.append("RBT.ADDRESS AS BENEFICIARY_ADDRESS, RBT.IS_BENEF_TITLE_FETCH, BT.BANK_NAME, RT.VOUCHER_NO || '/' || RT.VOUCHER_YEAR AS VOUCHER_NO, ");
         sql.append("RT.TOTAL_AMOUNT, STTT.SBP_TRANSACTION_TYPE, RBT.ACCOUNT_NO || '/' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO ");
@@ -920,7 +920,7 @@ public class MainService {
             sql.append(" AND AT.CHECK_DIGIT = ?");
             params.add(accountNumberDto.getCheckDigit());            
         }
-
+        sql.append(" ORDER BY TT.TRANSACTION_DATE, TT.TRANSACTION_TIME ");
 
         List<RTGSReportDto> resultList = new ArrayList<>();
         try (
@@ -997,7 +997,7 @@ public class MainService {
     // }
 
     @Transactional(rollbackOn = Exception.class)
-    public boolean cancelOutwardRtgs(String voucherNo, String voucherYear) throws Exception {
+    public boolean cancelOutwardRtgs(String voucherNo, String voucherYear, String loginId) throws Exception {
 
         try (Connection connection = datasource.getConnection()) {
             AccountNumberDto accountNo = new AccountNumberDto();
@@ -1026,8 +1026,9 @@ public class MainService {
                 throw ex;
             }
 
+            
             StringBuilder sb2 = new StringBuilder();
-            sb2.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL+?");
+            sb2.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL + ? ");
             sb2.append("WHERE BRANCH_CD = ? AND ACCOUNT_TYPE_CD = ? ");
             sb2.append("AND CUSTOMER_NO = ? AND RUN_NO = ? AND CHECK_DIGIT = ?");
 
@@ -1045,11 +1046,11 @@ public class MainService {
                 DatabaseErrorHandler.log((SQLException) ex);
                 throw ex;
             }
-
+            
             var localDateString = String.valueOf(LocalDate.now());
-
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
             String localTimeString = LocalTime.now().format(timeFormatter);
+
 
             var newReferenceNo = generateRefNo();
             StringBuilder sb3 = new StringBuilder();
@@ -1117,17 +1118,22 @@ public class MainService {
                 throw ex;
             }
 
-            String updateSql = "UPDATE RTGS_TL SET STATUS = ? WHERE VOUCHER_NO = ?  AND VOUCHER_YEAR = ?";
+            String updateSql = "UPDATE RTGS_TL SET STATUS=?, CANCELLED_BY=?, CANCELLED_DATE=?, CANCELLED_TIME=? WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
 
             int rowsUpdated = 0;
-            try (PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
-
+            try (PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) 
+            {
                 preparedStatement.setString(1, "C");
-                preparedStatement.setString(2, voucherNo);
-                preparedStatement.setString(3, voucherYear);
+                preparedStatement.setString(2, loginId);
+                preparedStatement.setString(3, localDateString);
+                preparedStatement.setString(4, localTimeString);
+                preparedStatement.setString(5, voucherNo);
+                preparedStatement.setString(6, voucherYear);
+
                 rowsUpdated = preparedStatement.executeUpdate();
 
-            } catch (SQLException ex) {
+            } 
+            catch (SQLException ex) {
                 DatabaseErrorHandler.log((SQLException) ex);
                 throw ex;
             }
