@@ -900,11 +900,11 @@ public class MainService {
             params.add(reportFilters.getStatus());
         }
 
-        var detailsArray = reportFilters.getAccountNo().split("-");
-        var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
-
-
+        
         if (reportFilters.getAccountNo() != null && !reportFilters.getAccountNo().isEmpty()) {
+            var detailsArray = reportFilters.getAccountNo().split("-");
+            var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
+    
             sql.append(" AND AT.BRANCH_CD = ?");
             params.add(accountNumberDto.getBranchCode());
 

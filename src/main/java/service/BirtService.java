@@ -42,30 +42,26 @@ public class BirtService {
 
     public byte[] generateReport(ReportFilterDto reportFilter) throws BirtException {
 
-        var detailsArray = reportFilter.getAccountNo().split("-");
-        var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
-
-
-
         Map<String, Object> params = new HashMap<>();
         if (reportFilter != null) { 
             params.put("username", "Faiqa Haider");
             params.put("branch", reportFilter.getBranchCode());
             params.put("transferType", reportFilter.getTransactionType());
             params.put("Status", reportFilter.getStatus());
+        }
+
+
+        if (reportFilter.getAccountNo() != null && !reportFilter.getAccountNo().isEmpty()) {
+            var detailsArray = reportFilter.getAccountNo().split("-");
+            var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
 
             params.put("AccountBranchCd",accountNumberDto.getBranchCode());
             params.put("AccountTypeCd",accountNumberDto.getAccountType());
             params.put("customerNo",accountNumberDto.getCustomerNo());
             params.put("runNo",accountNumberDto.getRunNo());
             params.put("checkDigit",accountNumberDto.getCheckDigit());
-
-            // params.put("rtgsType", reportFilter.getRtgsType());
-            // params.put("customerNo", reportFilter.getCustomerNo());
-            // params.put("accountNo", reportFilter.getAccountNo());
         }
-
-
+        
         if (Boolean.TRUE.equals(reportFilter.getIsFromDate())) {
             params.put("fromdate", reportFilter.getFromDate());
         }
