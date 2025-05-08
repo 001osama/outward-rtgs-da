@@ -714,8 +714,7 @@ public class MainService {
             StringBuilder sb6 = new StringBuilder();
             sb6.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
             sb6.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2,");
-            sb6.append(
-                    "GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
+            sb6.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
             sb6.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb6.toString())) {
@@ -725,10 +724,10 @@ public class MainService {
                 preparedStatement.setString(4, newReferenceNo);
                 preparedStatement.setString(5, accoutNumberDto.getAccountType());
                 preparedStatement.setString(6, "80630");
-                preparedStatement.setBigDecimal(7, new BigDecimal("400"));
-                preparedStatement.setBigDecimal(8, new BigDecimal("25"));
-                preparedStatement.setBigDecimal(9, new BigDecimal("20"));
-                preparedStatement.setBigDecimal(10, new BigDecimal("4567"));
+                preparedStatement.setBigDecimal(7, new BigDecimal("230"));
+                preparedStatement.setBigDecimal(8, new BigDecimal("01"));
+                preparedStatement.setBigDecimal(9, new BigDecimal("01"));
+                preparedStatement.setBigDecimal(10, new BigDecimal("0586"));
                 preparedStatement.setBigDecimal(11, new BigDecimal("2"));
                 preparedStatement.setBigDecimal(12, new BigDecimal(rtgsForm.getTotalAmount()));
                 preparedStatement.setString(13, "G");
@@ -920,6 +919,7 @@ public class MainService {
             sql.append(" AND AT.CHECK_DIGIT = ?");
             params.add(accountNumberDto.getCheckDigit());            
         }
+
         sql.append(" ORDER BY TT.TRANSACTION_DATE, TT.TRANSACTION_TIME ");
 
         List<RTGSReportDto> resultList = new ArrayList<>();
