@@ -37,6 +37,7 @@
             </structure>
         </scalar-parameter>
         <scalar-parameter name="fromdate" id="374">
+            <property name="hidden">false</property>
             <property name="valueType">static</property>
             <property name="isRequired">false</property>
             <property name="dataType">string</property>
@@ -426,13 +427,12 @@ try
 {
 	var bufferedWriter = new BufferedWriter(fileWriter);
 	bufferedWriter.write("EPRC Query is :"+ this.queryText);
-	
-	bufferedWriter.close()
-	java.lang.System.out.println("text file generated successfully",ex) 
+	java.lang.System.err.println("Text file generated successfully " + this.queryText) 
+	bufferedWriter.close() 
 }
 catch(ex)
 {
-	java.lang.System.err.println("Error generating text file",ex.message) 
+	java.lang.System.err.println("Error generating text file " + ex.message) 
 }
 finally
 {
