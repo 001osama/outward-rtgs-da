@@ -44,8 +44,8 @@ public class BirtService {
 
         Map<String, Object> params = new HashMap<>();
         if (reportFilter != null) { 
-            params.put("username", "Faiqa Haider");
-            params.put("branch", reportFilter.getBranchCode());
+            params.put("loginId", "Faiqa Haider");
+            params.put("branchCd", reportFilter.getBranchCode());
             params.put("transferType", reportFilter.getTransactionType());
             params.put("Status", reportFilter.getStatus());
         }

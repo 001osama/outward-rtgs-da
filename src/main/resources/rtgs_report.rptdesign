@@ -21,12 +21,13 @@
     <property name="bidiLayoutOrientation">ltr</property>
     <property name="imageDPI">96</property>
     <parameters>
-        <scalar-parameter name="username" id="371">
+        <scalar-parameter name="loginId" id="371">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">testuser</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -37,10 +38,11 @@
         </scalar-parameter>
         <scalar-parameter name="fromdate" id="374">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">fromdate</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -51,24 +53,11 @@
         </scalar-parameter>
         <scalar-parameter name="todate" id="375">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">todate</value>
-            </simple-property-list>
-            <list-property name="selectionList"/>
-            <property name="paramType">simple</property>
-            <property name="controlType">text-box</property>
-            <structure name="format">
-                <property name="category">Unformatted</property>
-            </structure>
-        </scalar-parameter>
-        <scalar-parameter name="branch" id="376">
-            <property name="valueType">static</property>
-            <property name="dataType">string</property>
-            <property name="distinct">true</property>
-            <simple-property-list name="defaultValue">
-                <value type="constant">testbranch</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -79,10 +68,11 @@
         </scalar-parameter>
         <scalar-parameter name="branchCd" id="457">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">1001</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -93,10 +83,11 @@
         </scalar-parameter>
         <scalar-parameter name="transferType" id="458">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">trantype</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -107,10 +98,11 @@
         </scalar-parameter>
         <scalar-parameter name="customerNo" id="459">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">customerNo</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -121,10 +113,11 @@
         </scalar-parameter>
         <scalar-parameter name="AccountBranchCd" id="460">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">acc_branchCd</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -135,10 +128,11 @@
         </scalar-parameter>
         <scalar-parameter name="AccountTypeCd" id="461">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">acc_typeCd</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -149,10 +143,11 @@
         </scalar-parameter>
         <scalar-parameter name="runNo" id="462">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">run_no</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -163,10 +158,11 @@
         </scalar-parameter>
         <scalar-parameter name="checkDigit" id="463">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">check_digit</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -177,10 +173,11 @@
         </scalar-parameter>
         <scalar-parameter name="Status" id="464">
             <property name="valueType">static</property>
+            <property name="isRequired">false</property>
             <property name="dataType">string</property>
             <property name="distinct">true</property>
             <simple-property-list name="defaultValue">
-                <value type="constant">status</value>
+                <value type="constant"></value>
             </simple-property-list>
             <list-property name="selectionList"/>
             <property name="paramType">simple</property>
@@ -235,6 +232,12 @@
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">TRANSACTION_DATE</text-property>
                     <text-property name="heading">TRANSACTION_DATE</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">TRANSACTION_TIME</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">TRANSACTION_TIME</text-property>
+                    <text-property name="heading">TRANSACTION_TIME</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">TRANSFER_TYPE</property>
@@ -311,52 +314,57 @@
                     </structure>
                     <structure>
                         <property name="position">4</property>
+                        <property name="name">TRANSACTION_TIME</property>
+                        <property name="dataType">time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
                         <property name="name">TRANSFER_TYPE</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">5</property>
+                        <property name="position">6</property>
                         <property name="name">ACCOUNT_INFO</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">6</property>
+                        <property name="position">7</property>
                         <property name="name">BENEFICIARY_ADDRESS</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">7</property>
+                        <property name="position">8</property>
                         <property name="name">IS_BENEF_TITLE_FETCH</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">8</property>
+                        <property name="position">9</property>
                         <property name="name">BANK_NAME</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">9</property>
+                        <property name="position">10</property>
                         <property name="name">VOUCHER_NO</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">10</property>
+                        <property name="position">11</property>
                         <property name="name">TOTAL_AMOUNT</property>
                         <property name="dataType">decimal</property>
                     </structure>
                     <structure>
-                        <property name="position">11</property>
+                        <property name="position">12</property>
                         <property name="name">SBP_TRANSACTION_TYPE</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">12</property>
+                        <property name="position">13</property>
                         <property name="name">BENEF_ACCOUNT_INFO</property>
                         <property name="dataType">string</property>
                     </structure>
                 </list-property>
             </structure>
-            <method name="beforeOpen"><![CDATA[if(params["branchCd"].value != null)
+            <method name="beforeOpen"><![CDATA[if(params["branchCd"].value != null &amp;&amp;  params["branchCd"].value != "")
 {
 	this.queryText = this.queryText + " AND RT.BRANCH_CD = '" + params["branchCd"] + "' "; 
 }
@@ -382,31 +390,32 @@ if(params["Status"].value != null &amp;&amp; params["Status"].value != "All")
 }
 
 
-if(params["AccountBranchCd"].value != null)
+if(params["AccountBranchCd"].value != null &amp;&amp; params["AccountBranchCd"].value != "")
 {
 	this.queryText = this.queryText + " AND AT.BRANCH_CD = " + params["AccountBranchCd"]; 
 }
 
-if(params["AccountTypeCd"].value != null)
+if(params["AccountTypeCd"].value != null &amp;&amp; params["AccountTypeCd"].value != "")
 {
 	this.queryText = this.queryText + " AND AT.ACCOUNT_TYPE_CD = " + params["AccountTypeCd"]; 
 }
 
-if(params["customerNo"].value != null)
+if(params["customerNo"].value != null &amp;&amp; params["customerNo"].value != "")
 {
 	this.queryText = this.queryText + " AND AT.CUSTOMER_NO = " + params["customerNo"]; 
 }
 
-if(params["runNo"].value != null)
+if(params["runNo"].value != null &amp;&amp; params["runNo"].value != "")
 {
 	this.queryText = this.queryText + " AND AT.RUN_NO = " + params["runNo"]; 
 }
 
-if(params["checkDigit"].value != null)
+if(params["checkDigit"].value != null &amp;&amp; params["checkDigit"].value != "")
 {
 	this.queryText = this.queryText + " AND AT.CHECK_DIGIT = " + params["checkDigit"]; 
 }
 
+this.queryText =  this.queryText + " ORDER BY TT.TRANSACTION_DATE DESC, TT.TRANSACTION_TIME DESC "; 
 
 
 importPackage(java.io)
@@ -454,62 +463,69 @@ finally
                 </structure>
                 <structure>
                     <property name="position">4</property>
+                    <property name="name">TRANSACTION_TIME</property>
+                    <property name="nativeName">TRANSACTION_TIME</property>
+                    <property name="dataType">time</property>
+                    <property name="nativeDataType">92</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
                     <property name="name">TRANSFER_TYPE</property>
                     <property name="nativeName">TRANSFER_TYPE</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">5</property>
+                    <property name="position">6</property>
                     <property name="name">ACCOUNT_INFO</property>
                     <property name="nativeName">ACCOUNT_INFO</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">6</property>
+                    <property name="position">7</property>
                     <property name="name">BENEFICIARY_ADDRESS</property>
                     <property name="nativeName">ADDRESS</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">7</property>
+                    <property name="position">8</property>
                     <property name="name">IS_BENEF_TITLE_FETCH</property>
                     <property name="nativeName">IS_BENEF_TITLE_FETCH</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">8</property>
+                    <property name="position">9</property>
                     <property name="name">BANK_NAME</property>
                     <property name="nativeName">BANK_NAME</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">9</property>
+                    <property name="position">10</property>
                     <property name="name">VOUCHER_NO</property>
                     <property name="nativeName">VOUCHER_NO</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">10</property>
+                    <property name="position">11</property>
                     <property name="name">TOTAL_AMOUNT</property>
                     <property name="nativeName">TOTAL_AMOUNT</property>
                     <property name="dataType">decimal</property>
                     <property name="nativeDataType">3</property>
                 </structure>
                 <structure>
-                    <property name="position">11</property>
+                    <property name="position">12</property>
                     <property name="name">SBP_TRANSACTION_TYPE</property>
                     <property name="nativeName">SBP_TRANSACTION_TYPE</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
-                    <property name="position">12</property>
+                    <property name="position">13</property>
                     <property name="name">BENEF_ACCOUNT_INFO</property>
                     <property name="nativeName">BENEF_ACCOUNT_INFO</property>
                     <property name="dataType">string</property>
@@ -519,7 +535,7 @@ finally
             <xml-property name="queryText"><![CDATA[SELECT 
 DISTINCT RBT.ADVISE_NO || '/' || RBT.ADVISE_YEAR AS ADVICE_NO,
 LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD,
-TT.TRANSACTION_DATE, RT.TRANSFER_TYPE, 
+TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, RT.TRANSFER_TYPE, 
 		LPAD(AT.BRANCH_CD, 4, '0') || '-' || 
 		LPAD(AT.ACCOUNT_TYPE_CD, 4, '0') || '-' || 
 		LPAD(AT.CUSTOMER_NO, 6, '0') || '-' || 
@@ -728,6 +744,12 @@ WHERE 1=1
                                 <property name="fontSize">8pt</property>
                                 <text-property name="text">BANK AL HABIB LIMITED</text-property>
                             </label>
+                            <image id="467">
+                                <property name="height">0.5833333333333334in</property>
+                                <property name="width">0.4895833333333333in</property>
+                                <property name="source">file</property>
+                                <expression name="uri" type="constant">/home/bahl/Project/outward-rtgs-da/src/main/resources/bahl-logo.png</expression>
+                            </image>
                         </cell>
                         <cell id="94">
                             <label id="96">
@@ -741,7 +763,7 @@ WHERE 1=1
                             <text-data id="380">
                                 <property name="fontSize">10pt</property>
                                 <property name="textAlign">center</property>
-                                <expression name="valueExpr">"From: " + reportContext.getParameterValue("fromdate") + "   To: " + reportContext.getParameterValue("todate")</expression>
+                                <expression name="valueExpr">"From: " + reportContext.getParameterValue("fromdate") +   "  To: " + reportContext.getParameterValue("todate")</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
@@ -770,7 +792,7 @@ WHERE 1=1
                     <row id="160">
                         <cell id="161">
                             <text-data id="372">
-                                <expression name="valueExpr">"Produced by: " + reportContext.getParameterValue("username")</expression>
+                                <expression name="valueExpr">"Produced by: " + reportContext.getParameterValue("loginId")</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
@@ -779,7 +801,7 @@ WHERE 1=1
                     <row id="163">
                         <cell id="164">
                             <text-data id="377">
-                                <expression name="valueExpr">"Produced by: " + reportContext.getParameterValue("branch")</expression>
+                                <expression name="valueExpr">"Produced by: " + reportContext.getParameterValue("branchCd")</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
