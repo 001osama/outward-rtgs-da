@@ -789,6 +789,19 @@ WHERE 1=1
                 <property name="pattern">dd/MM/yyyy</property>
             </structure>
         </style>
+        <style name="NewStyle17" id="545">
+            <property name="fontSize">9pt</property>
+        </style>
+        <style name="NewStyle19" id="546">
+            <property name="fontSize">9pt</property>
+        </style>
+        <style name="textCenter" id="547">
+            <property name="textAlign">center</property>
+            <property name="verticalAlign">top</property>
+        </style>
+        <style name="overflowAuto" id="548">
+            <property name="overflow">auto</property>
+        </style>
     </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
@@ -962,6 +975,7 @@ else dataSetRow["maxDate"]</expression>
     </page-setup>
     <body>
         <table id="381">
+            <property name="width">7.947916666666667in</property>
             <property name="dataSet">Data Set</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -1038,161 +1052,318 @@ else dataSetRow["maxDate"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
-            <column id="445"/>
-            <column id="446"/>
-            <column id="447"/>
-            <column id="448"/>
-            <column id="449"/>
-            <column id="450"/>
-            <column id="451"/>
-            <column id="452"/>
-            <column id="453"/>
-            <column id="454"/>
-            <column id="455"/>
-            <column id="456"/>
+            <column id="445">
+                <property name="width">0.5104166666666666in</property>
+            </column>
+            <column id="446">
+                <property name="width">0.6041666666666666in</property>
+            </column>
+            <column id="447">
+                <property name="width">0.65625in</property>
+            </column>
+            <column id="448">
+                <property name="width">0.6041666666666666in</property>
+            </column>
+            <column id="449">
+                <property name="width">0.7395833333333334in</property>
+            </column>
+            <column id="450">
+                <property name="width">0.8541666666666666in</property>
+            </column>
+            <column id="451">
+                <property name="width">0.7291666666666666in</property>
+            </column>
+            <column id="452">
+                <property name="width">1.0208333333333333in</property>
+            </column>
+            <column id="453">
+                <property name="width">0.6875in</property>
+            </column>
+            <column id="454">
+                <property name="width">0.6666666666666666in</property>
+            </column>
+            <column id="455">
+                <property name="width">0.40625in</property>
+            </column>
+            <column id="456">
+                <property name="width">0.46875in</property>
+            </column>
             <header>
                 <row id="382">
+                    <property name="style">NewStyle19</property>
+                    <property name="fontSize">8pt</property>
+                    <property name="fontWeight">bold</property>
                     <cell id="383">
-                        <label id="384">
-                            <text-property name="text">ADVICE_NO</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="386">
+                            <text-property name="text">Brn Cd</text-property>
                         </label>
                     </cell>
                     <cell id="385">
-                        <label id="386">
-                            <text-property name="text">BRANCH_CD</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="388">
+                            <text-property name="text">Tran Dt</text-property>
                         </label>
                     </cell>
                     <cell id="387">
-                        <label id="388">
-                            <text-property name="text">TRANSACTION_DATE</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="384">
+                            <property name="style">NewStyle17</property>
+                            <property name="fontSize">8pt</property>
+                            <text-property name="text">Advice No/ Year</text-property>
                         </label>
                     </cell>
                     <cell id="389">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <label id="390">
-                            <text-property name="text">TRANSFER_TYPE</text-property>
+                            <text-property name="text">Tran Type</text-property>
                         </label>
                     </cell>
                     <cell id="391">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <label id="392">
-                            <text-property name="text">ACCOUNT_INFO</text-property>
+                            <text-property name="text">Account No/ Name</text-property>
                         </label>
                     </cell>
                     <cell id="393">
-                        <label id="394">
-                            <text-property name="text">ADDRESS</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="406">
+                            <text-property name="text">Benef A/C No/  IBAN/Name</text-property>
                         </label>
                     </cell>
                     <cell id="395">
-                        <label id="396">
-                            <text-property name="text">IS_BENEF_TITLE_FETCH</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="394">
+                            <text-property name="text">Beneficiary Address</text-property>
                         </label>
                     </cell>
                     <cell id="397">
-                        <label id="398">
-                            <text-property name="text">Beneficiary Bank Name</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="396">
+                            <text-property name="text">Benef Title Fetch Through 1-Link</text-property>
                         </label>
                     </cell>
                     <cell id="399">
-                        <label id="400">
-                            <text-property name="text">VOUCHER_NO</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="398">
+                            <text-property name="text">Benef Bank Name</text-property>
                         </label>
                     </cell>
                     <cell id="401">
-                        <label id="402">
-                            <text-property name="text">TOTAL_AMOUNT</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="400">
+                            <text-property name="text">Vouch No/Year</text-property>
                         </label>
                     </cell>
                     <cell id="403">
-                        <label id="404">
-                            <text-property name="text">SBP_TRANSACTION_TYPE</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="402">
+                            <text-property name="text">Tran Amt</text-property>
                         </label>
                     </cell>
                     <cell id="405">
-                        <label id="406">
-                            <text-property name="text">BENEF_ACCOUNT_INFO</text-property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <label id="404">
+                            <text-property name="text">Type Cd</text-property>
                         </label>
                     </cell>
                 </row>
             </header>
             <detail>
                 <row id="407">
+                    <property name="fontSize">8pt</property>
                     <cell id="408">
-                        <data id="409">
-                            <property name="resultSetColumn">ADVICE_NO</property>
-                        </data>
-                    </cell>
-                    <cell id="410">
+                        <property name="style">textCenter</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="411">
+                            <structure name="toc"/>
                             <property name="resultSetColumn">BRANCH_CD</property>
                         </data>
                     </cell>
-                    <cell id="412">
+                    <cell id="410">
+                        <property name="style">overflowAuto</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="413">
                             <property name="style">transactionDateStyle</property>
                             <property name="resultSetColumn">TRANSACTION_DATE</property>
                         </data>
                     </cell>
+                    <cell id="412">
+                        <property name="style">overflowAuto</property>
+                        <property name="fontFamily">serif</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <data id="409">
+                            <property name="resultSetColumn">ADVICE_NO</property>
+                        </data>
+                    </cell>
                     <cell id="414">
+                        <property name="style">textCenter</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="415">
                             <property name="resultSetColumn">TRANSFER_TYPE</property>
                         </data>
                     </cell>
                     <cell id="416">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="417">
                             <property name="resultSetColumn">ACCOUNT_INFO</property>
                         </data>
                     </cell>
                     <cell id="418">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <data id="431">
+                            <property name="resultSetColumn">BENEF_ACCOUNT_INFO</property>
+                        </data>
+                    </cell>
+                    <cell id="420">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="419">
                             <property name="resultSetColumn">BENEFICIARY_ADDRESS</property>
                         </data>
                     </cell>
-                    <cell id="420">
+                    <cell id="422">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="421">
+                            <property name="style">textCenter</property>
                             <property name="resultSetColumn">IS_BENEF_TITLE_FETCH</property>
                         </data>
                     </cell>
-                    <cell id="422">
+                    <cell id="424">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="423">
                             <property name="resultSetColumn">BANK_NAME</property>
                         </data>
                     </cell>
-                    <cell id="424">
+                    <cell id="426">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="425">
                             <property name="resultSetColumn">VOUCHER_NO</property>
                         </data>
                     </cell>
-                    <cell id="426">
+                    <cell id="428">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="427">
                             <property name="resultSetColumn">TOTAL_AMOUNT</property>
                         </data>
                     </cell>
-                    <cell id="428">
+                    <cell id="430">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
                         <data id="429">
                             <property name="resultSetColumn">SBP_TRANSACTION_TYPE</property>
-                        </data>
-                    </cell>
-                    <cell id="430">
-                        <data id="431">
-                            <property name="resultSetColumn">BENEF_ACCOUNT_INFO</property>
                         </data>
                     </cell>
                 </row>
             </detail>
             <footer>
                 <row id="432">
-                    <cell id="433"/>
-                    <cell id="434"/>
-                    <cell id="435"/>
-                    <cell id="436"/>
-                    <cell id="437"/>
-                    <cell id="438"/>
-                    <cell id="439"/>
-                    <cell id="440"/>
-                    <cell id="441"/>
-                    <cell id="442"/>
-                    <cell id="443"/>
-                    <cell id="444"/>
+                    <cell id="433">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="434">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="435">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="436">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="437">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="438">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="439">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="440">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="441">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="442">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="443">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="444">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
                 </row>
             </footer>
         </table>
