@@ -12,6 +12,7 @@ import lombok.Setter;
 public class OutwardRTGSReponseDto {
     List<VoucherLaxDto> voucherLaxList;
     List<String> adviceNoList;
+    List<String> transactionNoList;
 }
 
 

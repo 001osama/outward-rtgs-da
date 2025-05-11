@@ -12,6 +12,7 @@ import dto.AuthorizeUserDto;
 import dto.BeneficiaryAccountDto;
 import dto.LoginRequestDto;
 import dto.OutwardRTGSFormDto;
+import dto.OutwardRTGSReponseDto;
 import dto.RTGSReportDto;
 import dto.ReportFilterDto;
 import dto.UserDto;
@@ -506,10 +507,10 @@ public class MainResource {
                         .build();
             }
 
-            // boolean isPostingUser = mainService.isPostingUser(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
-            // if(isPostingUser)
-            //     return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
-            //     .build();
+            boolean isPostingUser = mainService.isPostingUser(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
+            if(isPostingUser)
+                return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
+                .build();
 
             boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
 
@@ -551,17 +552,11 @@ public class MainResource {
             //     return Response.ok(new ApiResponse(null, "Same user cannot authorize", false))
             //     .build();
             
-            boolean isAuthorized = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
-
-            if (isAuthorized) 
-                return Response.ok(new ApiResponse(null, "RTGS transaction with voucher " + voucherInfo.toString() + " has been successfully authorized.", true))
-                        .build();
+            OutwardRTGSReponseDto outwardRTGSReponseDto = mainService.authorizeOutwardRtgs(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
             
-
-            return Response.status(Response.Status.NOT_FOUND)
-                        .entity(new ApiResponse(null, "RTGS transaction with voucher number " + voucherInfo.toString() + " not found or could not be authorized.", false))
-                        .build();
-            
+            return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse(outwardRTGSReponseDto, null, true))
+                    .build();
         } 
         catch (Exception ex) {
             logger.error("Error authorizing RTGS transaction for voucher "+ voucherInfo.toString(), ex);

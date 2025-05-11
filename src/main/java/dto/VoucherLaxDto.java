@@ -14,5 +14,6 @@ public class VoucherLaxDto {
     String creditAmount;
     String debitAmount;
     String accountNo;
+    String accountTitle;
     String currencyCode;
 }
