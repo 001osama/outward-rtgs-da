@@ -440,7 +440,7 @@ public class MainService {
         }
 
         StringBuilder sb2 = new StringBuilder();
-        sb2.append("SELECT AMOUNT,btl.BANK_NAME, btl.BANK_CD, rbt.ACCOUNT_TITLE, rbt.ACCOUNT_NO, ");
+        sb2.append("SELECT AMOUNT, btl.BANK_NAME, btl.BANK_CD, rbt.ACCOUNT_TITLE, rbt.ACCOUNT_NO, ");
         sb2.append("rbt.ADDRESS, rbt.IS_BENEF_TITLE_FETCH, rbt.BRANCH_CD FROM RTGS_BENEFICIARY_TL AS rbt LEFT JOIN BANKS_TL AS btl ON rbt.BANK_CD  = btl.BANK_CD ");
         sb2.append("WHERE rbt.VOUCHER_NO = ? AND rbt.VOUCHER_YEAR = ?");
 
@@ -509,7 +509,7 @@ public class MainService {
     public List<RTGSDto> getUnauthorizedOutwardRTGSList() {
         List<RTGSDto> resultList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT CURRENCY_TYPE, VARCHAR_FORMAT(TOTAL_AMOUNT, '999G999G999G999G999G999D00') AS TOTAL_AMOUNT, POSTED_BY, ");
+        sb.append("SELECT CT.ALPHA_CD || '-' || CT.CURRENCY_CD AS CURRENCY, VARCHAR_FORMAT(TOTAL_AMOUNT, '999,999,999,999,999,999.00') AS TOTAL_AMOUNT, POSTED_BY, ");
         sb.append("VARCHAR_FORMAT(POSTED_DATE, 'DD/MM/YYYY') AS POSTED_DATE, VOUCHER_NO || '/' || VOUCHER_YEAR AS VOUCHER_NO, ");
         sb.append("'OUTBR' AS EXP_CODE FROM RTGS_TL AS RT LEFT JOIN CURRENCY_TL AS CT ON RT.CURRENCY_CD = CT.CURRENCY_CD ");
         sb.append("WHERE STATUS = ? ORDER BY POSTED_DATE DESC");
@@ -523,7 +523,7 @@ public class MainService {
             while (resultSet.next()) {
                 resultList.add(
                         new RTGSDto(
-                                resultSet.getString("CURRENCY_TYPE"),
+                                resultSet.getString("CURRENCY"),
                                 resultSet.getString("TOTAL_AMOUNT"),
                                 resultSet.getString("POSTED_BY"),
                                 resultSet.getString("POSTED_DATE"),
@@ -768,8 +768,8 @@ public class MainService {
 
             StringBuilder sb7 = new StringBuilder();
             sb7.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
-            sb7.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999G999G999G999G999G999D00') ELSE '0.00' END AS DEBIT, ");
-            sb7.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999G999G999G999G999G999D00') ELSE '0.00' END AS CREDIT, ");
+            sb7.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999,999,999,999,999,999.00') ELSE '0.00' END AS DEBIT, ");
+            sb7.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999,999,999,999,999,999.00') ELSE '0.00' END AS CREDIT, ");
 
             sb7.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN LPAD(AC.branch_cd, 4, '0') || '-' || LPAD(AC.account_type_cd, 4, '0') || '-' || ");
             sb7.append("LPAD(AC.customer_no, 6, '0') || '-' || LPAD(AC.run_no, 2, '0') || '-' || AC.check_digit ");
@@ -843,8 +843,8 @@ public class MainService {
     public List<VoucherLaxDto> getTransactionLaxList(String voucherNo, String voucherYear) throws Exception {
         StringBuilder sb = new StringBuilder();
             sb.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
-            sb.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999G999G999G999G999G999D00') ELSE '0.00' END AS DEBIT, ");
-            sb.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999G999G999G999G999G999D00') ELSE '0.00' END AS CREDIT, ");
+            sb.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999,999,999,999,999,999.00') ELSE '0.00' END AS DEBIT, ");
+            sb.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999,999,999,999,999,999.00') ELSE '0.00' END AS CREDIT, ");
 
             sb.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN LPAD(AC.branch_cd, 4, '0') || '-' || LPAD(AC.account_type_cd, 4, '0') || '-' || ");
             sb.append("LPAD(AC.customer_no, 6, '0') || '-' || LPAD(AC.run_no, 2, '0') || '-' || AC.check_digit ");
@@ -1250,8 +1250,8 @@ public class MainService {
 
             StringBuilder sb = new StringBuilder();
             sb.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
-            sb.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999G999G999G999G999G999D00') ELSE '0.00' END AS DEBIT, ");
-            sb.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999G999G999G999G999G999D00') ELSE '0.00' END AS CREDIT, ");
+            sb.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999,999,999,999,999,999.00') ELSE '0.00' END AS DEBIT, ");
+            sb.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999,999,999,999,999,999.00') ELSE '0.00' END AS CREDIT, ");
 
             sb.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN LPAD(AC.branch_cd, 4, '0') || '-' || LPAD(AC.account_type_cd, 4, '0') || '-' || ");
             sb.append("LPAD(AC.customer_no, 6, '0') || '-' || LPAD(AC.run_no, 2, '0') || '-' || AC.check_digit ");
