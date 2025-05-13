@@ -101,6 +101,23 @@ public class MainService {
         return false;
     }
 
+    public boolean isAuthUserExist(String loginId) {
+        try (Connection connection = datasource.getConnection();
+                PreparedStatement preparedStatement = connection
+                        .prepareStatement("SELECT LOGIN_ID FROM USER_TL WHERE LOGIN_ID = ? AND ROLE_ID=1")) {
+
+            preparedStatement.setString(1, loginId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Unexpected error occurred while retrieving user with loginId " + loginId, e);
+        }
+        return false;
+    }
+
     public UserDto createUser(UserDto user) {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(
@@ -241,10 +258,8 @@ public class MainService {
 
         query.append(" SELECT");
         query.append(" acctype.account_type || '-' || LPAD(acc.account_type_cd, 4,'0') AS acc_type,");
-        query.append(
-                " 'PK65BAHL' || LPAD(acc.branch_cd, 4, '0') || LPAD(acc.account_type_cd, 4, '0') || LPAD(acc.customer_no, 6, '0') || LPAD(acc.run_no, 4, '0') || acc.check_digit AS iban,");
-        query.append(
-                " LPAD(acc.branch_cd, 4, '0') || '-' || LPAD(acc.account_type_cd, 4, '0') || '-' || LPAD(acc.customer_no, 6, '0') || '-' || LPAD(acc.run_no, 4, '0') || '-' || acc.check_digit || '-' || acc.account_title AS acc_name,");
+        query.append(" 'PK65BAHL' || LPAD(acc.branch_cd, 4, '0') || LPAD(acc.account_type_cd, 4, '0') || LPAD(acc.customer_no, 6, '0') || LPAD(acc.run_no, 4, '0') || acc.check_digit AS iban,");
+        query.append(" LPAD(acc.branch_cd, 4, '0') || '-' || LPAD(acc.account_type_cd, 4, '0') || '-' || LPAD(acc.customer_no, 6, '0') || '-' || LPAD(acc.run_no, 4, '0') || '-' || acc.check_digit || '-' || acc.account_title AS acc_name,");
         query.append(" acc.available_bal");
         query.append(" FROM account_tl AS acc");
         query.append(" LEFT JOIN account_type_tl AS acctype");
@@ -345,8 +360,7 @@ public class MainService {
         return optionList;
     }
 
-    public boolean authorizeUser(AuthorizeUserDto authUserDto) {
-        List<ExceptionDto> optionList = new ArrayList<>();
+    public Integer getUserRole(AuthorizeUserDto authUserDto) {
         String sqlQuery = "SELECT * FROM USER_TL WHERE LOGIN_ID=? AND PASSWORD=?";
 
         try (Connection connection = datasource.getConnection();
@@ -356,13 +370,14 @@ public class MainService {
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            while (resultSet.next()) {
-                return true;
+            if (resultSet.next()) {
+                return resultSet.getInt("ROLE_ID");
             }
+
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while getting exception list for activity", e);
         }
-        return false;
+        return null;
     }
 
     public BeneficiaryAccountDto getBeneficiaryAccountDetails(String AccOrIban, String BankCode) {
@@ -393,10 +408,8 @@ public class MainService {
         sb.append("SELECT LPAD(BRANCH_CD, 4, '0') || '-' || LPAD(ACCOUNT_TYPE_CD , 4, '0') || '-' ||");
         sb.append("LPAD(CUSTOMER_NO, 6, '0') || '-' || LPAD(RUN_NO, 2, '0') || '-' || ");
         sb.append("CHECK_DIGIT AS ACCOUNT_NO, BRANCH_CD, CURRENCY_CD, SBP_TRANSACTION_TYPE_CD, TRANSFER_TYPE, ");
-        sb.append(
-                "CUSTOMER_NO, TOTAL_AMOUNT, PURPOSE_OF_PAYMENT_CD, CHEQUE_NO, CHEQUE_DATE, SENDER_TO_RECEIVER_INFO, ");
-        sb.append(
-                "REMARKS, PAYMENT_MODE, POSTED_BY FROM rtgs_tl WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
+        sb.append("CUSTOMER_NO, TOTAL_AMOUNT, PURPOSE_OF_PAYMENT_CD, CHEQUE_NO, CHEQUE_DATE, SENDER_TO_RECEIVER_INFO, ");
+        sb.append("REMARKS, PAYMENT_MODE, POSTED_BY FROM rtgs_tl WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
 
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
@@ -440,7 +453,7 @@ public class MainService {
         }
 
         StringBuilder sb2 = new StringBuilder();
-        sb2.append("SELECT AMOUNT, btl.BANK_NAME, btl.BANK_CD, rbt.ACCOUNT_TITLE, rbt.ACCOUNT_NO, ");
+        sb2.append("SELECT AMOUNT, btl.BANK_NAME, btl.BANK_CD, rbt.ACCOUNT_TITLE, rbt.ACC_OR_IBAN, ");
         sb2.append("rbt.ADDRESS, rbt.IS_BENEF_TITLE_FETCH, rbt.BRANCH_CD FROM RTGS_BENEFICIARY_TL AS rbt LEFT JOIN BANKS_TL AS btl ON rbt.BANK_CD  = btl.BANK_CD ");
         sb2.append("WHERE rbt.VOUCHER_NO = ? AND rbt.VOUCHER_YEAR = ?");
 
@@ -458,7 +471,7 @@ public class MainService {
                             resultSet.getString("BANK_NAME"),
                             resultSet.getString("BANK_CD"),
                             resultSet.getString("ACCOUNT_TITLE"),
-                            resultSet.getString("ACCOUNT_NO"),
+                            resultSet.getString("ACC_OR_IBAN"),
                             resultSet.getString("ADDRESS"),
                             resultSet.getString("BRANCH_CD"),
                             resultSet.getBoolean("IS_BENEF_TITLE_FETCH")
@@ -592,39 +605,50 @@ public class MainService {
                 throw ex;
             }
 
-            StringBuilder sb2 = new StringBuilder();
-            sb2.append("INSERT INTO RTGS_BENEFICIARY_TL (ACCOUNT_NO, ACCOUNT_TITLE, BANK_CD, BRANCH_CD, ADDRESS, ADVISE_NO, ");
-            sb2.append("ADVISE_YEAR, VOUCHER_NO, VOUCHER_YEAR, AMOUNT, IS_BENEF_TITLE_FETCH) ");
-            sb2.append("VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            var transactionLaxList = rtgsForm.getTransactionLaxList();
+            for (var transactionLax : transactionLaxList) {
+                StringBuilder sb2 = new StringBuilder();
+                sb2.append("INSERT INTO RTGS_BENEFICIARY_TL (ACC_OR_IBAN, ACCOUNT_TITLE, BANK_CD, ADDRESS, ADVISE_NO, ");
+                sb2.append("ADVISE_YEAR, VOUCHER_NO, VOUCHER_YEAR, AMOUNT, IS_BENEF_TITLE_FETCH ");
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+                var isBranchCodeGiven = transactionLax.getBeneficiaryBranchCode() != ""; 
+                if(isBranchCodeGiven)
+                    sb2.append(", BRANCH_CD");
 
-                var transactionLaxList = rtgsForm.getTransactionLaxList();
-                BigDecimal currentAdviceNo = generateAdviseNo();
+                sb2.append(") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
-                for (var transactionLax : transactionLaxList) {
+                if(isBranchCodeGiven)
+                    sb2.append(", ?");
+                
+                sb2.append(")");
+
+                try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+
+                    BigDecimal currentAdviceNo = generateAdviseNo();
                     preparedStatement.setString(1, transactionLax.getBeneficiaryIbanOrAccountNo());
                     preparedStatement.setString(2, transactionLax.getBeneficiaryAccountName());
                     preparedStatement.setString(3, transactionLax.getBeneficiaryBankCode());
-                    preparedStatement.setString(4, transactionLax.getBeneficiaryBranchCode());
-                    preparedStatement.setString(5, transactionLax.getBeneficiaryAddress());
-                    preparedStatement.setBigDecimal(6, currentAdviceNo);
-                    preparedStatement.setString(7, currentYearString);
-                    preparedStatement.setBigDecimal(8, newVoucherNo);
-                    preparedStatement.setString(9, currentYearString);
-                    preparedStatement.setString(10, transactionLax.getTransactionAmount());
-                    preparedStatement.setBoolean(11, transactionLax.isBeneficiaryTitleFetch());
+                    preparedStatement.setString(4, transactionLax.getBeneficiaryAddress());
+                    preparedStatement.setBigDecimal(5, currentAdviceNo);
+                    preparedStatement.setString(6, currentYearString);
+                    preparedStatement.setBigDecimal(7, newVoucherNo);
+                    preparedStatement.setString(8, currentYearString);
+                    preparedStatement.setString(9, transactionLax.getTransactionAmount());
+                    preparedStatement.setBoolean(10, transactionLax.isBeneficiaryTitleFetch());
+                    
+                    if(isBranchCodeGiven)
+                        preparedStatement.setString(11, transactionLax.getBeneficiaryBranchCode());
 
                     preparedStatement.addBatch();
 
                     currentAdviceNo = currentAdviceNo.add(BigDecimal.ONE);
+                    
+                    int[] affectedRows = preparedStatement.executeBatch();
+                    logger.info("Affected No of rows is: " + affectedRows.length);
+                } catch (SQLException ex) {
+                    DatabaseErrorHandler.log((SQLException) ex);
+                    throw ex;
                 }
-
-                int[] affectedRows = preparedStatement.executeBatch();
-                logger.info("Affected No of rows is: " + affectedRows.length);
-            } catch (SQLException ex) {
-                DatabaseErrorHandler.log((SQLException) ex);
-                throw ex;
             }
 
             StringBuilder sb3 = new StringBuilder();

@@ -319,6 +319,7 @@
                     <text-property name="heading">BENEF_ACCOUNT_INFO</text-property>
                 </structure>
             </list-property>
+            <list-property name="parameters"/>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -398,15 +399,12 @@
                     </structure>
                 </list-property>
             </structure>
-            <method name="beforeOpen"><![CDATA[reportContext.minDate = null;
-reportContext.maxDate = null;
-
-if(params["branchCd"].value != null &amp;&amp;  params["branchCd"].value != "")
+            <method name="beforeOpen"><![CDATA[if(params["branchCd"].value != null &amp;&amp;  params["branchCd"].value != "")
 {
 	this.queryText = this.queryText + " AND RT.BRANCH_CD = '" + params["branchCd"] + "' "; 
 }
 
-if(params["transferType"].value != null &amp;&amp; params["transferType"].value != "All")
+if(params["transferType"].value != null &amp;&amp; params["transferType"].value != ""  &amp;&amp; params["transferType"].value != "All")
 {
 	this.queryText = this.queryText + " AND RT.TRANSFER_TYPE = '" + params["transferType"] + "' "; 
 }
@@ -421,7 +419,7 @@ if(params["fromdate"].value != null &amp;&amp; params["fromdate"].value != "")
 	this.queryText = this.queryText + " AND TT.TRANSACTION_DATE >= '" + params["fromdate"] + "' "; 
 }
 
-if(params["Status"].value != null &amp;&amp; params["Status"].value != "All")
+if(params["Status"].value != null &amp;&amp; params["Status"].value != "" &amp;&amp; params["Status"].value != "All")
 {
 	this.queryText = this.queryText + " AND RT.STATUS = '" + params["Status"] + "' "; 
 }
@@ -569,14 +567,16 @@ finally
                 </structure>
             </list-property>
             <xml-property name="queryText"><![CDATA[SELECT 
-DISTINCT RBT.ADVISE_NO || '/' || RBT.ADVISE_YEAR AS ADVICE_NO,
+DISTINCT RBT.ADVISE_NO || '/ ' || RBT.ADVISE_YEAR AS ADVICE_NO,
 LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD,
-TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, RT.TRANSFER_TYPE, 
+TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, 
+CASE WHEN RT.TRANSFER_TYPE = 103 THEN RT.TRANSFER_TYPE || '(Single)'
+	ELSE RT.TRANSFER_TYPE || '(Multiple)' END AS TRANSFER_TYPE, 
 		LPAD(AT.BRANCH_CD, 4, '0') || '-' || 
 		LPAD(AT.ACCOUNT_TYPE_CD, 4, '0') || '-' || 
 		LPAD(AT.CUSTOMER_NO, 6, '0') || '-' || 
 		LPAD(AT.RUN_NO, 2, '0') || '-' || 
-		AT.CHECK_DIGIT || '-' || AT.ACCOUNT_TITLE AS ACCOUNT_INFO,
+		AT.CHECK_DIGIT || '/' || AT.ACCOUNT_TITLE AS ACCOUNT_INFO,
 		RBT.ADDRESS AS BENEFICIARY_ADDRESS,
 		CASE RBT.IS_BENEF_TITLE_FETCH
 		        WHEN 1 THEN 'Yes'
@@ -584,10 +584,10 @@ TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, RT.TRANSFER_TYPE,
 		        ELSE CAST(RBT.IS_BENEF_TITLE_FETCH AS VARCHAR(5))
 		    END AS IS_BENEF_TITLE_FETCH,
 		BT.BANK_NAME,
-		RT.VOUCHER_NO || '/' || RT.VOUCHER_YEAR AS VOUCHER_NO,
+		RT.VOUCHER_NO || '/ ' || RT.VOUCHER_YEAR AS VOUCHER_NO,
 		RT.TOTAL_AMOUNT ,
 		STTT.SBP_TRANSACTION_TYPE,
-		RBT.ACCOUNT_NO || '/' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO
+		RBT.ACC_OR_IBAN || '/ ' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO
 		
 FROM RTGS_BENEFICIARY_TL AS RBT 
 LEFT JOIN RTGS_TL AS RT 
@@ -802,10 +802,41 @@ WHERE 1=1
         <style name="overflowAuto" id="548">
             <property name="overflow">auto</property>
         </style>
+        <style name="NewStyle20" id="550">
+            <property name="width">100%</property>
+        </style>
+        <style name="NewStyle21" id="551">
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopWidth">thin</property>
+        </style>
+        <style name="NewStyle22" id="552">
+            <structure name="numberFormat">
+                <property name="category">Currency</property>
+                <property name="pattern">###0.00;(###0.00){RoundingMode=HALF_UP}</property>
+            </structure>
+        </style>
+        <style name="amountMasking" id="553">
+            <structure name="numberFormat">
+                <property name="category">Currency</property>
+                <property name="pattern">#,##0.00;(#,##0.00){RoundingMode=HALF_UP}</property>
+            </structure>
+        </style>
+        <style name="horAlignLeft" id="554">
+            <property name="textAlign">left</property>
+        </style>
+        <style name="tableRowDataHeight" id="595">
+            <property name="canShrink">true</property>
+            <property name="overflow">auto</property>
+        </style>
     </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
+            <property name="leftMargin">0.2in</property>
+            <property name="rightMargin">0.2in</property>
             <property name="headerHeight">1in</property>
+            <property name="footerHeight">0.5in</property>
             <page-header>
                 <grid id="88">
                     <property name="height">10.3125in</property>
@@ -814,10 +845,10 @@ WHERE 1=1
                         <property name="width">2.1041666666666665in</property>
                     </column>
                     <column id="90">
-                        <property name="width">3.8958333333333335in</property>
+                        <property name="width">3.8229166666666665in</property>
                     </column>
                     <column id="91">
-                        <property name="width">2.0104166666666665in</property>
+                        <property name="width">2.0833333333333335in</property>
                     </column>
                     <row id="92">
                         <property name="height">10.3125in</property>
@@ -827,8 +858,9 @@ WHERE 1=1
                                 <text-property name="text">BANK AL HABIB LIMITED</text-property>
                             </label>
                             <image id="467">
-                                <property name="height">0.5833333333333334in</property>
-                                <property name="width">0.4895833333333333in</property>
+                                <property name="marginLeft">5pt</property>
+                                <property name="height">0.5520833333333334in</property>
+                                <property name="width">0.6145833333333334in</property>
                                 <property name="source">file</property>
                                 <expression name="uri" type="constant">/home/bahl/Project/outward-rtgs-da/src/main/resources/bahl-logo.png</expression>
                             </image>
@@ -852,16 +884,16 @@ WHERE 1=1
                                         <grid id="525">
                                             <property name="width">3.7604166666666665in</property>
                                             <column id="526">
-                                                <property name="width">0.6875in</property>
+                                                <property name="width">1.25in</property>
                                             </column>
                                             <column id="527">
-                                                <property name="width">1.2604166666666667in</property>
+                                                <property name="width">0.71875in</property>
                                             </column>
                                             <column id="528">
-                                                <property name="width">0.5in</property>
+                                                <property name="width">0.3020833333333333in</property>
                                             </column>
                                             <column id="529">
-                                                <property name="width">1.3125in</property>
+                                                <property name="width">1.4895833333333333in</property>
                                             </column>
                                             <row id="530">
                                                 <cell id="531">
@@ -944,11 +976,20 @@ else dataSetRow["maxDate"]</expression>
             </page-header>
             <page-footer>
                 <grid id="157">
-                    <column id="158"/>
-                    <column id="159"/>
+                    <property name="marginTop">2pt</property>
+                    <property name="width">7.947916666666667in</property>
+                    <column id="158">
+                        <property name="width">4.229166666666667in</property>
+                    </column>
+                    <column id="159">
+                        <property name="width">3.71875in</property>
+                    </column>
                     <row id="160">
                         <cell id="161">
                             <text-data id="372">
+                                <property name="fontSize">8pt</property>
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingBottom">3pt</property>
                                 <expression name="valueExpr">"Produced by: " + reportContext.getParameterValue("loginId")</expression>
                                 <property name="contentType">html</property>
                             </text-data>
@@ -958,15 +999,59 @@ else dataSetRow["maxDate"]</expression>
                     <row id="163">
                         <cell id="164">
                             <text-data id="377">
-                                <expression name="valueExpr">"Produced by: " + reportContext.getParameterValue("branchCd")</expression>
+                                <property name="fontSize">8pt</property>
+                                <expression name="valueExpr">"Branch: " + reportContext.getParameterValue("branchCd")</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
                         <cell id="165">
-                            <auto-text id="168">
-                                <property name="textAlign">right</property>
-                                <property name="type">page-number</property>
-                            </auto-text>
+                            <grid id="581">
+                                <property name="width">3.90625in</property>
+                                <column id="582">
+                                    <property name="width">2.5729166666666665in</property>
+                                </column>
+                                <column id="583">
+                                    <property name="width">0.5in</property>
+                                </column>
+                                <column id="584">
+                                    <property name="width">0.15625in</property>
+                                </column>
+                                <column id="585">
+                                    <property name="width">0.6770833333333334in</property>
+                                </column>
+                                <row id="586">
+                                    <cell id="587">
+                                        <text id="591">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="textAlign">right</property>
+                                            <property name="contentType">auto</property>
+                                            <text-property name="content"><![CDATA[Page No]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="588">
+                                        <auto-text id="592">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="textAlign">right</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="589">
+                                        <text id="593">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="textAlign">right</property>
+                                            <property name="contentType">auto</property>
+                                            <text-property name="content"><![CDATA[/]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="590">
+                                        <auto-text id="594">
+                                            <property name="fontSize">8pt</property>
+                                            <property name="textAlign">left</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
                         </cell>
                     </row>
                 </grid>
@@ -975,7 +1060,9 @@ else dataSetRow["maxDate"]</expression>
     </page-setup>
     <body>
         <table id="381">
-            <property name="width">7.947916666666667in</property>
+            <property name="marginTop">auto</property>
+            <property name="marginBottom">0pt</property>
+            <property name="width">8.072916666666666in</property>
             <property name="dataSet">Data Set</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -1052,67 +1139,80 @@ else dataSetRow["maxDate"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
+            <structure name="toc"/>
             <column id="445">
-                <property name="width">0.5104166666666666in</property>
+                <property name="width">0.46875in</property>
             </column>
             <column id="446">
-                <property name="width">0.6041666666666666in</property>
+                <property name="width">0.5520833333333334in</property>
             </column>
             <column id="447">
-                <property name="width">0.65625in</property>
+                <property name="width">0.5625in</property>
             </column>
             <column id="448">
-                <property name="width">0.6041666666666666in</property>
-            </column>
-            <column id="449">
-                <property name="width">0.7395833333333334in</property>
-            </column>
-            <column id="450">
-                <property name="width">0.8541666666666666in</property>
-            </column>
-            <column id="451">
-                <property name="width">0.7291666666666666in</property>
-            </column>
-            <column id="452">
-                <property name="width">1.0208333333333333in</property>
-            </column>
-            <column id="453">
-                <property name="width">0.6875in</property>
-            </column>
-            <column id="454">
                 <property name="width">0.6666666666666666in</property>
             </column>
-            <column id="455">
-                <property name="width">0.40625in</property>
+            <column id="449">
+                <property name="width">1.1458333333333333in</property>
             </column>
-            <column id="456">
-                <property name="width">0.46875in</property>
+            <column id="450">
+                <property name="width">1.1354166666666667in</property>
+            </column>
+            <column id="451">
+                <property name="width">0.8958333333333334in</property>
+            </column>
+            <column id="453">
+                <property name="width">0.875in</property>
+            </column>
+            <column id="454">
+                <property name="width">0.5833333333333334in</property>
+            </column>
+            <column id="455">
+                <property name="width">1.1875in</property>
             </column>
             <header>
                 <row id="382">
                     <property name="style">NewStyle19</property>
                     <property name="fontSize">8pt</property>
                     <property name="fontWeight">bold</property>
+                    <property name="height">0.4270833333333333in</property>
                     <cell id="383">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="386">
                             <text-property name="text">Brn Cd</text-property>
                         </label>
                     </cell>
                     <cell id="385">
+                        <property name="style">NewStyle21</property>
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="388">
                             <text-property name="text">Tran Dt</text-property>
                         </label>
                     </cell>
                     <cell id="387">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="384">
                             <property name="style">NewStyle17</property>
                             <property name="fontSize">8pt</property>
@@ -1120,75 +1220,94 @@ else dataSetRow["maxDate"]</expression>
                         </label>
                     </cell>
                     <cell id="389">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="390">
                             <text-property name="text">Tran Type</text-property>
                         </label>
                     </cell>
                     <cell id="391">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="392">
-                            <text-property name="text">Account No/ Name</text-property>
+                            <text-property name="text">Account Number/ Account Name</text-property>
                         </label>
                     </cell>
                     <cell id="393">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="406">
-                            <text-property name="text">Benef A/C No/  IBAN/Name</text-property>
+                            <text-property name="text">Benef A/C No /IBAN/ Name</text-property>
                         </label>
                     </cell>
                     <cell id="395">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="394">
                             <text-property name="text">Beneficiary Address</text-property>
                         </label>
                     </cell>
-                    <cell id="397">
-                        <property name="paddingTop">1pt</property>
-                        <property name="paddingLeft">3pt</property>
-                        <property name="paddingRight">3pt</property>
-                        <label id="396">
-                            <text-property name="text">Benef Title Fetch Through 1-Link</text-property>
-                        </label>
-                    </cell>
                     <cell id="399">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="398">
                             <text-property name="text">Benef Bank Name</text-property>
                         </label>
                     </cell>
                     <cell id="401">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="400">
-                            <text-property name="text">Vouch No/Year</text-property>
+                            <text-property name="text">Vouch No /Year</text-property>
                         </label>
                     </cell>
                     <cell id="403">
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="verticalAlign">middle</property>
                         <label id="402">
                             <text-property name="text">Tran Amt</text-property>
-                        </label>
-                    </cell>
-                    <cell id="405">
-                        <property name="paddingTop">1pt</property>
-                        <property name="paddingLeft">3pt</property>
-                        <property name="paddingRight">3pt</property>
-                        <label id="404">
-                            <text-property name="text">Type Cd</text-property>
                         </label>
                     </cell>
                 </row>
@@ -1196,18 +1315,22 @@ else dataSetRow["maxDate"]</expression>
             <detail>
                 <row id="407">
                     <property name="fontSize">8pt</property>
+                    <property name="height">0%</property>
                     <cell id="408">
                         <property name="style">textCenter</property>
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
                         <data id="411">
+                            <property name="marginTop">0pt</property>
+                            <property name="marginBottom">0pt</property>
                             <structure name="toc"/>
                             <property name="resultSetColumn">BRANCH_CD</property>
                         </data>
                     </cell>
                     <cell id="410">
-                        <property name="style">overflowAuto</property>
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
@@ -1217,17 +1340,20 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="412">
-                        <property name="style">overflowAuto</property>
                         <property name="fontFamily">serif</property>
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
                         <data id="409">
+                            <property name="style">NewStyle20</property>
+                            <property name="textAlign">left</property>
+                            <structure name="toc"/>
                             <property name="resultSetColumn">ADVICE_NO</property>
                         </data>
                     </cell>
                     <cell id="414">
-                        <property name="style">textCenter</property>
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
@@ -1236,22 +1362,30 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="416">
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
                         <data id="417">
+                            <structure name="toc"/>
                             <property name="resultSetColumn">ACCOUNT_INFO</property>
                         </data>
                     </cell>
                     <cell id="418">
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
                         <data id="431">
+                            <structure name="stringFormat">
+                                <property name="category">Unformatted</property>
+                            </structure>
+                            <structure name="toc"/>
                             <property name="resultSetColumn">BENEF_ACCOUNT_INFO</property>
                         </data>
                     </cell>
                     <cell id="420">
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
@@ -1259,16 +1393,8 @@ else dataSetRow["maxDate"]</expression>
                             <property name="resultSetColumn">BENEFICIARY_ADDRESS</property>
                         </data>
                     </cell>
-                    <cell id="422">
-                        <property name="paddingTop">1pt</property>
-                        <property name="paddingLeft">3pt</property>
-                        <property name="paddingRight">3pt</property>
-                        <data id="421">
-                            <property name="style">textCenter</property>
-                            <property name="resultSetColumn">IS_BENEF_TITLE_FETCH</property>
-                        </data>
-                    </cell>
                     <cell id="424">
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
@@ -1277,6 +1403,7 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="426">
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
@@ -1285,19 +1412,13 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="428">
+                        <property name="fontSize">7.5pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
                         <data id="427">
+                            <property name="style">amountMasking</property>
                             <property name="resultSetColumn">TOTAL_AMOUNT</property>
-                        </data>
-                    </cell>
-                    <cell id="430">
-                        <property name="paddingTop">1pt</property>
-                        <property name="paddingLeft">3pt</property>
-                        <property name="paddingRight">3pt</property>
-                        <data id="429">
-                            <property name="resultSetColumn">SBP_TRANSACTION_TYPE</property>
                         </data>
                     </cell>
                 </row>
@@ -1339,11 +1460,6 @@ else dataSetRow["maxDate"]</expression>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
                     </cell>
-                    <cell id="440">
-                        <property name="paddingTop">1pt</property>
-                        <property name="paddingLeft">3pt</property>
-                        <property name="paddingRight">3pt</property>
-                    </cell>
                     <cell id="441">
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
@@ -1355,11 +1471,6 @@ else dataSetRow["maxDate"]</expression>
                         <property name="paddingRight">3pt</property>
                     </cell>
                     <cell id="443">
-                        <property name="paddingTop">1pt</property>
-                        <property name="paddingLeft">3pt</property>
-                        <property name="paddingRight">3pt</property>
-                    </cell>
-                    <cell id="444">
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>

@@ -405,13 +405,25 @@ public class MainResource {
     public Response authorizeUser(AuthorizeUserDto authUserDto) {
         logger.info("message : =====> authorizeUser method hit with body " + authUserDto.toString());
         try {
-            
-            var isAuthorized = mainService.authorizeUser(authUserDto);
 
-            if (!isAuthorized) 
+            var isUserExist = mainService.isUserExist(authUserDto.getLoginId());
+            if (!isUserExist) 
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(new ApiResponse(null, "Invalid Credentials", false))
+                        .entity(new ApiResponse(null, "Invalid User Id", false))
                         .build();
+            
+
+            var roleId = mainService.getUserRole(authUserDto);
+
+            if (roleId == null) 
+                return Response.status(Response.Status.BAD_REQUEST)
+                        .entity(new ApiResponse(null, "Invalid Password", false))
+                        .build();
+
+            if (roleId != 1)
+                return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(new ApiResponse(null, "You are not allowed to perform this transaction", false))
+                            .build();
             
 
             return Response.status(Response.Status.CREATED)
