@@ -40,11 +40,11 @@ public class BirtService {
 //        }
     }
 
-    public byte[] generateReport(ReportFilterDto reportFilter) throws BirtException {
+    public byte[] generateRTGSReport(ReportFilterDto reportFilter) throws BirtException {
 
         Map<String, Object> params = new HashMap<>();
         if (reportFilter != null) { 
-            params.put("loginId", "Faiqa Haider");
+            params.put("loginId", reportFilter.getLoginId());
             params.put("branchCd", reportFilter.getBranchCode());
             params.put("transferType", reportFilter.getTransactionType());
             params.put("Status", reportFilter.getStatus());
@@ -61,7 +61,7 @@ public class BirtService {
             params.put("runNo",accountNumberDto.getRunNo());
             params.put("checkDigit",accountNumberDto.getCheckDigit());
         }
-        
+
         if (Boolean.TRUE.equals(reportFilter.getIsFromDate())) {
             params.put("fromdate", reportFilter.getFromDate());
         }
@@ -99,6 +99,44 @@ public class BirtService {
        byte[] reportContent =  outputStream.toByteArray();
        return reportContent;
     }
+
+
+    public byte[] generateVoucherReport(String voucherNo, String voucherYear) throws BirtException {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("VoucherNo", voucherNo);
+        params.put("VoucherYear", voucherYear);
+
+
+        EngineConfig engineConfig = new EngineConfig();
+        engineConfig.setEngineHome("");
+        Platform.startup(engineConfig);
+        IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
+        IReportEngine engine = factory.createReportEngine(engineConfig);
+
+        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/vouch_report.rptdesign");
+
+        IRunAndRenderTask task = engine.createRunAndRenderTask(report);
+
+        if (params!= null){
+            task.setParameterValues(params);
+        } 
+
+
+        PDFRenderOption options = new PDFRenderOption();
+        options.setOutputFormat("pdf");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        options.setOutputStream(outputStream);
+
+        task.setRenderOption(options);
+
+        task.run();
+        task.close();
+
+        byte[] reportContent =  outputStream.toByteArray();
+        return reportContent;
+    }
+
 
     @PreDestroy
     public void shutdown() {

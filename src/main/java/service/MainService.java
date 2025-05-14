@@ -359,6 +359,27 @@ public class MainService {
         }
         return optionList;
     }
+    public List<ListDto> getReasonList() {
+        List<ListDto> optionList = new ArrayList<>();
+        String sql = "SELECT REASON_CD as value, REASON_DESC|| ' - ' || LPAD(REASON_CD,4,0) as label FROM REASON_TL";
+
+        try (Connection connection = datasource.getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                optionList.add(
+                    new ListDto(
+                        resultSet.getString("label"),    
+                        resultSet.getString("value")
+                        ));
+            }
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while getting exception list for activity", e);
+        }
+        return optionList;
+    }
+    
 
     public Integer getUserRole(AuthorizeUserDto authUserDto) {
         String sqlQuery = "SELECT * FROM USER_TL WHERE LOGIN_ID=? AND PASSWORD=?";
@@ -513,7 +534,8 @@ public class MainService {
             while (resultSet.next()) {
                 return true;
             }
-        } catch (SQLException e) {
+        } 
+        catch (SQLException e) {
             logger.error("Unexpected error occurred while getting unauthorized rtgs list", e);
         }
         return false;
@@ -1072,7 +1094,7 @@ public class MainService {
     // }
 
     @Transactional(rollbackOn = Exception.class)
-    public boolean cancelOutwardRtgs(String voucherNo, String voucherYear, String loginId) throws Exception {
+    public boolean cancelOutwardRtgs(String voucherNo, String voucherYear, String loginId, String cancellationReason) throws Exception {
 
         try (Connection connection = datasource.getConnection()) {
             AccountNumberDto accountNo = new AccountNumberDto();
@@ -1216,7 +1238,7 @@ public class MainService {
                 throw ex;
             }
 
-            String updateSql = "UPDATE RTGS_TL SET STATUS=?, CANCELLED_BY=?, CANCELLED_DATE=?, CANCELLED_TIME=? WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
+            String updateSql = "UPDATE RTGS_TL SET STATUS=?, CANCELLED_BY=?, CANCELLED_DATE=?, CANCELLED_TIME=?, CANCELLATION_REASON=? WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
 
             int rowsUpdated = 0;
             try (PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) 
@@ -1225,8 +1247,9 @@ public class MainService {
                 preparedStatement.setString(2, loginId);
                 preparedStatement.setString(3, localDateString);
                 preparedStatement.setString(4, localTimeString);
-                preparedStatement.setString(5, voucherNo);
-                preparedStatement.setString(6, voucherYear);
+                preparedStatement.setString(5, cancellationReason);
+                preparedStatement.setString(6, voucherNo);
+                preparedStatement.setString(7, voucherYear);
 
                 rowsUpdated = preparedStatement.executeUpdate();
 
@@ -1484,7 +1507,7 @@ public class MainService {
 
     private BigDecimal generateVoucherNo() {
         BigDecimal previousVoucher = BigDecimal.ZERO;
-        String sqlQuery = "SELECT VOUCHER_NO FROM RTGS_TL ORDER BY VOUCHER_NO DESC, POSTED_TIME DESC, POSTED_DATE DESC FETCH FIRST 1 ROW ONLY";
+        String sqlQuery = "SELECT VOUCHER_NO FROM TRANSACTION_TL ORDER BY VOUCHER_NO DESC, TRANSACTION_TIME DESC, TRANSACTION_DATE DESC FETCH FIRST 1 ROW ONLY";
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(sqlQuery)) {

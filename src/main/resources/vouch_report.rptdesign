@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.27" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 4.19.0.v202502081713</property>
-    <list-property name="propertyBindings">
-        <structure>
-            <property name="name">queryText</property>
-            <property name="id">525</property>
-        </structure>
-        <structure>
-            <property name="name">queryTimeOut</property>
-            <property name="id">525</property>
-        </structure>
-        <structure>
-            <property name="name">rowFetchSize</property>
-            <property name="id">525</property>
-        </structure>
-    </list-property>
     <property name="units">in</property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <property name="bidiLayoutOrientation">ltr</property>
@@ -396,60 +382,70 @@ WHERE R.VOUCHER_NO =? AND R.VOUCHER_YEAR =?]]></xml-property>
             <list-property name="columnHints">
                 <structure>
                     <property name="columnName">ORIG_RESP</property>
+                    <property name="alias">ORIG_RESP</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">ORIG_RESP</text-property>
                     <text-property name="heading">ORIG_RESP</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">DEBIT</property>
+                    <property name="alias">DEBIT</property>
                     <property name="analysis">measure</property>
                     <text-property name="displayName">DEBIT</text-property>
                     <text-property name="heading">DEBIT</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">CREDIT</property>
+                    <property name="alias">CREDIT</property>
                     <property name="analysis">measure</property>
                     <text-property name="displayName">CREDIT</text-property>
                     <text-property name="heading">CREDIT</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">ACCOUNT_NO</property>
+                    <property name="alias">ACCOUNT_NO</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">ACCOUNT_NO</text-property>
                     <text-property name="heading">ACCOUNT_NO</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">INST_NO</property>
+                    <property name="alias">INST_NO</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">INST_NO</text-property>
                     <text-property name="heading">INST_NO</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">TRAN_CODE</property>
+                    <property name="alias">TRAN_CODE</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">TRAN_CODE</text-property>
                     <text-property name="heading">TRAN_CODE</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">TRAN_NO</property>
+                    <property name="alias">TRAN_NO</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">TRAN_NO</text-property>
                     <text-property name="heading">TRAN_NO</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">INST_DATE</property>
+                    <property name="alias">INST_DATE</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">INST_DATE</text-property>
                     <text-property name="heading">INST_DATE</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">ACCOUNT_TITLE</property>
+                    <property name="alias">ACCOUNT_TITLE</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">ACCOUNT_TITLE</text-property>
                     <text-property name="heading">ACCOUNT_TITLE</text-property>
                 </structure>
                 <structure>
                     <property name="columnName">CURRENCY_CODE</property>
+                    <property name="alias">CURRENCY_CODE</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">CURRENCY_CODE</text-property>
                     <text-property name="heading">CURRENCY_CODE</text-property>
@@ -623,12 +619,12 @@ WHERE R.VOUCHER_NO =? AND R.VOUCHER_YEAR =?]]></xml-property>
 CASE 
 	WHEN AMOUNT < 0 
 	THEN ABS(AMOUNT)
-	ELSE null 
+	ELSE 0 
 	END AS DEBIT,
 CASE 
 	WHEN AMOUNT > 0 
 	THEN AMOUNT 
-	ELSE null
+	ELSE 0
 	END AS CREDIT, 
 CASE 
 	WHEN T.ACCOUNT_IDENTITY = 'C' 
@@ -920,10 +916,10 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                         <property name="width">2.3229166666666665in</property>
                     </column>
                     <column id="7">
-                        <property name="width">3.28125in</property>
+                        <property name="width">3.1666666666666665in</property>
                     </column>
                     <column id="8">
-                        <property name="width">2.2395833333333335in</property>
+                        <property name="width">2.3541666666666665in</property>
                     </column>
                     <row id="9">
                         <property name="height">0.5729166666666666in</property>
@@ -936,13 +932,14 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                         </cell>
                         <cell id="11">
                             <text id="100">
-                                <property name="fontSize">12pt</property>
+                                <property name="fontSize">13pt</property>
                                 <property name="textAlign">center</property>
                                 <property name="contentType">auto</property>
                                 <text-property name="content"><![CDATA[Transaction Voucher]]></text-property>
                             </text>
                         </cell>
                         <cell id="12">
+                            <property name="paddingLeft">8pt</property>
                             <label id="381">
                                 <property name="fontSize">8pt</property>
                                 <text-property name="text">Report ID: VOUCHER</text-property>
@@ -960,37 +957,39 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
     </page-setup>
     <body>
         <grid id="460">
-            <property name="height">1.2708333333333333in</property>
+            <property name="height">1.1145833333333333in</property>
             <column id="461"/>
             <row id="462">
-                <property name="height">0.4895833333333333in</property>
+                <property name="height">0.3125in</property>
                 <cell id="463">
                     <grid id="490">
                         <property name="width">7.875in</property>
                         <column id="491">
-                            <property name="width">1.1041666666666667in</property>
+                            <property name="width">0.8645833333333334in</property>
                         </column>
                         <column id="492">
-                            <property name="width">1.84375in</property>
+                            <property name="width">1.3020833333333333in</property>
                         </column>
                         <column id="493">
-                            <property name="width">1.2083333333333333in</property>
+                            <property name="width">0.8229166666666666in</property>
                         </column>
                         <column id="494">
-                            <property name="width">1.2291666666666667in</property>
+                            <property name="width">1.3958333333333333in</property>
                         </column>
                         <column id="495">
-                            <property name="width">2.4895833333333335in</property>
+                            <property name="width">3.4895833333333335in</property>
                         </column>
                         <row id="496">
                             <cell id="497">
                                 <text id="502">
+                                    <property name="fontSize">9pt</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[Voucher No]]></text-property>
                                 </text>
                             </cell>
                             <cell id="498">
                                 <data id="515">
+                                    <property name="fontSize">9pt</property>
                                     <property name="dataSet">VouchData Set</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
@@ -1005,12 +1004,14 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                             </cell>
                             <cell id="499">
                                 <text id="503">
+                                    <property name="fontSize">9pt</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[Voucher Date]]></text-property>
                                 </text>
                             </cell>
                             <cell id="500">
                                 <data id="517">
+                                    <property name="fontSize">9pt</property>
                                     <structure name="dateTimeFormat">
                                         <property name="category">Custom</property>
                                         <property name="pattern">dd/MM/yyyy</property>
@@ -1052,25 +1053,27 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                 </cell>
             </row>
             <row id="464">
-                <property name="height">0.3854166666666667in</property>
+                <property name="height">0.25in</property>
                 <cell id="465">
                     <grid id="476">
                         <property name="width">7.875in</property>
                         <column id="477">
-                            <property name="width">1.125in</property>
+                            <property name="width">0.84375in</property>
                         </column>
                         <column id="478">
-                            <property name="width">6.75in</property>
+                            <property name="width">7.03125in</property>
                         </column>
                         <row id="479">
                             <cell id="480">
                                 <text id="504">
+                                    <property name="fontSize">9pt</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[Narration]]></text-property>
                                 </text>
                             </cell>
                             <cell id="481">
                                 <data id="524">
+                                    <property name="fontSize">9pt</property>
                                     <property name="dataSet">VouchData Set</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
@@ -1088,19 +1091,20 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                 </cell>
             </row>
             <row id="466">
-                <property name="height">0.3958333333333333in</property>
+                <property name="height">0.5520833333333334in</property>
                 <cell id="467">
                     <grid id="482">
                         <property name="width">7.875in</property>
                         <column id="483">
-                            <property name="width">1.1145833333333333in</property>
+                            <property name="width">0.8333333333333334in</property>
                         </column>
                         <column id="484">
-                            <property name="width">6.760416666666667in</property>
+                            <property name="width">7.041666666666667in</property>
                         </column>
                         <row id="485">
                             <cell id="486">
                                 <text id="522">
+                                    <property name="fontSize">9pt</property>
                                     <property name="contentType">auto</property>
                                     <text-property name="content"><![CDATA[Remarks
 ]]></text-property>
@@ -1108,6 +1112,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                             </cell>
                             <cell id="487">
                                 <data id="523">
+                                    <property name="fontSize">9pt</property>
                                     <property name="dataSet">VouchData Set</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
@@ -1128,7 +1133,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
         <table id="578">
             <property name="style">NewStyle2</property>
             <property name="marginTop">auto</property>
-            <property name="width">7.947916666666667in</property>
+            <property name="width">8.041666666666666in</property>
             <property name="dataSet">TranData Set</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -1140,14 +1145,22 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                 <structure>
                     <property name="name">DEBIT</property>
                     <text-property name="displayName">DEBIT</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["DEBIT"]</expression>
+                    <expression name="expression" type="javascript">if (dataSetRow["DEBIT"] == null) {
+" - "
+} else {
+dataSetRow["DEBIT"] }</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">false</property>
                 </structure>
                 <structure>
                     <property name="name">CREDIT</property>
                     <text-property name="displayName">CREDIT</text-property>
-                    <expression name="expression" type="javascript">dataSetRow["CREDIT"]</expression>
+                    <expression name="expression" type="javascript">if (dataSetRow["CREDIT"] == null) {
+" - "
+} else {
+dataSetRow["CREDIT"] }</expression>
                     <property name="dataType">decimal</property>
+                    <property name="allowExport">true</property>
                 </structure>
                 <structure>
                     <property name="name">ACCOUNT_NO</property>
@@ -1199,28 +1212,28 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                 <property name="width">1.3645833333333333in</property>
             </column>
             <column id="634">
-                <property name="width">0.9895833333333334in</property>
+                <property name="width">1.5625in</property>
             </column>
             <column id="635">
-                <property name="width">0.65625in</property>
+                <property name="width">0.6145833333333334in</property>
             </column>
             <column id="636">
-                <property name="width">0.875in</property>
+                <property name="width">0.7916666666666666in</property>
             </column>
             <column id="637">
-                <property name="width">0.6458333333333334in</property>
+                <property name="width">0.65625in</property>
             </column>
             <column id="638">
-                <property name="width">0.5416666666666666in</property>
+                <property name="width">0.5208333333333334in</property>
             </column>
             <column id="639">
-                <property name="width">0.3541666666666667in</property>
+                <property name="width">0.3229166666666667in</property>
             </column>
             <column id="640">
-                <property name="width">0.90625in</property>
+                <property name="width">0.7708333333333334in</property>
             </column>
             <column id="641">
-                <property name="width">1.0416666666666667in</property>
+                <property name="width">0.8645833333333334in</property>
             </column>
             <header>
                 <row id="579">
@@ -1228,6 +1241,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="580">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="593">
@@ -1237,6 +1251,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="582">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="587">
@@ -1246,6 +1261,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="584">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="597">
@@ -1255,6 +1271,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="586">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="581">
@@ -1264,6 +1281,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="588">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="589">
@@ -1273,6 +1291,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="590">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="595">
@@ -1282,15 +1301,17 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="592">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
-                        <property name="textAlign">left</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="verticalAlign">middle</property>
                         <label id="591">
+                            <property name="textAlign">left</property>
                             <text-property name="text">Trn Cd</text-property>
                         </label>
                     </cell>
                     <cell id="594">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
+                        <property name="paddingBottom">1pt</property>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="599">
@@ -1300,7 +1321,8 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="596">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
-                        <property name="textAlign">left</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="textAlign">right</property>
                         <property name="verticalAlign">middle</property>
                         <label id="583">
                             <text-property name="text">Debit</text-property>
@@ -1309,9 +1331,11 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <cell id="598">
                         <property name="fontSize">8pt</property>
                         <property name="fontWeight">bold</property>
-                        <property name="textAlign">left</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="textAlign">right</property>
                         <property name="verticalAlign">middle</property>
                         <label id="585">
+                            <property name="paddingRight">2pt</property>
                             <text-property name="text">Credit</text-property>
                         </label>
                     </cell>
@@ -1324,36 +1348,43 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     <property name="height">0%</property>
                     <cell id="601">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="614">
                             <property name="resultSetColumn">TRAN_NO</property>
                         </data>
                     </cell>
                     <cell id="603">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="608">
                             <property name="resultSetColumn">ACCOUNT_NO</property>
                         </data>
                     </cell>
                     <cell id="605">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="618">
                             <property name="resultSetColumn">ACCOUNT_TITLE</property>
                         </data>
                     </cell>
                     <cell id="607">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="602">
+                            <property name="paddingLeft">3pt</property>
                             <property name="resultSetColumn">ORIG_RESP</property>
                         </data>
                     </cell>
                     <cell id="609">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="610">
                             <property name="resultSetColumn">INST_NO</property>
                         </data>
                     </cell>
                     <cell id="611">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="616">
                             <structure name="dateTimeFormat">
                                 <property name="category">Custom</property>
@@ -1364,32 +1395,40 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                     </cell>
                     <cell id="613">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="612">
+                            <property name="paddingLeft">3pt</property>
+                            <property name="textAlign">left</property>
                             <property name="resultSetColumn">TRAN_CODE</property>
                         </data>
                     </cell>
                     <cell id="615">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
                         <data id="620">
                             <property name="resultSetColumn">CURRENCY_CODE</property>
                         </data>
                     </cell>
                     <cell id="617">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="textAlign">right</property>
                         <data id="604">
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                <property name="pattern">#,##0.00;(#,##0.00){RoundingMode=HALF_UP}</property>
                             </structure>
                             <property name="resultSetColumn">DEBIT</property>
                         </data>
                     </cell>
                     <cell id="619">
                         <property name="fontSize">7.5pt</property>
+                        <property name="paddingBottom">1pt</property>
+                        <property name="textAlign">right</property>
                         <data id="606">
                             <structure name="numberFormat">
                                 <property name="category">Currency</property>
-                                <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
+                                <property name="pattern">#,##0.00;(#,##0.00){RoundingMode=HALF_UP}</property>
                             </structure>
                             <property name="resultSetColumn">CREDIT</property>
                         </data>
@@ -1398,22 +1437,42 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
             </detail>
             <footer>
                 <row id="621">
-                    <cell id="622"/>
-                    <cell id="623"/>
-                    <cell id="624"/>
-                    <cell id="625"/>
-                    <cell id="626"/>
-                    <cell id="627"/>
-                    <cell id="628"/>
-                    <cell id="629"/>
-                    <cell id="630"/>
-                    <cell id="631"/>
+                    <cell id="622">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="623">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="624">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="625">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="626">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="627">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="628">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="629">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="630">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
+                    <cell id="631">
+                        <property name="paddingBottom">1pt</property>
+                    </cell>
                 </row>
             </footer>
         </table>
         <grid id="664">
             <property name="height">0.8958333333333334in</property>
-            <property name="width">7.96875in</property>
+            <property name="width">8.072916666666666in</property>
             <column id="665">
                 <property name="width">2.0208333333333335in</property>
             </column>
@@ -1421,18 +1480,23 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                 <property name="width">2.0104166666666665in</property>
             </column>
             <column id="667">
-                <property name="width">1.96875in</property>
+                <property name="width">2.34375in</property>
             </column>
             <column id="668">
-                <property name="width">1.96875in</property>
+                <property name="width">1.6979166666666667in</property>
             </column>
             <row id="669">
                 <property name="height">0.8958333333333334in</property>
                 <cell id="670">
                     <grid id="682">
                         <property name="height">0.23958333333333334in</property>
-                        <column id="683"/>
-                        <column id="684"/>
+                        <property name="width">1.9479166666666667in</property>
+                        <column id="683">
+                            <property name="width">0.5833333333333334in</property>
+                        </column>
+                        <column id="684">
+                            <property name="width">1.3645833333333333in</property>
+                        </column>
                         <row id="685">
                             <property name="height">0.23958333333333334in</property>
                             <cell id="686">
@@ -1464,14 +1528,16 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                 <cell id="672"/>
                 <cell id="673">
                     <grid id="674">
-                        <property name="width">1.6354166666666667in</property>
+                        <property name="height">0.4166666666666667in</property>
+                        <property name="width">1.65625in</property>
                         <column id="675">
-                            <property name="width">0.8541666666666666in</property>
+                            <property name="width">0.8645833333333334in</property>
                         </column>
                         <column id="676">
-                            <property name="width">0.78125in</property>
+                            <property name="width">0.7916666666666666in</property>
                         </column>
                         <row id="677">
+                            <property name="height">0.4166666666666667in</property>
                             <cell id="678">
                                 <property name="paddingRight">2pt</property>
                                 <data id="681">
@@ -1479,12 +1545,13 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                                     <property name="fontSize">7.5pt</property>
                                     <property name="marginBottom">10pt</property>
                                     <property name="marginRight">5pt</property>
+                                    <property name="paddingLeft">4pt</property>
                                     <property name="paddingBottom">4pt</property>
                                     <structure name="numberFormat">
                                         <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00{RoundingMode=HALF_DOWN}</property>
+                                        <property name="pattern">#,##0.00;(#,##0.00){RoundingMode=HALF_UP}</property>
                                     </structure>
-                                    <property name="textAlign">left</property>
+                                    <property name="textAlign">right</property>
                                     <property name="dataSet">TranData Set</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
@@ -1492,6 +1559,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                                             <text-property name="displayName">totalDebit</text-property>
                                             <expression name="expression" type="javascript">dataSetRow["totalDebit"]</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">false</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">totalDebit</property>
@@ -1504,12 +1572,14 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                                     <property name="marginLeft">5pt</property>
                                     <property name="marginBottom">10pt</property>
                                     <property name="marginRight">0pt</property>
+                                    <property name="paddingLeft">4pt</property>
                                     <property name="paddingBottom">4pt</property>
+                                    <property name="paddingRight">2pt</property>
                                     <structure name="numberFormat">
                                         <property name="category">Currency</property>
-                                        <property name="pattern">#,##0.00{RoundingMode=HALF_UP}</property>
-                                        <property name="locale">af_NA</property>
+                                        <property name="pattern">#,##0.00;(#,##0.00){RoundingMode=HALF_UP}</property>
                                     </structure>
+                                    <property name="textAlign">right</property>
                                     <property name="dataSet">TranData Set</property>
                                     <list-property name="boundDataColumns">
                                         <structure>
@@ -1517,6 +1587,7 @@ WHERE T.VOUCHER_NO = ? AND T.VOUCHER_YEAR = ?
                                             <text-property name="displayName">totalCredit</text-property>
                                             <expression name="expression" type="javascript">dataSetRow["totalCredit"]</expression>
                                             <property name="dataType">decimal</property>
+                                            <property name="allowExport">false</property>
                                         </structure>
                                     </list-property>
                                     <property name="resultSetColumn">totalCredit</property>

@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportFilterDto {
+    String loginId;
     String branchCode;
     String rtgsType;
     String transactionType;

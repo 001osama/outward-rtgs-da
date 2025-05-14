@@ -16,6 +16,8 @@ import dto.OutwardRTGSReponseDto;
 import dto.RTGSReportDto;
 import dto.ReportFilterDto;
 import dto.UserDto;
+import dto.VoucherCancelDto;
+import dto.VoucherDto;
 import dto.VoucherInfoDto;
 import dto.VoucherLaxDto;
 import jakarta.inject.Inject;
@@ -343,6 +345,29 @@ public class MainResource {
     }
 
     @GET
+    @Path("/getreasonlist")
+    public Response getReasonList() 
+    {
+        logger.info("message : =====> getReasonList method hit with activity Code");
+        try {
+            var result = mainService.getReasonList();
+            if (result == null) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(new ApiResponse(null, "Invalid Data", false))
+                    .build();
+            }
+            return Response.ok(new ApiResponse(result, null, true))
+                .build();
+        } catch (Exception ex) {
+            logger.error("Error in retrieving reason code list", ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null, "Failed to retrieve reason code list", false))
+                .build();
+        }
+    }
+
+
+    @GET
     @Path("/getunauthorizedoutwardrtgslist")
     public Response getUnauthorizedOutwardRTGSList() {
         logger.info("message : =====> getUnauthorizedOutwardRTGSList method hit");
@@ -507,24 +532,24 @@ public class MainResource {
 
     @POST 
     @Path("/cancelOutwardRtgs")
-    public Response cancelOutwardRtgs(VoucherInfoDto voucherInfoDto) {
-        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherInfoDto.toString() );
+    public Response cancelOutwardRtgs(VoucherCancelDto voucherDto) {
+        logger.info("message : =====> cancelRtgsTransaction method hit for voucherNo: {} and voucherYear: {}" + voucherDto.toString() );
         try {
-            if (voucherInfoDto.getVoucherNo() == null || 
-                voucherInfoDto.getVoucherNo().trim().isEmpty() || 
-                voucherInfoDto.getVoucherYear() == null || 
-                voucherInfoDto.getVoucherYear().trim().isEmpty() ) {
+            if (voucherDto.getVoucherNo() == null || 
+                voucherDto.getVoucherNo().trim().isEmpty() || 
+                voucherDto.getVoucherYear() == null || 
+                voucherDto.getVoucherYear().trim().isEmpty() ) {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity(new ApiResponse(null, "Voucher number is required for cancellation.", false))
                         .build();
             }
 
-            boolean isPostingUser = mainService.isPostingUser(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
-            if(isPostingUser)
-                return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
-                .build();
+            // boolean isPostingUser = mainService.isPostingUser(voucherDto.getVoucherNo(), voucherDto.getVoucherYear(), voucherDto.getLoginId());
+            // if(isPostingUser)
+            //     return Response.ok(new ApiResponse(null, "Same user cannot cancel", false))
+            //     .build();
 
-            boolean isCancelled = mainService.cancelOutwardRtgs(voucherInfoDto.getVoucherNo(), voucherInfoDto.getVoucherYear(), voucherInfoDto.getLoginId());
+            boolean isCancelled = mainService.cancelOutwardRtgs(voucherDto.getVoucherNo(), voucherDto.getVoucherYear(), voucherDto.getLoginId(), voucherDto.getCancellationReason());
 
             if (isCancelled) {
                 return Response.ok(new ApiResponse(null, "RTGS transaction with voucher number  ", true))
@@ -686,7 +711,7 @@ public class MainResource {
     @Path("/downloadRtgsReport")
     @Produces("application/json")  
 
-    public Response getRtgsReport(ReportFilterDto reportFilters) {
+    public Response downloadRtgsReport(ReportFilterDto reportFilters) {
         try {
             String base64Report;
             if(reportFilters.getReportFormat().equals("excel"))
@@ -737,12 +762,41 @@ public class MainResource {
             else
             {
 
-                byte[] reportByteArray = birtService.generateReport(reportFilters);
+                byte[] reportByteArray = birtService.generateRTGSReport(reportFilters);
                 base64Report = Base64.getEncoder().encodeToString(reportByteArray);
             }
 
             return Response.ok(new ApiResponse(base64Report, null, true))
                     .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(new ApiResponse(null, "Failed to create report", false))
+                .build();
+        }
+    }
+
+
+    @POST
+    @Path("/downloadVoucherReport")
+    @Produces("application/json")  
+    public Response getVoucherReport(VoucherDto voucherInfo)
+    {
+        try {
+            if(voucherInfo.getVoucherNo() == null || voucherInfo.getVoucherNo().trim().isEmpty() ||
+                voucherInfo.getVoucherYear() == null || voucherInfo.getVoucherYear().trim().isEmpty())
+                return Response.status(Response.Status.BAD_REQUEST)
+                            .entity(new ApiResponse(null, "Voucher No and Voucher Year is required.", false))
+                            .build();
+
+            String base64Report;
+            byte[] reportByteArray = birtService.generateVoucherReport(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear());
+            base64Report = Base64.getEncoder().encodeToString(reportByteArray);
+            
+
+            return Response.ok(new ApiResponse(base64Report, null, true))
+            .build();
 
         } catch (Exception e) {
             e.printStackTrace();
