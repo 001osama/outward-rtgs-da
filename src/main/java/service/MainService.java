@@ -752,8 +752,8 @@ public class MainService {
             StringBuilder sb5 = new StringBuilder();
             sb5.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
             sb5.append("ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, TRAN_CODE, ");
-            sb5.append("AMOUNT, ACCOUNT_IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS) ");
-            sb5.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb5.append("AMOUNT, ACCOUNT_IDENTITY, CURRENCY_CD, TRANSACTION_DATE, TRANSACTION_TIME, STATUS) ");
+            sb5.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb5.toString())) {
                 preparedStatement.setString(1, rtgsForm.getBranchCode());
@@ -767,9 +767,10 @@ public class MainService {
                 preparedStatement.setString(9, "30630");
                 preparedStatement.setBigDecimal(10, new BigDecimal(rtgsForm.getTotalAmount()).negate());
                 preparedStatement.setString(11, "C");
-                preparedStatement.setString(12, localDateString);
-                preparedStatement.setString(13, localTimeString);
-                preparedStatement.setString(14, "A");
+                preparedStatement.setString(12, rtgsForm.getCurrencyCode());
+                preparedStatement.setString(13, localDateString);
+                preparedStatement.setString(14, localTimeString);
+                preparedStatement.setString(15, "A");
 
                 int affectedRows = preparedStatement.executeUpdate();
                 logger.info("Affected No of rows is: ");
@@ -780,30 +781,36 @@ public class MainService {
             }
 
             newReferenceNo = incrementReferenceNo(newReferenceNo);
+            var instructionNo = generateInstructionNo();
             StringBuilder sb6 = new StringBuilder();
             sb6.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
-            sb6.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2,");
-            sb6.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
-            sb6.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb6.append("TRAN_CODE, CURRENCY_CD, MAIN_HD, SUB_HD_1, SUB_HD_2,");
+            sb6.append("GL_RUN_NO, GL_CHECK_DIGIT, OR_BRANCH_CD, INSTRUCTION_NO, INSTRUCTION_DATE, ");
+            sb6.append("AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS) ");
+            
+            sb6.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb6.toString())) {
-                preparedStatement.setString(1, "1001");
+                preparedStatement.setString(1, rtgsForm.getBranchCode());
                 preparedStatement.setBigDecimal(2, newVoucherNo);
                 preparedStatement.setString(3, currentYearString);
                 preparedStatement.setString(4, newReferenceNo);
-                preparedStatement.setString(5, accoutNumberDto.getAccountType());
-                preparedStatement.setString(6, "80630");
+                preparedStatement.setString(5, "80630");
+                preparedStatement.setString(6, rtgsForm.getCurrencyCode());
                 preparedStatement.setBigDecimal(7, new BigDecimal("230"));
                 preparedStatement.setBigDecimal(8, new BigDecimal("01"));
                 preparedStatement.setBigDecimal(9, new BigDecimal("01"));
                 preparedStatement.setBigDecimal(10, new BigDecimal("0586"));
-                preparedStatement.setBigDecimal(11, new BigDecimal("2"));
-                preparedStatement.setBigDecimal(12, new BigDecimal(rtgsForm.getTotalAmount()));
-                preparedStatement.setString(13, "G");
-                preparedStatement.setString(14, "M");
-                preparedStatement.setString(15, localDateString);
-                preparedStatement.setString(16, localTimeString);
-                preparedStatement.setString(17, "A");
+                preparedStatement.setBigDecimal(11, new BigDecimal("02"));
+                preparedStatement.setBigDecimal(12, new BigDecimal("0786"));
+                preparedStatement.setBigDecimal(13, instructionNo);
+                preparedStatement.setString(14, localDateString);
+                preparedStatement.setBigDecimal(15, new BigDecimal(rtgsForm.getTotalAmount()));
+                preparedStatement.setString(16, "G");
+                preparedStatement.setString(17, "M");
+                preparedStatement.setString(18, localDateString);
+                preparedStatement.setString(19, localTimeString);
+                preparedStatement.setString(20, "A");
 
                 int affectedRows = preparedStatement.executeUpdate();
                 logger.info("Affected No of rows is: " + affectedRows);
@@ -832,7 +839,7 @@ public class MainService {
             sb7.append("AND T.ACCOUNT_IDENTITY = 'C'");
 
             sb7.append("LEFT JOIN GL_ACCOUNT_TL GL ON T.MAIN_HD = GL.MAIN_HD AND T.SUB_HD_1 = GL.SUB_HD_1 AND T.SUB_HD_2 = GL.SUB_HD_2 ");
-            sb7.append("AND T.GL_RUN_NO = GL.GL_RUN_NO AND T.GL_CHECK_DIGIT = GL.GL_CHECK_DIGIT AND T.IDENTITY = GL.IDENTITY AND T.BRANCH_CD = GL.BRANCH_CD ");
+            sb7.append("AND T.GL_RUN_NO = GL.GL_RUN_NO AND T.GL_CHECK_DIGIT = GL.GL_CHECK_DIGIT AND T.IDENTITY = GL.IDENTITY AND T.OR_BRANCH_CD = GL.BRANCH_CD ");
             sb7.append("AND T.ACCOUNT_IDENTITY = 'G'");
 
             sb7.append("WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?");
@@ -1099,9 +1106,10 @@ public class MainService {
         try (Connection connection = datasource.getConnection()) {
             AccountNumberDto accountNo = new AccountNumberDto();
             BigDecimal totalAmount = BigDecimal.ZERO;
+            BigDecimal currencyCode = BigDecimal.ZERO;
 
             StringBuilder sb = new StringBuilder();
-            sb.append("SELECT BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, ");
+            sb.append("SELECT BRANCH_CD, CURRENCY_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, ");
             sb.append("TOTAL_AMOUNT FROM RTGS_TL WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
@@ -1117,6 +1125,7 @@ public class MainService {
                     accountNo.setRunNo(resultSet.getString("RUN_NO"));
                     accountNo.setCheckDigit(resultSet.getString("CHECK_DIGIT"));
                     totalAmount = resultSet.getBigDecimal("TOTAL_AMOUNT");
+                    currencyCode = resultSet.getBigDecimal("CURRENCY_CD");
                 }
             } catch (SQLException ex) {
                 DatabaseErrorHandler.log((SQLException) ex);
@@ -1153,7 +1162,7 @@ public class MainService {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb10.toString())) {
                 preparedStatement.setBigDecimal(1, totalAmount);
                 preparedStatement.setString(2, "M");
-                preparedStatement.setString(3, "1001");
+                preparedStatement.setString(3, "0786");
                 preparedStatement.setString(4, "230");
                 preparedStatement.setString(5, "01");
                 preparedStatement.setString(6, "01");
@@ -1174,26 +1183,27 @@ public class MainService {
 
             var newReferenceNo = generateRefNo();
             StringBuilder sb3 = new StringBuilder();
-            sb3.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
+            sb3.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, CURRENCY_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
             sb3.append("ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, TRAN_CODE,");
             sb3.append("AMOUNT, ACCOUNT_IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS) ");
-            sb3.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb3.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
                 preparedStatement.setString(1, accountNo.getBranchCode());
-                preparedStatement.setString(2, voucherNo);
-                preparedStatement.setString(3, voucherYear);
-                preparedStatement.setString(4, newReferenceNo);
-                preparedStatement.setString(5, accountNo.getAccountType());
-                preparedStatement.setString(6, accountNo.getCustomerNo());
-                preparedStatement.setString(7, accountNo.getRunNo());
-                preparedStatement.setString(8, accountNo.getCheckDigit());
-                preparedStatement.setString(9, "80630");
-                preparedStatement.setBigDecimal(10, totalAmount);
-                preparedStatement.setString(11, "C");
-                preparedStatement.setString(12, localDateString);
-                preparedStatement.setString(13, localTimeString);
-                preparedStatement.setString(14, "A");
+                preparedStatement.setBigDecimal(2, currencyCode);
+                preparedStatement.setString(3, voucherNo);
+                preparedStatement.setString(4, voucherYear);
+                preparedStatement.setString(5, newReferenceNo);
+                preparedStatement.setString(6, accountNo.getAccountType());
+                preparedStatement.setString(7, accountNo.getCustomerNo());
+                preparedStatement.setString(8, accountNo.getRunNo());
+                preparedStatement.setString(9, accountNo.getCheckDigit());
+                preparedStatement.setString(10, "80630");
+                preparedStatement.setBigDecimal(11, totalAmount);
+                preparedStatement.setString(12, "C");
+                preparedStatement.setString(13, localDateString);
+                preparedStatement.setString(14, localTimeString);
+                preparedStatement.setString(15, "A");
 
                 int affectedRows = preparedStatement.executeUpdate();
                 logger.info("Affected No of rows is: ");
@@ -1204,11 +1214,12 @@ public class MainService {
             }
 
             newReferenceNo = incrementReferenceNo(newReferenceNo);
+            var instructionNo = generateInstructionNo();
             StringBuilder sb4 = new StringBuilder();
-            sb4.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
-            sb4.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2, ");
-            sb4.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
-            sb4.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sb4.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO, ");
+            sb4.append("TRAN_CODE, CURRENCY_CD, OR_BRANCH_CD, MAIN_HD, SUB_HD_1, SUB_HD_2, ");
+            sb4.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, INSTRUCTION_NO, INSTRUCTION_DATE , TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
+            sb4.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb4.toString())) {
 
@@ -1216,19 +1227,22 @@ public class MainService {
                 preparedStatement.setString(2, voucherNo);
                 preparedStatement.setString(3, voucherYear);
                 preparedStatement.setString(4, newReferenceNo);
-                preparedStatement.setString(5, accountNo.getAccountType());
-                preparedStatement.setString(6, "30630");
-                preparedStatement.setBigDecimal(7, new BigDecimal("400"));
-                preparedStatement.setBigDecimal(8, new BigDecimal("25"));
-                preparedStatement.setBigDecimal(9, new BigDecimal("20"));
-                preparedStatement.setBigDecimal(10, new BigDecimal("4567"));
-                preparedStatement.setBigDecimal(11, new BigDecimal("2"));
-                preparedStatement.setBigDecimal(12, totalAmount.negate());
-                preparedStatement.setString(13, "G");
-                preparedStatement.setString(14, "M");
-                preparedStatement.setString(15, localDateString);
-                preparedStatement.setString(16, localTimeString);
-                preparedStatement.setString(17, "A");
+                preparedStatement.setString(5, "30630");
+                preparedStatement.setBigDecimal(6, currencyCode);
+                preparedStatement.setBigDecimal(7, new BigDecimal("0786"));
+                preparedStatement.setBigDecimal(8, new BigDecimal("230"));
+                preparedStatement.setBigDecimal(9, new BigDecimal("01"));
+                preparedStatement.setBigDecimal(10, new BigDecimal("01"));
+                preparedStatement.setBigDecimal(11, new BigDecimal("0586"));
+                preparedStatement.setBigDecimal(12, new BigDecimal("02"));
+                preparedStatement.setBigDecimal(13, totalAmount.negate());
+                preparedStatement.setString(14, "G");
+                preparedStatement.setString(15, "M");
+                preparedStatement.setBigDecimal(16, instructionNo);
+                preparedStatement.setString(17, localDateString);
+                preparedStatement.setString(18, localDateString);
+                preparedStatement.setString(19, localTimeString);
+                preparedStatement.setString(20, "A");
 
                 int affectedRows = preparedStatement.executeUpdate();
                 logger.info("Affected No of rows is: " + affectedRows);
@@ -1314,7 +1328,7 @@ public class MainService {
             sb.append("AND T.ACCOUNT_IDENTITY = 'C'");
 
             sb.append("LEFT JOIN GL_ACCOUNT_TL GL ON T.MAIN_HD = GL.MAIN_HD AND T.SUB_HD_1 = GL.SUB_HD_1 AND T.SUB_HD_2 = GL.SUB_HD_2 ");
-            sb.append("AND T.GL_RUN_NO = GL.GL_RUN_NO AND T.GL_CHECK_DIGIT = GL.GL_CHECK_DIGIT AND T.IDENTITY = GL.IDENTITY AND T.BRANCH_CD = GL.BRANCH_CD ");
+            sb.append("AND T.GL_RUN_NO = GL.GL_RUN_NO AND T.GL_CHECK_DIGIT = GL.GL_CHECK_DIGIT AND T.IDENTITY = GL.IDENTITY AND T.OR_BRANCH_CD = GL.BRANCH_CD ");
             sb.append("AND T.ACCOUNT_IDENTITY = 'G'");
 
 
@@ -1523,6 +1537,29 @@ public class MainService {
         }
         return previousVoucher.add(BigDecimal.ONE);
     }
+
+    private BigDecimal generateInstructionNo() {
+        BigDecimal previousVoucher = BigDecimal.ZERO;
+        String sqlQuery = "SELECT INSTRUCTION_NO FROM TRANSACTION_TL ORDER BY INSTRUCTION_NO DESC, TRANSACTION_TIME DESC, TRANSACTION_DATE DESC FETCH FIRST 1 ROW ONLY";
+        try (Connection connection = datasource.getConnection();
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(sqlQuery)) {
+
+            if (resultSet.next()) 
+                previousVoucher = resultSet.getBigDecimal("INSTRUCTION_NO");
+            
+            
+            if(previousVoucher == null || previousVoucher == BigDecimal.ZERO)
+                previousVoucher = new BigDecimal(6492515);
+
+        } catch (SQLException e) {
+            logger.error("Unexpected error occurred while retrieving branches", e);
+            return null;
+        }
+        return previousVoucher.add(BigDecimal.ONE);
+    }
+
+    
 
     private String incrementReferenceNo(String referenceNo) {
         if (referenceNo == null || referenceNo.isEmpty()) {
