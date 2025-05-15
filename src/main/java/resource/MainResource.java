@@ -729,11 +729,11 @@ public class MainResource {
                 headerRow.createCell(4).setCellValue("AccountNumber-AccountName");
                 headerRow.createCell(5).setCellValue("Benef A/C No /IBAN /Name");
                 headerRow.createCell(6).setCellValue("Beneficiary Address");
-                headerRow.createCell(7).setCellValue("Benef. Title Fetch Through 1-Link");
-                headerRow.createCell(8).setCellValue("Benef. Bank Name");
-                headerRow.createCell(9).setCellValue("VouchNo/Year");
-                headerRow.createCell(10).setCellValue("Tran. Amt");
-                headerRow.createCell(11).setCellValue("TypeC");
+                // headerRow.createCell(7).setCellValue("Benef. Title Fetch Through 1-Link");
+                headerRow.createCell(7).setCellValue("Benef. Bank Name");
+                headerRow.createCell(8).setCellValue("VouchNo/Year");
+                headerRow.createCell(9).setCellValue("Tran. Amt");
+                // headerRow.createCell(11).setCellValue("TypeC");
 
                 int rowNum = 1;
                 for (RTGSReportDto entity : dataList) {
@@ -745,11 +745,11 @@ public class MainResource {
                     row.createCell(4).setCellValue(entity.getAccountInfo());
                     row.createCell(5).setCellValue(entity.getBeneficiaryAccountInfo());
                     row.createCell(6).setCellValue(entity.getBeneficiaryAddress());
-                    row.createCell(7).setCellValue(entity.isBeneficiaryTitleFetch());
-                    row.createCell(8).setCellValue(entity.getBankName());
-                    row.createCell(9).setCellValue(entity.getVoucherNo());
-                    row.createCell(10).setCellValue(entity.getTotalAmount());
-                    row.createCell(11).setCellValue(entity.getSbpTransactionType());
+                    // row.createCell(7).setCellValue(entity.isBeneficiaryTitleFetch());
+                    row.createCell(7).setCellValue(entity.getBankName());
+                    row.createCell(8).setCellValue(entity.getVoucherNo());
+                    row.createCell(9).setCellValue(entity.getTotalAmount());
+                    // row.createCell(11).setCellValue(entity.getSbpTransactionType());
                 }
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();

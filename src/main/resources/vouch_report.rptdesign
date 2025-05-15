@@ -1206,34 +1206,34 @@ dataSetRow["CREDIT"] }</expression>
                 </structure>
             </list-property>
             <column id="632">
-                <property name="width">0.5729166666666666in</property>
+                <property name="width">0.4270833333333333in</property>
             </column>
             <column id="633">
-                <property name="width">1.3645833333333333in</property>
+                <property name="width">1.0729166666666667in</property>
             </column>
             <column id="634">
-                <property name="width">1.5625in</property>
+                <property name="width">1.6145833333333333in</property>
             </column>
             <column id="635">
-                <property name="width">0.6145833333333334in</property>
+                <property name="width">0.5833333333333334in</property>
             </column>
             <column id="636">
-                <property name="width">0.7916666666666666in</property>
+                <property name="width">0.7395833333333334in</property>
             </column>
             <column id="637">
-                <property name="width">0.65625in</property>
+                <property name="width">0.5520833333333334in</property>
             </column>
             <column id="638">
-                <property name="width">0.5208333333333334in</property>
+                <property name="width">0.5in</property>
             </column>
             <column id="639">
-                <property name="width">0.3229166666666667in</property>
+                <property name="width">0.2916666666666667in</property>
             </column>
             <column id="640">
-                <property name="width">0.7708333333333334in</property>
+                <property name="width">1.1145833333333333in</property>
             </column>
             <column id="641">
-                <property name="width">0.8645833333333334in</property>
+                <property name="width">1.1458333333333333in</property>
             </column>
             <header>
                 <row id="579">
@@ -1325,6 +1325,7 @@ dataSetRow["CREDIT"] }</expression>
                         <property name="textAlign">right</property>
                         <property name="verticalAlign">middle</property>
                         <label id="583">
+                            <property name="textAlign">right</property>
                             <text-property name="text">Debit</text-property>
                         </label>
                     </cell>
@@ -1480,10 +1481,10 @@ dataSetRow["CREDIT"] }</expression>
                 <property name="width">2.0104166666666665in</property>
             </column>
             <column id="667">
-                <property name="width">2.34375in</property>
+                <property name="width">1.7708333333333333in</property>
             </column>
             <column id="668">
-                <property name="width">1.6979166666666667in</property>
+                <property name="width">2.2708333333333335in</property>
             </column>
             <row id="669">
                 <property name="height">0.8958333333333334in</property>
@@ -1529,12 +1530,12 @@ dataSetRow["CREDIT"] }</expression>
                 <cell id="673">
                     <grid id="674">
                         <property name="height">0.4166666666666667in</property>
-                        <property name="width">1.65625in</property>
+                        <property name="width">2.1979166666666665in</property>
                         <column id="675">
-                            <property name="width">0.8645833333333334in</property>
+                            <property name="width">1.1354166666666667in</property>
                         </column>
                         <column id="676">
-                            <property name="width">0.7916666666666666in</property>
+                            <property name="width">1.0625in</property>
                         </column>
                         <row id="677">
                             <property name="height">0.4166666666666667in</property>
@@ -1544,8 +1545,8 @@ dataSetRow["CREDIT"] }</expression>
                                     <property name="style">double</property>
                                     <property name="fontSize">7.5pt</property>
                                     <property name="marginBottom">10pt</property>
-                                    <property name="marginRight">5pt</property>
-                                    <property name="paddingLeft">4pt</property>
+                                    <property name="marginRight">0pt</property>
+                                    <property name="paddingLeft">1pt</property>
                                     <property name="paddingBottom">4pt</property>
                                     <structure name="numberFormat">
                                         <property name="category">Currency</property>
@@ -1569,12 +1570,12 @@ dataSetRow["CREDIT"] }</expression>
                                 <data id="680">
                                     <property name="style">double</property>
                                     <property name="fontSize">7.5pt</property>
-                                    <property name="marginLeft">5pt</property>
+                                    <property name="marginLeft">0pt</property>
                                     <property name="marginBottom">10pt</property>
                                     <property name="marginRight">0pt</property>
-                                    <property name="paddingLeft">4pt</property>
+                                    <property name="paddingLeft">1pt</property>
                                     <property name="paddingBottom">4pt</property>
-                                    <property name="paddingRight">2pt</property>
+                                    <property name="paddingRight">1pt</property>
                                     <structure name="numberFormat">
                                         <property name="category">Currency</property>
                                         <property name="pattern">#,##0.00;(#,##0.00){RoundingMode=HALF_UP}</property>

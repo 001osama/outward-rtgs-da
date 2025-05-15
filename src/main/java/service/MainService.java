@@ -361,7 +361,7 @@ public class MainService {
     }
     public List<ListDto> getReasonList() {
         List<ListDto> optionList = new ArrayList<>();
-        String sql = "SELECT REASON_CD as value, REASON_DESC|| ' - ' || LPAD(REASON_CD,4,0) as label FROM REASON_TL";
+        String sql = "SELECT REASON_CD as VALUE, REASON_DESC|| ' - ' || LPAD(REASON_CD,4,0) as label FROM REASON_TL  ORDER BY VALUE";
 
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -955,7 +955,7 @@ public class MainService {
         sql.append("LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD, TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, RT.TRANSFER_TYPE, ");
         sql.append("LPAD(AT.BRANCH_CD, 4, '0') || '-' || LPAD(AT.ACCOUNT_TYPE_CD, 4, '0') || '-' || LPAD(AT.CUSTOMER_NO, 6, '0') || '-' || LPAD(AT.RUN_NO, 2, '0') || '-' || AT.CHECK_DIGIT || '-' || AT.ACCOUNT_TITLE AS ACCOUNT_INFO, ");
         sql.append("RBT.ADDRESS AS BENEFICIARY_ADDRESS, RBT.IS_BENEF_TITLE_FETCH, BT.BANK_NAME, RT.VOUCHER_NO || '/' || RT.VOUCHER_YEAR AS VOUCHER_NO, ");
-        sql.append("RT.TOTAL_AMOUNT, STTT.SBP_TRANSACTION_TYPE, RBT.ACCOUNT_NO || '/' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO ");
+        sql.append("RT.TOTAL_AMOUNT, STTT.SBP_TRANSACTION_TYPE, RBT.ACC_OR_IBAN || '/' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO ");
         sql.append("FROM RTGS_BENEFICIARY_TL AS RBT LEFT JOIN RTGS_TL AS RT ON RBT.VOUCHER_NO = RT.VOUCHER_NO ");
         sql.append("LEFT JOIN SBP_TRANSACTION_TYPE_TL AS STTT ON STTT.SBP_TRANSACTION_TYPE_CD = RT.SBP_TRANSACTION_TYPE_CD ");
         sql.append("LEFT JOIN ACCOUNT_TL AS AT ON AT.BRANCH_CD = RT.BRANCH_CD AND AT.ACCOUNT_TYPE_CD = RT.ACCOUNT_TYPE_CD ");
@@ -1206,9 +1206,8 @@ public class MainService {
             newReferenceNo = incrementReferenceNo(newReferenceNo);
             StringBuilder sb4 = new StringBuilder();
             sb4.append("INSERT INTO TRANSACTION_TL (BRANCH_CD, VOUCHER_NO, VOUCHER_YEAR, REFERENCE_NO,");
-            sb4.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2,");
-            sb4.append(
-                    "GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
+            sb4.append("ACCOUNT_TYPE_CD, TRAN_CODE, MAIN_HD, SUB_HD_1, SUB_HD_2, ");
+            sb4.append("GL_RUN_NO, GL_CHECK_DIGIT, AMOUNT, ACCOUNT_IDENTITY, IDENTITY, TRANSACTION_DATE, TRANSACTION_TIME, STATUS)");
             sb4.append("VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb4.toString())) {
