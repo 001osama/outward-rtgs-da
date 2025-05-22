@@ -967,7 +967,8 @@ public class MainService {
         sql.append("LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD, TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, CASE WHEN RT.TRANSFER_TYPE = 103 THEN RT.TRANSFER_TYPE || ' (Single)' ELSE RT.TRANSFER_TYPE || ' (Multiple)' END AS TRANSFER_TYPE, ");
         sql.append("LPAD(AT.BRANCH_CD, 4, '0') || '-' || LPAD(AT.ACCOUNT_TYPE_CD, 4, '0') || '-' || LPAD(AT.CUSTOMER_NO, 6, '0') || '-' || LPAD(AT.RUN_NO, 2, '0') || '-' || AT.CHECK_DIGIT || '/' || AT.ACCOUNT_TITLE AS ACCOUNT_INFO, ");
         sql.append("RBT.ADDRESS AS BENEFICIARY_ADDRESS, RBT.IS_BENEF_TITLE_FETCH, BT.BANK_NAME, RT.VOUCHER_NO || '/' || RT.VOUCHER_YEAR AS VOUCHER_NO, ");
-        sql.append("VARCHAR_FORMAT(RT.TOTAL_AMOUNT, '999,999,999,999,999,999.00') as TOTAL_AMOUNT, STTT.SBP_TRANSACTION_TYPE, RBT.ACC_OR_IBAN || '/' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO ");
+        sql.append("VARCHAR_FORMAT(RT.TOTAL_AMOUNT, '999,999,999,999,999,999.00') as TOTAL_AMOUNT, STTT.SBP_TRANSACTION_TYPE, RBT.ACC_OR_IBAN || '/' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO, ");
+        sql.append("CASE RT.STATUS WHEN 'U' THEN 'Unauthorize' WHEN 'A' THEN 'Authorized' ELSE 'Cancelled' END AS STATUS ");
         sql.append("FROM RTGS_BENEFICIARY_TL AS RBT LEFT JOIN RTGS_TL AS RT ON RBT.VOUCHER_NO = RT.VOUCHER_NO ");
         sql.append("LEFT JOIN SBP_TRANSACTION_TYPE_TL AS STTT ON STTT.SBP_TRANSACTION_TYPE_CD = RT.SBP_TRANSACTION_TYPE_CD ");
         sql.append("LEFT JOIN ACCOUNT_TL AS AT ON AT.BRANCH_CD = RT.BRANCH_CD AND AT.ACCOUNT_TYPE_CD = RT.ACCOUNT_TYPE_CD ");
@@ -1057,7 +1058,8 @@ public class MainService {
                         resultSet.getString("VOUCHER_NO"),
                         resultSet.getString("TOTAL_AMOUNT"),
                         resultSet.getString("SBP_TRANSACTION_TYPE"),
-                        resultSet.getString("BENEF_ACCOUNT_INFO")
+                        resultSet.getString("BENEF_ACCOUNT_INFO"),
+                        resultSet.getString("STATUS")
                         )
                     );
             }

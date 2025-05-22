@@ -22,4 +22,5 @@ public class RTGSReportDto {
     String totalAmount;
     String sbpTransactionType;
     String beneficiaryAccountInfo;
+    String status;
 }
