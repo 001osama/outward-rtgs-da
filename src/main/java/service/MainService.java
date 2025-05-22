@@ -739,7 +739,7 @@ public class MainService {
             try (PreparedStatement preparedStatement = connection.prepareStatement(sb10.toString())) {
                 preparedStatement.setString(1, rtgsForm.getTotalAmount());
                 preparedStatement.setString(2, "M");
-                preparedStatement.setString(3, "1001");
+                preparedStatement.setString(3, "786");
                 preparedStatement.setString(4, "230");
                 preparedStatement.setString(5, "01");
                 preparedStatement.setString(6, "01");
