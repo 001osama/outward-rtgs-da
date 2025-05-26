@@ -55,14 +55,14 @@ public class MainResource {
         {
             var isUserExist = mainService.isUserExist(user.getLoginId());
             if(isUserExist)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Login Id already exists",false))
                 .build();
 
             var result = mainService.createUser(user);
 
             if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Invalid Data",false))
                 .build();
 
@@ -71,7 +71,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error creating user", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Internal Server Error Occured",false))
                 .build();
         }
@@ -87,7 +87,7 @@ public class MainResource {
             var result = mainService.getUser(loginRequest);
 
             if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null,"Invalid credentials",false))
                     .build();
 
@@ -96,7 +96,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error creating user", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Internal Server Error Occured",false))
                 .build();
         }
@@ -111,7 +111,7 @@ public class MainResource {
         {
             var result = mainService.getBranchList();
             if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Invalid Data",false))
                 .build();
 
@@ -121,7 +121,7 @@ public class MainResource {
         catch(Exception ex)
         {
             logger.error("Error fetching branch details", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Failed to retrieve branch details",false))
                 .build();
         }
@@ -137,7 +137,7 @@ public class MainResource {
         {
             var result = mainService.getCurrencyList();
             if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Invalid Data",false))
                 .build();
 
@@ -147,7 +147,7 @@ public class MainResource {
         catch(Exception ex)
         {
             logger.error("Error fetching currency", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Failed to retrieve currency",false))
                 .build(); 
             
@@ -163,7 +163,7 @@ public class MainResource {
         {
             var result = mainService.getSBPTranTypeList();
             if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Invalid Data",false))
                 .build();
 
@@ -173,7 +173,7 @@ public class MainResource {
         catch(Exception ex)
         {
             logger.error("Error fetching transaction type", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
                 .build();
             
@@ -190,7 +190,7 @@ public class MainResource {
         {
             var accountNolist = mainService.getCustomerAccountNos(customerNo);
             if(accountNolist.size() == 0)
-                return Response.status(Response.Status.NOT_FOUND)
+                return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null,"Account not found",false))
                     .build();
 
@@ -201,7 +201,7 @@ public class MainResource {
         catch(Exception ex)
         {
             logger.error("Error fetching Accounts", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Internal Server Error Occured",false))
                 .build();
         }
@@ -220,7 +220,7 @@ public class MainResource {
         {
             var accountDetails = mainService.getAccountDetails(accoutNumberDto);
             if(accountDetails == null)
-                return Response.status(Response.Status.NOT_FOUND)
+                return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null,"Account not found",false))
                     .build();
             
@@ -230,7 +230,7 @@ public class MainResource {
         catch(Exception ex)
         {
             logger.error("Error fetching Accounts", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Internal Server Error Occured",false))
                 .build();
         }
@@ -246,7 +246,7 @@ public class MainResource {
         {
             var result = mainService.getPurposeofPaymentList();
             if(result == null)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Invalid Data",false))
                 .build();
 
@@ -256,7 +256,7 @@ public class MainResource {
         catch(Exception ex)
         {
             logger.error("Error in retrieving purpose of payment", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null,"Failed to retrieve transaction type",false))
                 .build();
             
@@ -266,13 +266,13 @@ public class MainResource {
 
     @GET
     @Path("/getbeneficiarybanklist")
-    public Response getBeneficiaryBankList(@QueryParam("search") String search) 
+    public Response getBeneficiaryBankList(@QueryParam("searchTerm") String searchTerm) 
     {
-        logger.info("message : =====> getBeneficiaryBankList method hit with search term: {}" + search);
+        logger.info("message : =====> getBeneficiaryBankList method hit with search term: {}" + searchTerm);
         try {
-        var result = mainService.getBeneficiaryBankList(search);
+        var result = mainService.getBeneficiaryBankList(searchTerm);
         if (result == null) {
-            return Response.status(Response.Status.BAD_REQUEST)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Invalid Data", false))
                     .build();
         }
@@ -280,7 +280,7 @@ public class MainResource {
                 .build();
         } catch (Exception ex) {
             logger.error("Error in retrieving beneficiary bank list", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Failed to retrieve beneficiary bank list", false))
                     .build();
         }
@@ -303,7 +303,7 @@ public class MainResource {
                 result = mainService.getBeneficiaryAccountDetails(accOrIban, bankCode);
 
             if (result == null) 
-                return Response.status(Response.Status.NOT_FOUND)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Beneficiary Account not found", false))
                         .build();
 
@@ -312,7 +312,7 @@ public class MainResource {
                     .build();
         } catch (Exception ex) {
             logger.error("Error fetching Account details", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error Occurred", false))
                     .build();
         }
@@ -330,7 +330,7 @@ public class MainResource {
         try {
             var result = mainService.getExceptionList(activityCode);
             if (result == null) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Invalid Data", false))
                     .build();
             }
@@ -338,7 +338,7 @@ public class MainResource {
                 .build();
         } catch (Exception ex) {
             logger.error("Error in retrieving beneficiary bank list", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null, "Failed to retrieve beneficiary bank list", false))
                 .build();
         }
@@ -352,7 +352,7 @@ public class MainResource {
         try {
             var result = mainService.getReasonList();
             if (result == null) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Invalid Data", false))
                     .build();
             }
@@ -360,7 +360,7 @@ public class MainResource {
                 .build();
         } catch (Exception ex) {
             logger.error("Error in retrieving reason code list", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null, "Failed to retrieve reason code list", false))
                 .build();
         }
@@ -376,7 +376,7 @@ public class MainResource {
             var rtgsList = mainService.getUnauthorizedOutwardRTGSList();
 
             if (rtgsList == null || rtgsList.size() == 0) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "No Voucher exist for authorization", false))
                         .build();
             }
@@ -388,7 +388,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
                     .build();
         }
@@ -407,7 +407,7 @@ public class MainResource {
             boolean isVoucherExist = mainService.isCancelVoucherExist(voucherNo, voucherYear);
 
             if (!isVoucherExist) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Voucher not found for cancellation", false))
                         .build();
             }
@@ -419,7 +419,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
                     .build();
         }
@@ -433,7 +433,7 @@ public class MainResource {
 
             var isUserExist = mainService.isUserExist(authUserDto.getLoginId());
             if (!isUserExist) 
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid User Id", false))
                         .build();
             
@@ -441,12 +441,12 @@ public class MainResource {
             var roleId = mainService.getUserRole(authUserDto);
 
             if (roleId == null) 
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid Password", false))
                         .build();
 
             if (roleId != 1)
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                             .entity(new ApiResponse(null, "You are not allowed to perform this transaction", false))
                             .build();
             
@@ -458,7 +458,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
                     .build();
         }
@@ -474,7 +474,7 @@ public class MainResource {
             var createdLaxList = mainService.createOutwardRtgs(rtgsForm);
 
             if (createdLaxList == null || createdLaxList.getVoucherLaxList().size() == 0) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid RTGS Form Data", false))
                         .build();
             }
@@ -486,7 +486,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error", false))
                     .build();
         }
@@ -504,14 +504,14 @@ public class MainResource {
 
             if (voucherNo == null || voucherNo.isEmpty() || voucherNo.isBlank()
             || voucherYear == null || voucherYear.isEmpty() || voucherYear.isBlank()) 
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid Request Data", false))
                         .build();
             
             var outwardRTGS = mainService.getOutwardRTGS(voucherNo, voucherYear);
 
             if (outwardRTGS == null) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid RTGS Form Data", false))
                         .build();
             }
@@ -523,7 +523,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error submitting RTGS form", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error Occurred while submitting RTGS form", false))
                     .build();
         }
@@ -539,7 +539,7 @@ public class MainResource {
                 voucherDto.getVoucherNo().trim().isEmpty() || 
                 voucherDto.getVoucherYear() == null || 
                 voucherDto.getVoucherYear().trim().isEmpty() ) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Voucher number is required for cancellation.", false))
                         .build();
             }
@@ -557,14 +557,14 @@ public class MainResource {
             } 
 
 
-            return Response.status(Response.Status.NOT_FOUND)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Voucher not found", false))
                     .build();
         
         } 
         catch (Exception ex) {
             logger.error("Error cancelling RTGS transaction for voucherNo: {} and year: {}", ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Error occurred while cancelling voucher.", false))
                     .build();
         }
@@ -579,7 +579,7 @@ public class MainResource {
             if (voucherInfo.getVoucherNo() == null || voucherInfo.getVoucherNo().isEmpty()
             || voucherInfo.getVoucherYear() == null || voucherInfo.getVoucherYear().isEmpty()
             || voucherInfo.getLoginId() == null || voucherInfo.getLoginId().isEmpty()) {
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Voucher number is required for authorization.", false))
                         .build();
             }
@@ -597,7 +597,7 @@ public class MainResource {
         } 
         catch (Exception ex) {
             logger.error("Error authorizing RTGS transaction for voucher "+ voucherInfo.toString(), ex);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null, "Internal Server Error occurred while authorizing RTGS transaction.", false))
                     .build();
         }
@@ -615,10 +615,9 @@ public class MainResource {
             try {
                 if (chequeNo == null || chequeNo.trim().isEmpty() || 
                     accountNo == null || accountNo.trim().isEmpty()) 
-                    return Response.status(Response.Status.BAD_REQUEST)
+                    return Response.status(Response.Status.OK)
                             .entity(new ApiResponse(null, "Cheque Number is required.", false))
                             .build();
-
 
                 var detailsArray = accountNo.split("-");
                 var accountNumberDto = new AccountNumberDto(detailsArray[0], detailsArray[1], detailsArray[2], detailsArray[3], detailsArray[4]);
@@ -626,19 +625,19 @@ public class MainResource {
                 String chequeStatus = mainService.getChequeStatus(accountNumberDto, chequeNo);
                 
                 if(chequeStatus == null)
-                    return Response.status(Response.Status.NOT_FOUND)
+                    return Response.status(Response.Status.OK)
                             .entity(new ApiResponse(null, "Cheque No " + chequeNo + " does not exist", false))
                             .build();
 
                 else if(chequeStatus.equals("C"))
                 {
-                    return Response.status(Response.Status.BAD_REQUEST)
+                    return Response.status(Response.Status.OK)
                             .entity(new ApiResponse(null, "Cheque "+ chequeNo +" has cancelled", false))
                             .build();
                 }
                 else if(chequeStatus.equals("P"))
                 {
-                    return Response.status(Response.Status.BAD_REQUEST)
+                    return Response.status(Response.Status.OK)
                             .entity(new ApiResponse(null, "Cheque " + chequeNo + " is already Paid", false))
                             .build();
                 }
@@ -650,7 +649,7 @@ public class MainResource {
             } 
             catch (Exception ex) {
                 logger.error("Error authorizing RTGS transaction for chequeNo: { "+ chequeNo +" }", ex);
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Internal Server Error occurred while validating cheque.", false))
                         .build();
             }
@@ -701,7 +700,7 @@ public class MainResource {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null, "Failed to create report", false))
                 .build();
         }
@@ -771,7 +770,7 @@ public class MainResource {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null, "Failed to create report", false))
                 .build();
         }
@@ -786,7 +785,7 @@ public class MainResource {
         try {
             if(voucherInfo.getVoucherNo() == null || voucherInfo.getVoucherNo().trim().isEmpty() ||
                 voucherInfo.getVoucherYear() == null || voucherInfo.getVoucherYear().trim().isEmpty())
-                return Response.status(Response.Status.BAD_REQUEST)
+                return Response.status(Response.Status.OK)
                             .entity(new ApiResponse(null, "Voucher No and Voucher Year is required.", false))
                             .build();
 
@@ -800,7 +799,7 @@ public class MainResource {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.OK)
                 .entity(new ApiResponse(null, "Failed to create report", false))
                 .build();
         }
@@ -821,7 +820,7 @@ public class MainResource {
 
     //     } catch (Exception e) {
     //         e.printStackTrace();
-    //         return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+    //         return Response.status(Response.Status.OK)
     //             .entity(new ApiResponse(null, "Failed to create report", false))
     //             .build();
     //     }
