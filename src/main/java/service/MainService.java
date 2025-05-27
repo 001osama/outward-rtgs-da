@@ -177,7 +177,7 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
-                        "SELECT currency_cd as value, currency_type || ' - ' || currency_cd as label FROM CURRENCY_TL")) {
+                        "SELECT currency_cd as value, currency_type || ' - ' || currency_cd as label FROM CURRENCY_TL ")) {
 
             while (resultSet.next()) {
                 optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
@@ -547,7 +547,7 @@ public class MainService {
         sb.append("SELECT CT.ALPHA_CD || '-' || CT.CURRENCY_CD AS CURRENCY, VARCHAR_FORMAT(TOTAL_AMOUNT, '999,999,999,999,999,999.00') AS TOTAL_AMOUNT, POSTED_BY, ");
         sb.append("VARCHAR_FORMAT(POSTED_DATE, 'DD/MM/YYYY') AS POSTED_DATE, VOUCHER_NO || '/' || VOUCHER_YEAR AS VOUCHER_NO, ");
         sb.append("'OUTBR' AS EXP_CODE FROM RTGS_TL AS RT LEFT JOIN CURRENCY_TL AS CT ON RT.CURRENCY_CD = CT.CURRENCY_CD ");
-        sb.append("WHERE STATUS = ? ORDER BY POSTED_DATE DESC");
+        sb.append("WHERE STATUS = ? ORDER BY POSTED_DATE DESC, VOUCHER_NO DESC");
         
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
@@ -678,25 +678,25 @@ public class MainService {
                 }
             }
 
-            StringBuilder sb3 = new StringBuilder();
-            sb3.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL - ? ");
-            sb3.append("WHERE BRANCH_CD = ? AND ACCOUNT_TYPE_CD = ? ");
-            sb3.append("AND CUSTOMER_NO = ? AND RUN_NO = ? AND CHECK_DIGIT = ?");
+            // StringBuilder sb3 = new StringBuilder();
+            // sb3.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL - ? ");
+            // sb3.append("WHERE BRANCH_CD = ? AND ACCOUNT_TYPE_CD = ? ");
+            // sb3.append("AND CUSTOMER_NO = ? AND RUN_NO = ? AND CHECK_DIGIT = ?");
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
-                preparedStatement.setString(1, rtgsForm.getTotalAmount());
-                preparedStatement.setString(2, accoutNumberDto.getBranchCode());
-                preparedStatement.setString(3, accoutNumberDto.getAccountType());
-                preparedStatement.setString(4, accoutNumberDto.getCustomerNo());
-                preparedStatement.setString(5, accoutNumberDto.getRunNo());
-                preparedStatement.setString(6, accoutNumberDto.getCheckDigit());
+            // try (PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
+            //     preparedStatement.setString(1, rtgsForm.getTotalAmount());
+            //     preparedStatement.setString(2, accoutNumberDto.getBranchCode());
+            //     preparedStatement.setString(3, accoutNumberDto.getAccountType());
+            //     preparedStatement.setString(4, accoutNumberDto.getCustomerNo());
+            //     preparedStatement.setString(5, accoutNumberDto.getRunNo());
+            //     preparedStatement.setString(6, accoutNumberDto.getCheckDigit());
 
-                int affectedRows = preparedStatement.executeUpdate();
-                logger.info("Affected No of rows is: " + affectedRows);
-            } catch (SQLException ex) {
-                DatabaseErrorHandler.log((SQLException) ex);
-                throw ex;
-            }
+            //     int affectedRows = preparedStatement.executeUpdate();
+            //     logger.info("Affected No of rows is: " + affectedRows);
+            // } catch (SQLException ex) {
+            //     DatabaseErrorHandler.log((SQLException) ex);
+            //     throw ex;
+            // }
 
             BigDecimal chequeStartNo = BigDecimal.ZERO;
             String sqlQuery = "SELECT START_NO FROM CHEQUEBOOK_TL WHERE ? BETWEEN START_NO AND (START_NO+9)";
@@ -730,28 +730,28 @@ public class MainService {
             }
 
 
-            StringBuilder sb10 = new StringBuilder();
-            sb10.append("UPDATE GL_ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL + ? ");
-            sb10.append("WHERE IDENTITY = ? AND BRANCH_CD = ? ");
-            sb10.append("AND MAIN_HD = ? AND SUB_HD_1 = ? AND SUB_HD_2 = ?");
-            sb10.append("AND GL_RUN_NO = ? AND GL_CHECK_DIGIT = ? ");
+            // StringBuilder sb10 = new StringBuilder();
+            // sb10.append("UPDATE GL_ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL + ? ");
+            // sb10.append("WHERE IDENTITY = ? AND BRANCH_CD = ? ");
+            // sb10.append("AND MAIN_HD = ? AND SUB_HD_1 = ? AND SUB_HD_2 = ?");
+            // sb10.append("AND GL_RUN_NO = ? AND GL_CHECK_DIGIT = ? ");
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb10.toString())) {
-                preparedStatement.setString(1, rtgsForm.getTotalAmount());
-                preparedStatement.setString(2, "M");
-                preparedStatement.setString(3, "786");
-                preparedStatement.setString(4, "230");
-                preparedStatement.setString(5, "01");
-                preparedStatement.setString(6, "01");
-                preparedStatement.setString(7, "0586");
-                preparedStatement.setString(8, "02");
+            // try (PreparedStatement preparedStatement = connection.prepareStatement(sb10.toString())) {
+            //     preparedStatement.setString(1, rtgsForm.getTotalAmount());
+            //     preparedStatement.setString(2, "M");
+            //     preparedStatement.setString(3, "786");
+            //     preparedStatement.setString(4, "230");
+            //     preparedStatement.setString(5, "01");
+            //     preparedStatement.setString(6, "01");
+            //     preparedStatement.setString(7, "0586");
+            //     preparedStatement.setString(8, "02");
 
-                int affectedRows = preparedStatement.executeUpdate();
-                logger.info("Affected No of rows is: " + affectedRows);
-            } catch (SQLException ex) {
-                DatabaseErrorHandler.log((SQLException) ex);
-                throw ex;
-            }
+            //     int affectedRows = preparedStatement.executeUpdate();
+            //     logger.info("Affected No of rows is: " + affectedRows);
+            // } catch (SQLException ex) {
+            //     DatabaseErrorHandler.log((SQLException) ex);
+            //     throw ex;
+            // }
 
             var newReferenceNo = generateRefNo();
             StringBuilder sb5 = new StringBuilder();
@@ -836,7 +836,7 @@ public class MainService {
 
 
             sb7.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN AC.account_title ELSE GL.account_title END AS ACCOUNT_TITLE, ");
-            sb7.append("'PKR' AS CURRENCY_CODE FROM TRANSACTION_TL T ");
+            sb7.append("CT.ALPHA_CD AS CURRENCY_CODE FROM TRANSACTION_TL T LEFT JOIN CURRENCY_TL CT ON T.CURRENCY_CD = CT.CURRENCY_CD ");
 
 
             sb7.append("LEFT JOIN ACCOUNT_TL AC ON T.branch_cd = AC.branch_cd AND T.account_type_cd = AC.account_type_cd ");
@@ -898,6 +898,74 @@ public class MainService {
         }
     }
 
+    public boolean isBalanceSufficient(String voucherNo, String voucherYear, String loginId) throws Exception
+    {
+        int rowsUpdated = 0;
+        var localDateString = String.valueOf(LocalDate.now());
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String localTimeString = LocalTime.now().format(timeFormatter);
+
+        try (Connection connection = datasource.getConnection()) 
+        {
+            AccountNumberDto accountNo = new AccountNumberDto();
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            BigDecimal availabeBalance = BigDecimal.ZERO;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT BRANCH_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, ");
+            sb.append("TOTAL_AMOUNT FROM RTGS_TL WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
+                preparedStatement.setString(1, voucherNo);
+                preparedStatement.setString(2, voucherYear);
+                preparedStatement.setString(3, "U");
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    accountNo.setBranchCode(resultSet.getString("BRANCH_CD"));
+                    accountNo.setAccountType(resultSet.getString("ACCOUNT_TYPE_CD"));
+                    accountNo.setCustomerNo(resultSet.getString("CUSTOMER_NO"));
+                    accountNo.setRunNo(resultSet.getString("RUN_NO"));
+                    accountNo.setCheckDigit(resultSet.getString("CHECK_DIGIT"));
+                    totalAmount = resultSet.getBigDecimal("TOTAL_AMOUNT");
+                }
+            } catch (SQLException ex) {
+                DatabaseErrorHandler.log((SQLException) ex);
+                throw ex;
+            }
+            
+            StringBuilder sb2 = new StringBuilder();
+            sb2.append("SELECT AVAILABLE_BAL FROM ACCOUNT_TL WHERE BRANCH_CD=?  ");
+            sb2.append("AND ACCOUNT_TYPE_CD=? AND CUSTOMER_NO=? AND RUN_NO=? AND CHECK_DIGIT=? ");
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+                preparedStatement.setString(1, accountNo.getBranchCode());
+                preparedStatement.setString(2, accountNo.getAccountType());
+                preparedStatement.setString(3, accountNo.getCustomerNo());
+                preparedStatement.setString(4, accountNo.getRunNo());
+                preparedStatement.setString(5, accountNo.getCheckDigit());
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    availabeBalance = resultSet.getBigDecimal("AVAILABLE_BAL");
+                }
+            } catch (SQLException ex) {
+                DatabaseErrorHandler.log((SQLException) ex);
+                throw ex;
+            }
+            var resultDummy = availabeBalance.compareTo(totalAmount); 
+            if (availabeBalance.compareTo(totalAmount) >= 0) {
+                return true;
+            }
+
+            
+            return false;
+        } catch (Exception ex) {
+            logger.info("Generic exception occurred", ex);
+            throw ex;
+        }
+    }
+
     public List<VoucherLaxDto> getTransactionLaxList(String voucherNo, String voucherYear) throws Exception {
         StringBuilder sb = new StringBuilder();
             sb.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
@@ -911,7 +979,7 @@ public class MainService {
 
 
             sb.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN AC.account_title ELSE GL.account_title END AS ACCOUNT_TITLE, ");
-            sb.append("'PKR' AS CURRENCY_CODE FROM TRANSACTION_TL T ");
+            sb.append("CT.ALPHA_CD  AS CURRENCY_CODE FROM TRANSACTION_TL T LEFT JOIN CURRENCY_TL CT ON T.CURRENCY_CD = CT.CURRENCY_CD ");
 
 
             sb.append("LEFT JOIN ACCOUNT_TL AC ON T.branch_cd = AC.branch_cd AND T.account_type_cd = AC.account_type_cd ");
@@ -1140,48 +1208,48 @@ public class MainService {
             }
 
             
-            StringBuilder sb2 = new StringBuilder();
-            sb2.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL + ? ");
-            sb2.append("WHERE BRANCH_CD = ? AND ACCOUNT_TYPE_CD = ? ");
-            sb2.append("AND CUSTOMER_NO = ? AND RUN_NO = ? AND CHECK_DIGIT = ?");
+            // StringBuilder sb2 = new StringBuilder();
+            // sb2.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL + ? ");
+            // sb2.append("WHERE BRANCH_CD = ? AND ACCOUNT_TYPE_CD = ? ");
+            // sb2.append("AND CUSTOMER_NO = ? AND RUN_NO = ? AND CHECK_DIGIT = ?");
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
-                preparedStatement.setBigDecimal(1, totalAmount);
-                preparedStatement.setString(2, accountNo.getBranchCode());
-                preparedStatement.setString(3, accountNo.getAccountType());
-                preparedStatement.setString(4, accountNo.getCustomerNo());
-                preparedStatement.setString(5, accountNo.getRunNo());
-                preparedStatement.setString(6, accountNo.getCheckDigit());
+            // try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+            //     preparedStatement.setBigDecimal(1, totalAmount);
+            //     preparedStatement.setString(2, accountNo.getBranchCode());
+            //     preparedStatement.setString(3, accountNo.getAccountType());
+            //     preparedStatement.setString(4, accountNo.getCustomerNo());
+            //     preparedStatement.setString(5, accountNo.getRunNo());
+            //     preparedStatement.setString(6, accountNo.getCheckDigit());
 
-                int affectedRows = preparedStatement.executeUpdate();
-                logger.info("Affected No of rows is: " + affectedRows);
-            } catch (SQLException ex) {
-                DatabaseErrorHandler.log((SQLException) ex);
-                throw ex;
-            }
+            //     int affectedRows = preparedStatement.executeUpdate();
+            //     logger.info("Affected No of rows is: " + affectedRows);
+            // } catch (SQLException ex) {
+            //     DatabaseErrorHandler.log((SQLException) ex);
+            //     throw ex;
+            // }
 
-            StringBuilder sb10 = new StringBuilder();
-            sb10.append("UPDATE GL_ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL - ? ");
-            sb10.append("WHERE IDENTITY = ? AND BRANCH_CD = ? ");
-            sb10.append("AND MAIN_HD = ? AND SUB_HD_1 = ? AND SUB_HD_2 = ?");
-            sb10.append("AND GL_RUN_NO = ? AND GL_CHECK_DIGIT = ? ");
+            // StringBuilder sb10 = new StringBuilder();
+            // sb10.append("UPDATE GL_ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL - ? ");
+            // sb10.append("WHERE IDENTITY = ? AND BRANCH_CD = ? ");
+            // sb10.append("AND MAIN_HD = ? AND SUB_HD_1 = ? AND SUB_HD_2 = ?");
+            // sb10.append("AND GL_RUN_NO = ? AND GL_CHECK_DIGIT = ? ");
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb10.toString())) {
-                preparedStatement.setBigDecimal(1, totalAmount);
-                preparedStatement.setString(2, "M");
-                preparedStatement.setString(3, "0786");
-                preparedStatement.setString(4, "230");
-                preparedStatement.setString(5, "01");
-                preparedStatement.setString(6, "01");
-                preparedStatement.setString(7, "0586");
-                preparedStatement.setString(8, "02");
+            // try (PreparedStatement preparedStatement = connection.prepareStatement(sb10.toString())) {
+            //     preparedStatement.setBigDecimal(1, totalAmount);
+            //     preparedStatement.setString(2, "M");
+            //     preparedStatement.setString(3, "0786");
+            //     preparedStatement.setString(4, "230");
+            //     preparedStatement.setString(5, "01");
+            //     preparedStatement.setString(6, "01");
+            //     preparedStatement.setString(7, "0586");
+            //     preparedStatement.setString(8, "02");
 
-                int affectedRows = preparedStatement.executeUpdate();
-                logger.info("Affected No of rows is: " + affectedRows);
-            } catch (SQLException ex) {
-                DatabaseErrorHandler.log((SQLException) ex);
-                throw ex;
-            }
+            //     int affectedRows = preparedStatement.executeUpdate();
+            //     logger.info("Affected No of rows is: " + affectedRows);
+            // } catch (SQLException ex) {
+            //     DatabaseErrorHandler.log((SQLException) ex);
+            //     throw ex;
+            // }
             
             var localDateString = String.valueOf(LocalDate.now());
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -1312,6 +1380,77 @@ public class MainService {
 
         try (Connection connection = datasource.getConnection()) 
         {
+            AccountNumberDto accountNo = new AccountNumberDto();
+            BigDecimal totalAmount = BigDecimal.ZERO;
+            BigDecimal currencyCode = BigDecimal.ZERO;
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT BRANCH_CD, CURRENCY_CD, ACCOUNT_TYPE_CD, CUSTOMER_NO, RUN_NO, CHECK_DIGIT, ");
+            sb.append("TOTAL_AMOUNT FROM RTGS_TL WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
+                preparedStatement.setString(1, voucherNo);
+                preparedStatement.setString(2, voucherYear);
+                preparedStatement.setString(3, "U");
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    accountNo.setBranchCode(resultSet.getString("BRANCH_CD"));
+                    accountNo.setAccountType(resultSet.getString("ACCOUNT_TYPE_CD"));
+                    accountNo.setCustomerNo(resultSet.getString("CUSTOMER_NO"));
+                    accountNo.setRunNo(resultSet.getString("RUN_NO"));
+                    accountNo.setCheckDigit(resultSet.getString("CHECK_DIGIT"));
+                    totalAmount = resultSet.getBigDecimal("TOTAL_AMOUNT");
+                    currencyCode = resultSet.getBigDecimal("CURRENCY_CD");
+                }
+            } catch (SQLException ex) {
+                DatabaseErrorHandler.log((SQLException) ex);
+                throw ex;
+            }
+
+            StringBuilder sb2 = new StringBuilder();
+            sb2.append("UPDATE ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL - ? ");
+            sb2.append("WHERE BRANCH_CD = ? AND ACCOUNT_TYPE_CD = ? ");
+            sb2.append("AND CUSTOMER_NO = ? AND RUN_NO = ? AND CHECK_DIGIT = ?");
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+                preparedStatement.setBigDecimal(1, totalAmount);
+                preparedStatement.setString(2, accountNo.getBranchCode());
+                preparedStatement.setString(3, accountNo.getAccountType());
+                preparedStatement.setString(4, accountNo.getCustomerNo());
+                preparedStatement.setString(5, accountNo.getRunNo());
+                preparedStatement.setString(6, accountNo.getCheckDigit());
+
+                int affectedRows = preparedStatement.executeUpdate();
+                logger.info("Affected No of rows is: " + affectedRows);
+            } catch (SQLException ex) {
+                DatabaseErrorHandler.log((SQLException) ex);
+                throw ex;
+            }
+
+            StringBuilder sb3 = new StringBuilder();
+            sb3.append("UPDATE GL_ACCOUNT_TL SET AVAILABLE_BAL = AVAILABLE_BAL + ? ");
+            sb3.append("WHERE IDENTITY = ? AND BRANCH_CD = ? ");
+            sb3.append("AND MAIN_HD = ? AND SUB_HD_1 = ? AND SUB_HD_2 = ?");
+            sb3.append("AND GL_RUN_NO = ? AND GL_CHECK_DIGIT = ? ");
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
+                preparedStatement.setBigDecimal(1, totalAmount);
+                preparedStatement.setString(2, "M");
+                preparedStatement.setString(3, "786");
+                preparedStatement.setString(4, "230");
+                preparedStatement.setString(5, "01");
+                preparedStatement.setString(6, "01");
+                preparedStatement.setString(7, "0586");
+                preparedStatement.setString(8, "02");
+
+                int affectedRows = preparedStatement.executeUpdate();
+                logger.info("Affected No of rows is: " + affectedRows);
+            } catch (SQLException ex) {
+                DatabaseErrorHandler.log((SQLException) ex);
+                throw ex;
+            }
+
             String sqlQuery = "UPDATE RTGS_TL SET AUTH_DATE = ?, AUTH_TIME = ?, AUTH_BY = ?, STATUS = ? WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
             try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
                 preparedStatement.setString(1, localDateString);
@@ -1330,8 +1469,9 @@ public class MainService {
                 throw ex;
             }
 
-            String query = "UPDATE TRANSACTION_TL SET STATUS = ?  WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            String sqlQuery2 = "UPDATE TRANSACTION_TL SET STATUS = ?  WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery2)) {
                 preparedStatement.setString(1, "A");
                 preparedStatement.setString(2, voucherNo);
                 preparedStatement.setString(3, voucherYear);
@@ -1345,34 +1485,34 @@ public class MainService {
                 throw ex;
             }
 
-            StringBuilder sb = new StringBuilder();
-            sb.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
-            sb.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999,999,999,999,999,999.00') ELSE '0.00' END AS DEBIT, ");
-            sb.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999,999,999,999,999,999.00') ELSE '0.00' END AS CREDIT, ");
+            StringBuilder sb4 = new StringBuilder();
+            sb4.append("SELECT Voucher_No || '/' || Voucher_year AS VOUCHER_NO, REFERENCE_NO, ");
+            sb4.append("CASE WHEN AMOUNT < 0 THEN VARCHAR_FORMAT(ABS(AMOUNT), '999,999,999,999,999,999.00') ELSE '0.00' END AS DEBIT, ");
+            sb4.append("CASE WHEN AMOUNT > 0 THEN VARCHAR_FORMAT(AMOUNT, '999,999,999,999,999,999.00') ELSE '0.00' END AS CREDIT, ");
 
-            sb.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN LPAD(AC.branch_cd, 4, '0') || '-' || LPAD(AC.account_type_cd, 4, '0') || '-' || ");
-            sb.append("LPAD(AC.customer_no, 6, '0') || '-' || LPAD(AC.run_no, 2, '0') || '-' || AC.check_digit ");
-            sb.append("ELSE GL.IDENTITY || '-' || LPAD(GL.MAIN_HD, 3, '0') || '-' || LPAD(GL.SUB_HD_1, 2, '0') || '-' || ");
-            sb.append("LPAD(GL.SUB_HD_2, 2, '0') || '-' || LPAD(GL.GL_RUN_NO, 4, '0') || '-' || GL.GL_CHECK_DIGIT END AS ACCOUNT_NO,");
-
-
-            sb.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN AC.account_title ELSE GL.account_title END AS ACCOUNT_TITLE, ");
-            sb.append("'PKR' AS CURRENCY_CODE FROM TRANSACTION_TL T ");
+            sb4.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN LPAD(AC.branch_cd, 4, '0') || '-' || LPAD(AC.account_type_cd, 4, '0') || '-' || ");
+            sb4.append("LPAD(AC.customer_no, 6, '0') || '-' || LPAD(AC.run_no, 2, '0') || '-' || AC.check_digit ");
+            sb4.append("ELSE GL.IDENTITY || '-' || LPAD(GL.MAIN_HD, 3, '0') || '-' || LPAD(GL.SUB_HD_1, 2, '0') || '-' || ");
+            sb4.append("LPAD(GL.SUB_HD_2, 2, '0') || '-' || LPAD(GL.GL_RUN_NO, 4, '0') || '-' || GL.GL_CHECK_DIGIT END AS ACCOUNT_NO,");
 
 
-            sb.append("LEFT JOIN ACCOUNT_TL AC ON T.branch_cd = AC.branch_cd AND T.account_type_cd = AC.account_type_cd ");
-            sb.append("AND T.customer_no = AC.customer_no  AND T.run_no = AC.run_no AND T.check_digit = AC.check_digit ");
-            sb.append("AND T.ACCOUNT_IDENTITY = 'C'");
-
-            sb.append("LEFT JOIN GL_ACCOUNT_TL GL ON T.MAIN_HD = GL.MAIN_HD AND T.SUB_HD_1 = GL.SUB_HD_1 AND T.SUB_HD_2 = GL.SUB_HD_2 ");
-            sb.append("AND T.GL_RUN_NO = GL.GL_RUN_NO AND T.GL_CHECK_DIGIT = GL.GL_CHECK_DIGIT AND T.IDENTITY = GL.IDENTITY AND T.OR_BRANCH_CD = GL.BRANCH_CD ");
-            sb.append("AND T.ACCOUNT_IDENTITY = 'G'");
+            sb4.append("CASE WHEN T.ACCOUNT_IDENTITY = 'C' THEN AC.account_title ELSE GL.account_title END AS ACCOUNT_TITLE, ");
+            sb4.append("CT.ALPHA_CD  AS CURRENCY_CODE FROM TRANSACTION_TL T LEFT JOIN CURRENCY_TL CT ON T.CURRENCY_CD  = CT.CURRENCY_CD ");
 
 
-            sb.append("WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?");
+            sb4.append("LEFT JOIN ACCOUNT_TL AC ON T.branch_cd = AC.branch_cd AND T.account_type_cd = AC.account_type_cd ");
+            sb4.append("AND T.customer_no = AC.customer_no  AND T.run_no = AC.run_no AND T.check_digit = AC.check_digit ");
+            sb4.append("AND T.ACCOUNT_IDENTITY = 'C'");
+
+            sb4.append("LEFT JOIN GL_ACCOUNT_TL GL ON T.MAIN_HD = GL.MAIN_HD AND T.SUB_HD_1 = GL.SUB_HD_1 AND T.SUB_HD_2 = GL.SUB_HD_2 ");
+            sb4.append("AND T.GL_RUN_NO = GL.GL_RUN_NO AND T.GL_CHECK_DIGIT = GL.GL_CHECK_DIGIT AND T.IDENTITY = GL.IDENTITY AND T.OR_BRANCH_CD = GL.BRANCH_CD ");
+            sb4.append("AND T.ACCOUNT_IDENTITY = 'G'");
+
+
+            sb4.append("WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ?");
 
             OutwardRTGSReponseDto result = new OutwardRTGSReponseDto();
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sb4.toString())) {
 
                 List<VoucherLaxDto> resultList = new ArrayList<>();
 
@@ -1396,9 +1536,8 @@ public class MainService {
                 throw ex;
             }
 
-            StringBuilder sb2 = new StringBuilder();
-            sb2.append("SELECT ADVISE_NO FROM RTGS_BENEFICIARY_TL WHERE VOUCHER_NO = ? AND VOUCHER_YEAR=?");
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb2.toString())) {
+            String sqlQuery3 = "SELECT ADVISE_NO FROM RTGS_BENEFICIARY_TL WHERE VOUCHER_NO = ? AND VOUCHER_YEAR=?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery3)) {
                 preparedStatement.setString(1, voucherNo);
                 preparedStatement.setString(2, voucherYear);
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -1414,9 +1553,8 @@ public class MainService {
                 throw ex;
             }
 
-            StringBuilder sb3 = new StringBuilder();
-            sb3.append("SELECT TRAN_NO FROM TRANSACTION_TL WHERE VOUCHER_NO=? AND VOUCHER_YEAR=?");
-            try (PreparedStatement preparedStatement = connection.prepareStatement(sb3.toString())) {
+            String sqlQuery4 ="SELECT TRAN_NO FROM TRANSACTION_TL WHERE VOUCHER_NO=? AND VOUCHER_YEAR=?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery4)) {
                 preparedStatement.setString(1, voucherNo);
                 preparedStatement.setString(2, voucherYear);
                 ResultSet resultSet = preparedStatement.executeQuery();

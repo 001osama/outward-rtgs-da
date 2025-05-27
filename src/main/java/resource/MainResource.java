@@ -584,6 +584,12 @@ public class MainResource {
                         .build();
             }
 
+            boolean isBalanceSufficient = mainService.isBalanceSufficient(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
+            if(!isBalanceSufficient)
+                return Response.status(Response.Status.OK)
+                .entity(new ApiResponse(null, "Insufficient funds in customer account", false))
+                .build();
+
             // boolean isPostingUser = mainService.isPostingUser(voucherInfo.getVoucherNo(), voucherInfo.getVoucherYear(), voucherInfo.getLoginId());
             // if(isPostingUser)
             //     return Response.ok(new ApiResponse(null, "Same user cannot authorize", false))

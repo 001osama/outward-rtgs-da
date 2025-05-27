@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 4.19.0.v202502081713</property>
-    <list-property name="propertyBindings">
-        <structure>
-            <property name="name">queryText</property>
-            <property name="id">5</property>
-        </structure>
-        <structure>
-            <property name="name">queryTimeOut</property>
-            <property name="id">5</property>
-        </structure>
-        <structure>
-            <property name="name">rowFetchSize</property>
-            <property name="id">5</property>
-        </structure>
-    </list-property>
     <property name="units">in</property>
     <method name="initialize"><![CDATA[0]]></method>
     <property name="iconFile">/templates/blank_report.gif</property>
@@ -277,12 +263,6 @@
                     <text-property name="heading">ACCOUNT_INFO</text-property>
                 </structure>
                 <structure>
-                    <property name="columnName">BENEFICIARY_ADDRESS</property>
-                    <property name="analysis">dimension</property>
-                    <text-property name="displayName">ADDRESS</text-property>
-                    <text-property name="heading">ADDRESS</text-property>
-                </structure>
-                <structure>
                     <property name="columnName">IS_BENEF_TITLE_FETCH</property>
                     <property name="analysis">measure</property>
                     <text-property name="displayName">IS_BENEF_TITLE_FETCH</text-property>
@@ -307,6 +287,12 @@
                     <text-property name="heading">TOTAL_AMOUNT</text-property>
                 </structure>
                 <structure>
+                    <property name="columnName">STATUS</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">STATUS</text-property>
+                    <text-property name="heading">STATUS</text-property>
+                </structure>
+                <structure>
                     <property name="columnName">SBP_TRANSACTION_TYPE</property>
                     <property name="analysis">dimension</property>
                     <text-property name="displayName">SBP_TRANSACTION_TYPE</text-property>
@@ -329,71 +315,81 @@
                     </structure>
                     <structure>
                         <property name="position">2</property>
+                        <property name="name">ADNO</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
                         <property name="name">BRANCH_CD</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">3</property>
+                        <property name="position">4</property>
                         <property name="name">TRANSACTION_DATE</property>
                         <property name="dataType">date</property>
                     </structure>
                     <structure>
-                        <property name="position">4</property>
+                        <property name="position">5</property>
                         <property name="name">TRANSACTION_TIME</property>
                         <property name="dataType">time</property>
                     </structure>
                     <structure>
-                        <property name="position">5</property>
+                        <property name="position">6</property>
                         <property name="name">TRANSFER_TYPE</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">6</property>
+                        <property name="position">7</property>
                         <property name="name">ACCOUNT_INFO</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">7</property>
+                        <property name="position">8</property>
                         <property name="name">BENEFICIARY_ADDRESS</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">8</property>
+                        <property name="position">9</property>
                         <property name="name">IS_BENEF_TITLE_FETCH</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">9</property>
+                        <property name="position">10</property>
                         <property name="name">BANK_NAME</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">10</property>
+                        <property name="position">11</property>
                         <property name="name">VOUCHER_NO</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
-                        <property name="position">11</property>
+                        <property name="position">12</property>
                         <property name="name">TOTAL_AMOUNT</property>
                         <property name="dataType">decimal</property>
                     </structure>
                     <structure>
-                        <property name="position">12</property>
-                        <property name="name">SBP_TRANSACTION_TYPE</property>
-                        <property name="dataType">string</property>
-                    </structure>
-                    <structure>
                         <property name="position">13</property>
-                        <property name="name">BENEF_ACCOUNT_INFO</property>
+                        <property name="name">STATUS</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">14</property>
+                        <property name="name">SBP_TRANSACTION_TYPE</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">BENEF_ACCOUNT_INFO</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
                         <property name="name">maxDate</property>
                         <property name="dataType">date</property>
                     </structure>
                     <structure>
-                        <property name="position">15</property>
+                        <property name="position">17</property>
                         <property name="name">minDate</property>
                         <property name="dataType">date</property>
                     </structure>
@@ -450,7 +446,7 @@ if(params["checkDigit"].value != null &amp;&amp; params["checkDigit"].value != "
 	this.queryText = this.queryText + " AND AT.CHECK_DIGIT = " + params["checkDigit"]; 
 }
 
-this.queryText =  this.queryText + " ORDER BY TT.TRANSACTION_DATE DESC, TT.TRANSACTION_TIME DESC "; 
+this.queryText =  this.queryText + " ORDER BY TT.TRANSACTION_DATE DESC, TT.TRANSACTION_TIME DESC, RBT.ADVISE_NO DESC "; 
 
 
 importPackage(java.io)
@@ -479,99 +475,99 @@ finally
                     <property name="name">ADVICE_NO</property>
                     <property name="nativeName">ADVICE_NO</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">2</property>
-                    <property name="name">BRANCH_CD</property>
-                    <property name="nativeName">BRANCH_CD</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
+                    <property name="name">ADVISE_NO</property>
+                    <property name="nativeName">ADVISE_NO</property>
+                    <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="position">3</property>
-                    <property name="name">TRANSACTION_DATE</property>
-                    <property name="nativeName">TRANSACTION_DATE</property>
-                    <property name="dataType">date</property>
-                    <property name="nativeDataType">91</property>
+                    <property name="name">BRANCH_CD</property>
+                    <property name="nativeName">BRANCH_CD</property>
+                    <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="position">4</property>
-                    <property name="name">TRANSACTION_TIME</property>
-                    <property name="nativeName">TRANSACTION_TIME</property>
-                    <property name="dataType">time</property>
-                    <property name="nativeDataType">92</property>
+                    <property name="name">TRANSACTION_DATE</property>
+                    <property name="nativeName">TRANSACTION_DATE</property>
+                    <property name="dataType">date</property>
                 </structure>
                 <structure>
                     <property name="position">5</property>
-                    <property name="name">TRANSFER_TYPE</property>
-                    <property name="nativeName">TRANSFER_TYPE</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
+                    <property name="name">TRANSACTION_TIME</property>
+                    <property name="nativeName">TRANSACTION_TIME</property>
+                    <property name="dataType">time</property>
                 </structure>
                 <structure>
                     <property name="position">6</property>
-                    <property name="name">ACCOUNT_INFO</property>
-                    <property name="nativeName">ACCOUNT_INFO</property>
+                    <property name="name">TRANSFER_TYPE</property>
+                    <property name="nativeName">TRANSFER_TYPE</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">7</property>
-                    <property name="name">BENEFICIARY_ADDRESS</property>
-                    <property name="nativeName">ADDRESS</property>
+                    <property name="name">ACCOUNT_INFO</property>
+                    <property name="nativeName">ACCOUNT_INFO</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">8</property>
-                    <property name="name">IS_BENEF_TITLE_FETCH</property>
-                    <property name="nativeName">IS_BENEF_TITLE_FETCH</property>
+                    <property name="name">ADDRESS</property>
+                    <property name="nativeName">ADDRESS</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">9</property>
-                    <property name="name">BANK_NAME</property>
-                    <property name="nativeName">BANK_NAME</property>
+                    <property name="name">IS_BENEF_TITLE_FETCH</property>
+                    <property name="nativeName">IS_BENEF_TITLE_FETCH</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">10</property>
-                    <property name="name">VOUCHER_NO</property>
-                    <property name="nativeName">VOUCHER_NO</property>
+                    <property name="name">BANK_NAME</property>
+                    <property name="nativeName">BANK_NAME</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
                 <structure>
                     <property name="position">11</property>
-                    <property name="name">TOTAL_AMOUNT</property>
-                    <property name="nativeName">TOTAL_AMOUNT</property>
-                    <property name="dataType">decimal</property>
-                    <property name="nativeDataType">3</property>
+                    <property name="name">VOUCHER_NO</property>
+                    <property name="nativeName">VOUCHER_NO</property>
+                    <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="position">12</property>
-                    <property name="name">SBP_TRANSACTION_TYPE</property>
-                    <property name="nativeName">SBP_TRANSACTION_TYPE</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
+                    <property name="name">TOTAL_AMOUNT</property>
+                    <property name="nativeName">TOTAL_AMOUNT</property>
+                    <property name="dataType">decimal</property>
                 </structure>
                 <structure>
                     <property name="position">13</property>
+                    <property name="name">STATUS</property>
+                    <property name="nativeName">STATUS</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">SBP_TRANSACTION_TYPE</property>
+                    <property name="nativeName">SBP_TRANSACTION_TYPE</property>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
                     <property name="name">BENEF_ACCOUNT_INFO</property>
                     <property name="nativeName">BENEF_ACCOUNT_INFO</property>
                     <property name="dataType">string</property>
-                    <property name="nativeDataType">12</property>
                 </structure>
             </list-property>
             <xml-property name="queryText"><![CDATA[SELECT 
 DISTINCT RBT.ADVISE_NO || '/ ' || RBT.ADVISE_YEAR AS ADVICE_NO,
+RBT.ADVISE_NO AS ADNO,
 LPAD(RT.BRANCH_CD, 4, '0') AS BRANCH_CD,
 TT.TRANSACTION_DATE, TT.TRANSACTION_TIME, 
-CASE WHEN RT.TRANSFER_TYPE = 103 THEN RT.TRANSFER_TYPE || '(Single)'
-	ELSE RT.TRANSFER_TYPE || '(Multiple)' END AS TRANSFER_TYPE, 
+CASE WHEN RT.TRANSFER_TYPE = 103 THEN RT.TRANSFER_TYPE || ' (Single)'
+	ELSE RT.TRANSFER_TYPE || ' (Multiple)' END AS TRANSFER_TYPE, 
 		LPAD(AT.BRANCH_CD, 4, '0') || '-' || 
 		LPAD(AT.ACCOUNT_TYPE_CD, 4, '0') || '-' || 
 		LPAD(AT.CUSTOMER_NO, 6, '0') || '-' || 
@@ -586,6 +582,7 @@ CASE WHEN RT.TRANSFER_TYPE = 103 THEN RT.TRANSFER_TYPE || '(Single)'
 		BT.BANK_NAME,
 		RT.VOUCHER_NO || '/ ' || RT.VOUCHER_YEAR AS VOUCHER_NO,
 		RT.TOTAL_AMOUNT ,
+		RT.STATUS,
 		STTT.SBP_TRANSACTION_TYPE,
 		RBT.ACC_OR_IBAN || '/ ' || RBT.ACCOUNT_TITLE AS BENEF_ACCOUNT_INFO
 		
@@ -604,7 +601,7 @@ AND AT.CUSTOMER_NO = RT.CUSTOMER_NO
 AND AT.RUN_NO = RT.RUN_NO 
 AND AT.CHECK_DIGIT = RT.CHECK_DIGIT
 
-INNER JOIN TRANSACTION_TL AS TT 
+LEFT JOIN TRANSACTION_TL AS TT 
 ON RT.VOUCHER_NO = TT.VOUCHER_NO
 LEFT JOIN BANKS_TL AS BT ON RBT.BANK_CD = BT.BANK_CD
 WHERE 1=1 
@@ -830,6 +827,10 @@ WHERE 1=1
             <property name="canShrink">true</property>
             <property name="overflow">auto</property>
         </style>
+        <style name="NewStyle23" id="596">
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+        </style>
     </styles>
     <page-setup>
         <simple-master-page name="Simple MasterPage" id="2">
@@ -855,6 +856,7 @@ WHERE 1=1
                         <cell id="93">
                             <label id="99">
                                 <property name="fontSize">8pt</property>
+                                <property name="fontWeight">bold</property>
                                 <text-property name="text">BANK AL HABIB LIMITED</text-property>
                             </label>
                             <image id="467">
@@ -1062,7 +1064,7 @@ else dataSetRow["maxDate"]</expression>
         <table id="381">
             <property name="marginTop">auto</property>
             <property name="marginBottom">0pt</property>
-            <property name="width">8.072916666666666in</property>
+            <property name="width">8.03125in</property>
             <property name="dataSet">Data Set</property>
             <list-property name="boundDataColumns">
                 <structure>
@@ -1138,41 +1140,77 @@ else dataSetRow["maxDate"]</expression>
                     <expression name="expression" type="javascript">dataSetRow["BENEF_ACCOUNT_INFO"]</expression>
                     <property name="dataType">string</property>
                 </structure>
+                <structure>
+                    <property name="name">STATUS</property>
+                    <text-property name="displayName">STATUS</text-property>
+                    <expression name="expression" type="javascript">if (dataSetRow["STATUS"] == 'U') {
+  "Unauthorized";
+} else if (dataSetRow["STATUS"] == 'A') {
+  "Authorized";
+} else if (dataSetRow["STATUS"] == 'C') {
+  "Cancelled";
+} else {
+  "";
+}</expression>
+                    <property name="dataType">string</property>
+                    <property name="allowExport">true</property>
+                </structure>
+                <structure>
+                    <property name="name">TRANSACTION_TIME</property>
+                    <text-property name="displayName">TRANSACTION_TIME</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["TRANSACTION_TIME"]</expression>
+                    <property name="dataType">time</property>
+                </structure>
+                <structure>
+                    <property name="name">maxDate</property>
+                    <text-property name="displayName">maxDate</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["maxDate"]</expression>
+                    <property name="dataType">date</property>
+                </structure>
+                <structure>
+                    <property name="name">minDate</property>
+                    <text-property name="displayName">minDate</text-property>
+                    <expression name="expression" type="javascript">dataSetRow["minDate"]</expression>
+                    <property name="dataType">date</property>
+                </structure>
             </list-property>
             <structure name="toc"/>
             <column id="445">
-                <property name="width">0.46875in</property>
+                <property name="width">0.4166666666666667in</property>
             </column>
             <column id="446">
-                <property name="width">0.5520833333333334in</property>
+                <property name="width">0.5208333333333334in</property>
             </column>
             <column id="447">
-                <property name="width">0.5625in</property>
+                <property name="width">0.4895833333333333in</property>
             </column>
             <column id="448">
-                <property name="width">0.6666666666666666in</property>
+                <property name="width">0.5208333333333334in</property>
             </column>
             <column id="449">
-                <property name="width">1.1458333333333333in</property>
+                <property name="width">1.0625in</property>
             </column>
             <column id="450">
-                <property name="width">1.1354166666666667in</property>
+                <property name="width">1.3541666666666667in</property>
             </column>
             <column id="451">
-                <property name="width">0.8958333333333334in</property>
+                <property name="width">1.0208333333333333in</property>
             </column>
             <column id="453">
-                <property name="width">0.875in</property>
+                <property name="width">0.5104166666666666in</property>
             </column>
             <column id="454">
-                <property name="width">0.5833333333333334in</property>
+                <property name="width">0.4583333333333333in</property>
+            </column>
+            <column id="612">
+                <property name="width">0.6354166666666666in</property>
             </column>
             <column id="455">
-                <property name="width">1.1875in</property>
+                <property name="width">1.0416666666666667in</property>
             </column>
             <header>
                 <row id="382">
-                    <property name="style">NewStyle19</property>
+                    <property name="style">NewStyle23</property>
                     <property name="fontSize">8pt</property>
                     <property name="fontWeight">bold</property>
                     <property name="height">0.4270833333333333in</property>
@@ -1215,7 +1253,7 @@ else dataSetRow["maxDate"]</expression>
                         <property name="verticalAlign">middle</property>
                         <label id="384">
                             <property name="style">NewStyle17</property>
-                            <property name="fontSize">8pt</property>
+                            <property name="fontSize">7pt</property>
                             <text-property name="text">Advice No/ Year</text-property>
                         </label>
                     </cell>
@@ -1294,7 +1332,22 @@ else dataSetRow["maxDate"]</expression>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="400">
-                            <text-property name="text">Vouch No /Year</text-property>
+                            <text-property name="text">Voucher No /Year</text-property>
+                        </label>
+                    </cell>
+                    <cell id="609">
+                        <property name="fontFamily">"Abyssinica SIL"</property>
+                        <property name="fontSize">7.5pt</property>
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <property name="textAlign">justify</property>
+                        <property name="verticalAlign">middle</property>
+                        <label id="614">
+                            <property name="textAlign">left</property>
+                            <text-property name="text">Status</text-property>
                         </label>
                     </cell>
                     <cell id="403">
@@ -1307,6 +1360,7 @@ else dataSetRow["maxDate"]</expression>
                         <property name="textAlign">left</property>
                         <property name="verticalAlign">middle</property>
                         <label id="402">
+                            <property name="textAlign">center</property>
                             <text-property name="text">Tran Amt</text-property>
                         </label>
                     </cell>
@@ -1318,11 +1372,13 @@ else dataSetRow["maxDate"]</expression>
                     <property name="height">0%</property>
                     <cell id="408">
                         <property name="style">textCenter</property>
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="411">
+                            <property name="fontSize">7pt</property>
                             <property name="marginTop">0pt</property>
                             <property name="marginBottom">0pt</property>
                             <structure name="toc"/>
@@ -1330,10 +1386,11 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="410">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="413">
                             <property name="style">transactionDateStyle</property>
                             <property name="resultSetColumn">TRANSACTION_DATE</property>
@@ -1341,10 +1398,11 @@ else dataSetRow["maxDate"]</expression>
                     </cell>
                     <cell id="412">
                         <property name="fontFamily">serif</property>
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="409">
                             <property name="style">NewStyle20</property>
                             <property name="textAlign">left</property>
@@ -1353,29 +1411,32 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="414">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="415">
                             <property name="resultSetColumn">TRANSFER_TYPE</property>
                         </data>
                     </cell>
                     <cell id="416">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="417">
                             <structure name="toc"/>
                             <property name="resultSetColumn">ACCOUNT_INFO</property>
                         </data>
                     </cell>
                     <cell id="418">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="431">
                             <structure name="stringFormat">
                                 <property name="category">Unformatted</property>
@@ -1385,39 +1446,56 @@ else dataSetRow["maxDate"]</expression>
                         </data>
                     </cell>
                     <cell id="420">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="419">
                             <property name="resultSetColumn">BENEFICIARY_ADDRESS</property>
                         </data>
                     </cell>
                     <cell id="424">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="423">
                             <property name="resultSetColumn">BANK_NAME</property>
                         </data>
                     </cell>
                     <cell id="426">
-                        <property name="fontSize">7.5pt</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="425">
                             <property name="resultSetColumn">VOUCHER_NO</property>
                         </data>
                     </cell>
-                    <cell id="428">
-                        <property name="fontSize">7.5pt</property>
+                    <cell id="610">
+                        <property name="fontFamily">"Abyssinica SIL"</property>
+                        <property name="fontSize">7pt</property>
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
+                        <property name="textAlign">justify</property>
+                        <data id="615">
+                            <property name="textAlign">left</property>
+                            <property name="resultSetColumn">STATUS</property>
+                        </data>
+                    </cell>
+                    <cell id="428">
+                        <property name="fontSize">7pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                        <property name="textAlign">left</property>
                         <data id="427">
                             <property name="style">amountMasking</property>
+                            <property name="textAlign">center</property>
                             <property name="resultSetColumn">TOTAL_AMOUNT</property>
                         </data>
                     </cell>
@@ -1466,6 +1544,11 @@ else dataSetRow["maxDate"]</expression>
                         <property name="paddingRight">3pt</property>
                     </cell>
                     <cell id="442">
+                        <property name="paddingTop">1pt</property>
+                        <property name="paddingLeft">3pt</property>
+                        <property name="paddingRight">3pt</property>
+                    </cell>
+                    <cell id="611">
                         <property name="paddingTop">1pt</property>
                         <property name="paddingLeft">3pt</property>
                         <property name="paddingRight">3pt</property>
