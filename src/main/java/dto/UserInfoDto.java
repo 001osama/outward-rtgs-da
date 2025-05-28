@@ -10,7 +10,7 @@ import lombok.Setter;
 public class UserInfoDto {
     String loginId;
     String branchCode;
-    int role;
+    String role;
     String lastLoggedInDate;
     String currentLoggedInDate;
 }

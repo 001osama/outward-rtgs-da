@@ -1,25 +1,14 @@
 package resource;
-
 import java.util.Base64;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jboss.logging.Logger;
-import dto.AccountNumberDto;
-import dto.ApiResponse;
-import dto.AuthorizeUserDto;
-import dto.BeneficiaryAccountDto;
-import dto.LoginRequestDto;
-import dto.OutwardRTGSFormDto;
-import dto.OutwardRTGSReponseDto;
-import dto.RTGSReportDto;
-import dto.ReportFilterDto;
-import dto.UserDto;
-import dto.VoucherCancelDto;
-import dto.VoucherDto;
-import dto.VoucherInfoDto;
-import dto.VoucherLaxDto;
+import dto.*;
+import service.*;
+import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -29,8 +18,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import service.BirtService;
-import service.MainService;
 
 @Path("/data-access")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -45,6 +32,35 @@ public class MainResource {
 
     @Inject
     BirtService birtService;
+
+    @Inject
+    JwtService jwtService;
+
+    @POST
+    @PermitAll
+    @Path("/login")
+    public Response login(LoginRequestDto loginRequest)
+    {
+        logger.info("message : =====> login method hit with body "+ loginRequest.toString());
+        try 
+        {
+            var result = mainService.getUser(loginRequest);
+
+            if(result == null)
+                return Response.status(Response.Status.OK)
+                    .entity(new ApiResponse(null,"Invalid credentials",false))
+                    .build();
+            var token = jwtService.generateToken(result);
+            return Response.ok(new ApiResponse(token, null, true))
+                .build();
+        } 
+        catch (Exception ex) {
+            logger.error("Error creating user", ex);
+            return Response.status(Response.Status.OK)
+                .entity(new ApiResponse(null,"Internal Server Error Occured",false))
+                .build();
+        }
+    }
 
     @POST
     @Path("/createuser")
@@ -103,6 +119,7 @@ public class MainResource {
     }
 
     @GET
+    @RolesAllowed("user")
     @Path("/getbranchlist")
     public Response getBranchesList() 
     {

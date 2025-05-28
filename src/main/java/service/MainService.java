@@ -47,13 +47,18 @@ public class MainService {
 
     @Inject
     Logger logger;
+    
 
     public UserInfoDto getUser(LoginRequestDto dto) {
         try (Connection connection = datasource.getConnection()) {
-            String sqlQuery = "SELECT LOGIN_ID, ROLE_ID, VARCHAR_FORMAT(LASTLOGGEDIN, 'DD/MM/YYYY') AS LASTLOGGEDIN, VARCHAR_FORMAT(DATE(CURRENT_TIMESTAMP), 'DD/MM/YYYY') AS CURRENTDATE, LPAD(BRANCH_CD, 4, '0') AS BRANCH_CD FROM USER_TL WHERE LOGIN_ID = ? AND BRANCH_CD = ? AND PASSWORD = ? ";
+            StringBuilder sb = new StringBuilder();
+            sb.append("SELECT LOGIN_ID, RT.ROLE_TYPE, VARCHAR_FORMAT(LASTLOGGEDIN, 'DD/MM/YYYY') AS LASTLOGGEDIN, ");
+            sb.append("VARCHAR_FORMAT(DATE(CURRENT_TIMESTAMP), 'DD/MM/YYYY') AS CURRENTDATE, LPAD(BRANCH_CD, 4, '0') AS BRANCH_CD ");
+            sb.append("FROM USER_TL UT LEFT JOIN ROLE_TL RT ON RT.ROLE_ID = UT.ROLE_ID ");
+            sb.append("WHERE LOGIN_ID = ? AND BRANCH_CD = ? AND PASSWORD = ? ");
             try (
                     PreparedStatement preparedStatement = connection
-                            .prepareStatement(sqlQuery)) {
+                            .prepareStatement(sb.toString())) {
 
                 preparedStatement.setString(1, dto.getLoginId());
                 preparedStatement.setString(2, dto.getBranchCode());
@@ -63,7 +68,7 @@ public class MainService {
                         UserInfoDto user = new UserInfoDto(
                                 resultSet.getString("LOGIN_ID"),
                                 resultSet.getString("BRANCH_CD"),
-                                resultSet.getInt("ROLE_ID"),
+                                resultSet.getString("ROLE_TYPE"),
                                 resultSet.getString("LASTLOGGEDIN"),
                                 resultSet.getString("CURRENTDATE"));
 
