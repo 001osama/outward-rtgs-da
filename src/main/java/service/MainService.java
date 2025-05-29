@@ -318,7 +318,7 @@ public class MainService {
         String sql = "SELECT bank_cd as value, bank_name || '-' || cpcd || '-' || LPAD(bank_cd,4,'0') as label FROM BANKS_TL";
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            sql += " WHERE LOWER(bank_name) LIKE LOWER('%' || ? || '%') OR LOWER(bank_cd) LIKE LOWER('%' || ? || '%')";
+            sql += " WHERE LOWER(bank_name) LIKE LOWER('%' || ? || '%') OR LOWER(bank_cd) LIKE LOWER('%' || ? || '%') OR LOWER(cpcd) LIKE LOWER('%' || ? || '%') ";
         }
 
         try (Connection connection = datasource.getConnection();
@@ -327,6 +327,7 @@ public class MainService {
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 preparedStatement.setString(1, searchTerm);
                 preparedStatement.setString(2, searchTerm);
+                preparedStatement.setString(3, searchTerm);
             }
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -550,20 +551,21 @@ public class MainService {
         sb.append("WHERE STATUS = ? ORDER BY POSTED_DATE DESC, VOUCHER_NO DESC");
         
         try (Connection connection = datasource.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
             preparedStatement.setString(1, "U");
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
                 resultList.add(
-                        new RTGSDto(
-                                resultSet.getString("CURRENCY"),
-                                resultSet.getString("TOTAL_AMOUNT"),
-                                resultSet.getString("POSTED_BY"),
-                                resultSet.getString("POSTED_DATE"),
-                                resultSet.getString("VOUCHER_NO"),
-                                resultSet.getString("EXP_CODE")));
+                new RTGSDto(
+                resultSet.getString("CURRENCY"),
+                resultSet.getString("TOTAL_AMOUNT"),
+                resultSet.getString("POSTED_BY"),
+                resultSet.getString("POSTED_DATE"),
+                resultSet.getString("VOUCHER_NO"),
+                resultSet.getString("EXP_CODE"))
+                );
             }
         } catch (SQLException e) {
             logger.error("Unexpected error occurred while getting unauthorized rtgs list", e);

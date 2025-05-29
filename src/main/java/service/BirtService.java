@@ -77,7 +77,7 @@ public class BirtService {
         IReportEngineFactory factory = (IReportEngineFactory) Platform.createFactoryObject(IReportEngineFactory.EXTENSION_REPORT_ENGINE_FACTORY);
         IReportEngine engine = factory.createReportEngine(engineConfig);
 
-        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/rtgs_report.rptdesign");
+        IReportRunnable report = engine.openReportDesign("/home/bahl/Project/outward-rtgs-da/src/main/resources/rtgs_report4.rptdesign");
 
         IRunAndRenderTask task = engine.createRunAndRenderTask(report);
 
