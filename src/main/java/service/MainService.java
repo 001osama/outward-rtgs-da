@@ -315,7 +315,7 @@ public class MainService {
 
     public List<ListDto> getBeneficiaryBankList(String searchTerm) {
         List<ListDto> optionList = new ArrayList<>();
-        String sql = "SELECT bank_cd as value, bank_name || ' - ' || bank_cd as label FROM BANKS_TL";
+        String sql = "SELECT bank_cd as value, bank_name || '-' || cpcd || '-' || LPAD(bank_cd,4,'0') as label FROM BANKS_TL";
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             sql += " WHERE LOWER(bank_name) LIKE LOWER('%' || ? || '%') OR LOWER(bank_cd) LIKE LOWER('%' || ? || '%')";
