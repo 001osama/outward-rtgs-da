@@ -160,7 +160,7 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
-                        "SELECT branch_cd as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
+                        "SELECT LPAD(branch_cd, 4, 0) as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
 
             while (resultSet.next()) {
                 optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
@@ -204,13 +204,14 @@ public class MainService {
         return optionList;
     }
 
-    public List<String> getCustomerAccountNos(String customerNo) {
+    public List<String> getCustomerAccountNos(String customerNo, String branchCode) {
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection
                         // For ibm db2 testing remains
                         .prepareStatement(
-                                "SELECT LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 2, '0') || '-' || check_digit AS account_number FROM account_tl where customer_no = ?")) {
+                                "SELECT LPAD(branch_cd, 4, '0') || '-' || LPAD(account_type_cd, 4, '0') || '-' || LPAD(customer_no, 6, '0') || '-' || LPAD(run_no, 2, '0') || '-' || check_digit AS account_number FROM account_tl where customer_no = ? AND branch_cd = ? ")) {
             preparedStatement.setString(1, customerNo);
+            preparedStatement.setString(2, branchCode);
 
             List<String> result = new ArrayList<String>();
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -383,12 +384,13 @@ public class MainService {
     
 
     public Integer getUserRole(AuthorizeUserDto authUserDto) {
-        String sqlQuery = "SELECT * FROM USER_TL WHERE LOGIN_ID=? AND PASSWORD=?";
+        String sqlQuery = "SELECT * FROM USER_TL WHERE LOGIN_ID=? AND PASSWORD=? AND BRANCH_CD = ?";
 
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
             preparedStatement.setString(1, authUserDto.getLoginId());
             preparedStatement.setString(2, authUserDto.getPassword());
+            preparedStatement.setString(3, authUserDto.getBranchCode());
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -424,20 +426,21 @@ public class MainService {
         return null;
     }
 
-    public OutwardRTGSDto getOutwardRTGS(String VoucherNo, String VoucherYear) throws Exception {
+    public OutwardRTGSDto getOutwardRTGS(String VoucherNo, String VoucherYear, String BranchCode) throws Exception {
         OutwardRTGSDto outwardRTGS = new OutwardRTGSDto();
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT LPAD(BRANCH_CD, 4, '0') || '-' || LPAD(ACCOUNT_TYPE_CD , 4, '0') || '-' ||");
         sb.append("LPAD(CUSTOMER_NO, 6, '0') || '-' || LPAD(RUN_NO, 2, '0') || '-' || ");
-        sb.append("CHECK_DIGIT AS ACCOUNT_NO, BRANCH_CD, CURRENCY_CD, SBP_TRANSACTION_TYPE_CD, TRANSFER_TYPE, ");
+        sb.append("CHECK_DIGIT AS ACCOUNT_NO, LPAD(BRANCH_CD, 4, '0') AS BRANCH_CD, CURRENCY_CD, SBP_TRANSACTION_TYPE_CD, TRANSFER_TYPE, ");
         sb.append("CUSTOMER_NO, TOTAL_AMOUNT, PURPOSE_OF_PAYMENT_CD, CHEQUE_NO, CHEQUE_DATE, SENDER_TO_RECEIVER_INFO, ");
-        sb.append("REMARKS, PAYMENT_MODE, POSTED_BY FROM rtgs_tl WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND STATUS = ?");
+        sb.append("REMARKS, PAYMENT_MODE, POSTED_BY FROM rtgs_tl WHERE VOUCHER_NO = ? AND VOUCHER_YEAR = ? AND BRANCH_CD = ? AND STATUS = ?");
 
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
             preparedStatement.setString(1, VoucherNo);
             preparedStatement.setString(2, VoucherYear);
-            preparedStatement.setString(3, "U");
+            preparedStatement.setString(3, BranchCode);
+            preparedStatement.setString(4, "U");
 
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -521,14 +524,15 @@ public class MainService {
         return outwardRTGS;
     }
 
-    public boolean isCancelVoucherExist(String voucherNo, String voucherYear) {
-        String query = "SELECT * FROM RTGS_TL WHERE VOUCHER_NO=? AND VOUCHER_YEAR=?  AND STATUS = ?";
+    public boolean isCancelVoucherExist(String voucherNo, String voucherYear, String branchCode) {
+        String query = "SELECT * FROM RTGS_TL WHERE VOUCHER_NO=? AND VOUCHER_YEAR=? AND BRANCH_CD = ? AND STATUS = ?";
 
         try (Connection connection = datasource.getConnection();
                 PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, voucherNo);
             preparedStatement.setString(2, voucherYear);
-            preparedStatement.setString(3, "U");
+            preparedStatement.setString(3, branchCode);
+            preparedStatement.setString(4, "U");
 
             ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -542,17 +546,18 @@ public class MainService {
         return false;
     }
 
-    public List<RTGSDto> getUnauthorizedOutwardRTGSList() {
+    public List<RTGSDto> getUnauthorizedOutwardRTGSList(String branchCode) {
         List<RTGSDto> resultList = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT CT.ALPHA_CD || '-' || CT.CURRENCY_CD AS CURRENCY, VARCHAR_FORMAT(TOTAL_AMOUNT, '999,999,999,999,999,999.00') AS TOTAL_AMOUNT, POSTED_BY, ");
         sb.append("VARCHAR_FORMAT(POSTED_DATE, 'DD/MM/YYYY') AS POSTED_DATE, VOUCHER_NO || '/' || VOUCHER_YEAR AS VOUCHER_NO, ");
         sb.append("'OUTBR' AS EXP_CODE FROM RTGS_TL AS RT LEFT JOIN CURRENCY_TL AS CT ON RT.CURRENCY_CD = CT.CURRENCY_CD ");
-        sb.append("WHERE STATUS = ? ORDER BY POSTED_DATE DESC, VOUCHER_NO DESC");
+        sb.append("WHERE BRANCH_CD = ? AND STATUS = ? ORDER BY POSTED_DATE DESC, VOUCHER_NO DESC");
         
         try (Connection connection = datasource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
-            preparedStatement.setString(1, "U");
+            preparedStatement.setString(1, branchCode);
+            preparedStatement.setString(2, "U");
 
             ResultSet resultSet = preparedStatement.executeQuery();
 

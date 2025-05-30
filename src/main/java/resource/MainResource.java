@@ -183,12 +183,12 @@ public class MainResource {
 
     @GET
     @Path("/getcustomeraccountnos")
-    public Response getCustomerAccountNos(@QueryParam("customerNo") String customerNo) 
+    public Response getCustomerAccountNos(@QueryParam("customerNo") String customerNo, @QueryParam("branchCode") String branchCode) 
     {
         logger.info("message : =====> getAccountNo method hit");
         try
         {
-            var accountNolist = mainService.getCustomerAccountNos(customerNo);
+            var accountNolist = mainService.getCustomerAccountNos(customerNo, branchCode);
             if(accountNolist.size() == 0)
                 return Response.status(Response.Status.OK)
                     .entity(new ApiResponse(null,"Account not found",false))
@@ -369,11 +369,11 @@ public class MainResource {
 
     @GET
     @Path("/getunauthorizedoutwardrtgslist")
-    public Response getUnauthorizedOutwardRTGSList() {
+    public Response getUnauthorizedOutwardRTGSList(@QueryParam("branchCode") String branchCode) {
         logger.info("message : =====> getUnauthorizedOutwardRTGSList method hit");
         try {
             
-            var rtgsList = mainService.getUnauthorizedOutwardRTGSList();
+            var rtgsList = mainService.getUnauthorizedOutwardRTGSList(branchCode);
 
             if (rtgsList == null || rtgsList.size() == 0) {
                 return Response.status(Response.Status.OK)
@@ -399,12 +399,13 @@ public class MainResource {
     @Path("/iscancelvoucherexist")
     public Response isCancelVoucherExist(
         @QueryParam("voucherNo") String voucherNo,
-        @QueryParam("voucherYear") String voucherYear
+        @QueryParam("voucherYear") String voucherYear,
+        @QueryParam("branchCode") String branchCode
     ) {
         logger.info("message : =====> isCancelVoucherExist method hit");
         try {
             
-            boolean isVoucherExist = mainService.isCancelVoucherExist(voucherNo, voucherYear);
+            boolean isVoucherExist = mainService.isCancelVoucherExist(voucherNo, voucherYear, branchCode);
 
             if (!isVoucherExist) {
                 return Response.status(Response.Status.OK)
@@ -496,19 +497,21 @@ public class MainResource {
     @Path("/getOutwardRTGS")
     public Response getOutwardRTGS(
         @QueryParam("voucherNo") String voucherNo, 
-        @QueryParam("voucherYear") String voucherYear
+        @QueryParam("voucherYear") String voucherYear,
+        @QueryParam("branchCode") String branchCode
     ) 
     {
         logger.info("message : =====> getOutwardRTGS method hit with voucherInfo " + voucherNo + voucherYear);
         try {
 
             if (voucherNo == null || voucherNo.isEmpty() || voucherNo.isBlank()
-            || voucherYear == null || voucherYear.isEmpty() || voucherYear.isBlank()) 
+            || voucherYear == null || voucherYear.isEmpty() || voucherYear.isBlank()
+            || branchCode == null || branchCode.isEmpty() || branchCode.isBlank()) 
                 return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid Request Data", false))
                         .build();
             
-            var outwardRTGS = mainService.getOutwardRTGS(voucherNo, voucherYear);
+            var outwardRTGS = mainService.getOutwardRTGS(voucherNo, voucherYear, branchCode);
 
             if (outwardRTGS == null) {
                 return Response.status(Response.Status.OK)
