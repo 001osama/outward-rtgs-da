@@ -12,4 +12,5 @@ import lombok.Setter;
 public class AuthorizeUserDto {
     String loginId;
     String password;
+    String branchCode;
 }

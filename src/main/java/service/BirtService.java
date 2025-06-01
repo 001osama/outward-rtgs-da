@@ -85,8 +85,8 @@ public class BirtService {
             task.setParameterValues(params);
         } 
 
-
-        PDFRenderOption options = new PDFRenderOption();
+        EXCELRenderOption options = new EXCELRenderOption();
+        // PDFRenderOption options = new PDFRenderOption();
         options.setOutputFormat("pdf");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         options.setOutputStream(outputStream);
