@@ -465,12 +465,13 @@ public class MainResource {
         try {
 
             if (voucherNo == null || voucherNo.isEmpty() || voucherNo.isBlank()
-            || voucherYear == null || voucherYear.isEmpty() || voucherYear.isBlank()) 
+            || voucherYear == null || voucherYear.isEmpty() || voucherYear.isBlank()
+            || branchCode == null || branchCode.isEmpty() || branchCode.isBlank()) 
                 return Response.status(Response.Status.OK)
                         .entity(new ApiResponse(null, "Invalid Request Data", false))
                         .build();
             
-            var outwardRTGS = mainService.getOutwardRTGS(voucherNo, voucherYear);
+            var outwardRTGS = mainService.getOutwardRTGS(voucherNo, voucherYear, branchCode);
 
             if (outwardRTGS == null) {
                 return Response.status(Response.Status.OK)
