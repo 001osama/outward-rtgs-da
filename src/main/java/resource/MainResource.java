@@ -806,7 +806,7 @@ public class MainResource {
                 headerRow.createCell(6).setCellValue("Beneficiary Address");
                 // headerRow.createCell(7).setCellValue("Benef. Title Fetch Through 1-Link");
                 headerRow.createCell(7).setCellValue("Benef. Bank Name");
-                headerRow.createCell(8).setCellValue("VouchNo/Year");
+                headerRow.createCell(8).setCellValue("Voucher No/Year");
                 headerRow.createCell(9).setCellValue("Tran. Amount");
                 headerRow.createCell(10).setCellValue("Status");
 
