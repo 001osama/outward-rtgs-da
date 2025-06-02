@@ -960,7 +960,6 @@ public class MainService {
                 DatabaseErrorHandler.log((SQLException) ex);
                 throw ex;
             }
-            var resultDummy = availabeBalance.compareTo(totalAmount); 
             if (availabeBalance.compareTo(totalAmount) >= 0) {
                 return true;
             }
@@ -1105,7 +1104,7 @@ public class MainService {
             params.add(accountNumberDto.getCheckDigit());            
         }
 
-        sql.append(" ORDER BY TT.TRANSACTION_DATE, TT.TRANSACTION_TIME ");
+        sql.append(" ORDER BY TT.TRANSACTION_DATE DESC, TT.TRANSACTION_TIME DESC");
 
         List<RTGSReportDto> resultList = new ArrayList<>();
         try (
