@@ -160,7 +160,7 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
-                        "SELECT LPAD(branch_cd, 4, 0) as value, branch_name || ' - ' ||branch_cd as label FROM BRANCH_TL")) {
+                        "SELECT LPAD(branch_cd, 4, 0) as value, branch_name || '-' || LPAD(branch_cd, 4, 0) as label FROM BRANCH_TL")) {
 
             while (resultSet.next()) {
                 optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
@@ -177,7 +177,7 @@ public class MainService {
         try (Connection connection = datasource.getConnection();
                 Statement statement = connection.createStatement();
                 ResultSet resultSet = statement.executeQuery(
-                        "SELECT currency_cd as value, currency_type || ' - ' || currency_cd as label FROM CURRENCY_TL ")) {
+                        "SELECT currency_cd as value, currency_type || '-' || LPAD(currency_cd, 4, 0) as label FROM CURRENCY_TL ")) {
 
             while (resultSet.next()) {
                 optionList.add(new ListDto(resultSet.getString("label"), resultSet.getString("value")));
@@ -552,7 +552,7 @@ public class MainService {
         sb.append("SELECT CT.ALPHA_CD || '-' || CT.CURRENCY_CD AS CURRENCY, VARCHAR_FORMAT(TOTAL_AMOUNT, '999,999,999,999,999,999.00') AS TOTAL_AMOUNT, POSTED_BY, ");
         sb.append("VARCHAR_FORMAT(POSTED_DATE, 'DD/MM/YYYY') AS POSTED_DATE, VOUCHER_NO || '/' || VOUCHER_YEAR AS VOUCHER_NO, ");
         sb.append("'OUTBR' AS EXP_CODE FROM RTGS_TL AS RT LEFT JOIN CURRENCY_TL AS CT ON RT.CURRENCY_CD = CT.CURRENCY_CD ");
-        sb.append("WHERE BRANCH_CD = ? AND STATUS = ? ORDER BY POSTED_DATE DESC, VOUCHER_NO DESC");
+        sb.append("WHERE BRANCH_CD = ? AND STATUS = ? ORDER BY VOUCHER_NO DESC");
         
         try (Connection connection = datasource.getConnection();
             PreparedStatement preparedStatement = connection.prepareStatement(sb.toString())) {
