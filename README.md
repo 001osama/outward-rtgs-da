@@ -1,5 +1,21 @@
 # outward-rtgs-da
 
+docker run -itd --name mydb2 --privileged=true -p 50000:50000 -e LICENSE=accept -e DB2INSTANCE=bahl -e DB2INST1_PASSWORD=bahl -e DBNAME=testdb -v db2bahl:/database ibmcom/db2
+
+
+
+docker exec mydb2 mkdir -p /database/import
+
+docker cp "[backupLocation]\." mydb2:/database/import/
+
+docker exec mydb2 chown -R bahl /database/import
+
+docker exec -it mydb2 su - bahl -c "cd /database/import && db2 connect to testdb && db2move testdb import -io CREATE"
+
+
+
+
+
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
